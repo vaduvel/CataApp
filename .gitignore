@@ -5,5 +5,3 @@ local.properties
 *.apk
 *.keystore
 
-# arhive duplicate ale spec-urilor (extrase deja)
-*.zip
