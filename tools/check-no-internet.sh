@@ -6,6 +6,8 @@
 #
 # Iese cu cod 1 dacă a apărut o permisiune de rețea, fie scrisă de noi în manifest,
 # fie adusă de o bibliotecă și fuzionată în manifestul final.
+# Caută doar declarații reale, adică atributul android:name, nu mențiuni în comentarii
+# sau în documentație.
 
 set -uo pipefail
 
@@ -21,9 +23,8 @@ check_file() {
 	local file="$1"
 	local perm
 	for perm in "${FORBIDDEN[@]}"; do
-		# Caută doar declarații reale de permisiune, nu mențiuni în comentarii.
-		if grep -q "android:name=\"$perm\"" "$file" 2>/dev/null \
-			|| grep -q "android:name='$perm'" "$file" 2>/dev/null; then
+		# Acceptă spații în jurul semnului egal și oricare tip de ghilimele.
+		if grep -Eq "android:name[[:space:]]*=[[:space:]]*[\"']$perm[\"']" "$file" 2>/dev/null; then
 			echo "EȘEC: $perm apare în $file"
 			fail=1
 		fi

@@ -6,7 +6,7 @@ Specificația de implementare (sursa de adevăr): `SPEC.md`. Reguli de lucru pen
 
 ## Reguli de aur
 
-1. **Fără rețea.** Nu se adaugă niciodată `android.permission.INTERNET`. `tools/check-no-internet.sh` sparge build-ul dacă apare.
+1. **Fără rețea.** Aplicația nu cere niciodată permisiuni de rețea. `tools/check-no-internet.sh` sparge build-ul dacă apare vreuna.
 2. **Sumele se țin în cenți** (`Long`). Niciodată `Double`/`Float` pentru bani.
 3. **Aplicația nu emite facturi.** Produce evidența și *textul* care ajunge pe factură. Zero XML, zero SdI, zero TVA.
 4. Interfața e în **română**. Textele generate pentru client/contabil rămân în **italiană**.
@@ -14,18 +14,12 @@ Specificația de implementare (sursa de adevăr): `SPEC.md`. Reguli de lucru pen
 
 ## Cerințe
 
-- JDK 17
+- JDK 17 sau 21 (bytecode-ul produs rămâne 17 în ambele cazuri)
 - Android SDK 35 (`compileSdk` / `targetSdk` 35, `minSdk` 26 = Android 8.0)
 
 ## Build și instalare prin cablu
 
-Prima dată, o singură dată (wrapper-ul Gradle e binar și nu e comis):
-
-```bash
-gradle wrapper --gradle-version 8.9
-```
-
-Apoi:
+Wrapper-ul Gradle 8.9 e comis, deci nu ai nevoie de Gradle instalat separat:
 
 ```bash
 ./gradlew :app:assembleDebug
@@ -37,8 +31,10 @@ Verificări:
 
 ```bash
 ./gradlew :app:testDebugUnitTest      # logica de bani, textul de factură, regulile
-bash tools/check-no-internet.sh       # eșuează dacă a apărut permisiunea INTERNET
+bash tools/check-no-internet.sh       # eșuează dacă a apărut o permisiune de rețea
 ```
+
+Păstrează `~/.android/debug.keystore` într-un loc sigur, în afara repo-ului. Dacă se pierde, aplicația instalată nu mai poate fi actualizată fără dezinstalare, iar dezinstalarea șterge datele.
 
 ## Stadiu
 

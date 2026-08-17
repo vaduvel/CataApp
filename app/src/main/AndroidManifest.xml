@@ -3,8 +3,10 @@
 
 	<!--
 		REGULA DE AUR (SPEC §9): aplicația funcționează 100% offline.
-		Nu se adaugă niciodată android.permission.INTERNET sau altă permisiune de rețea.
-		Verificare automată: bash tools/check-no-internet.sh
+		Nu se adaugă niciodată permisiuni de rețea: INTERNET, ACCESS_NETWORK_STATE,
+		ACCESS_WIFI_STATE. Dacă o funcție are nevoie de rețea, nu intră în aplicație.
+		Numele complete ale permisiunilor sunt scrise intenționat doar în
+		tools/check-no-internet.sh, ca verificarea să nu se agațe de comentarii.
 	-->
 
 	<application
