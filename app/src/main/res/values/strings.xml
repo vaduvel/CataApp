@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Lucrări</string>
+
+	<string name="tab_today">Azi</string>
+	<string name="tab_jobs">Lucrări</string>
+	<string name="tab_punch">Rest</string>
+	<string name="tab_money">Bani</string>
+	<string name="tab_more">Mai mult</string>
+</resources>

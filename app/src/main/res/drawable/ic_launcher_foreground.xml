@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Zidărie simplă: se citește bine și la 48dp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="108dp"
+	android:height="108dp"
+	android:viewportWidth="108"
+	android:viewportHeight="108">
+
+	<path android:fillColor="#FFFFFF" android:pathData="M30,38h19v10H30z" />
+	<path android:fillColor="#FFFFFF" android:pathData="M53,38h25v10H53z" />
+	<path android:fillColor="#FFFFFF" android:pathData="M30,52h25v10H30z" />
+	<path android:fillColor="#FFFFFF" android:pathData="M59,52h19v10H59z" />
+	<path android:fillColor="#FFFFFF" android:pathData="M30,66h19v10H30z" />
+	<path android:fillColor="#FFFFFF" android:pathData="M53,66h25v10H53z" />
+</vector>
