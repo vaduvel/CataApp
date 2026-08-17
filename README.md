@@ -2,7 +2,7 @@
 
 Aplicație Android nativă, un singur utilizator, **100% offline**, pentru gestionarea lucrărilor de construcții: lucrări, zile lucrate, rest de făcut, măsurători, extra, bani și textul care ajunge pe factură.
 
-Specificația de implementare (sursa de adevăr): `SPEC.md`.
+Specificația de implementare (sursa de adevăr): `SPEC.md`. Reguli de lucru pentru agenți: `AGENTS.md`.
 
 ## Reguli de aur
 
@@ -19,6 +19,14 @@ Specificația de implementare (sursa de adevăr): `SPEC.md`.
 
 ## Build și instalare prin cablu
 
+Prima dată, o singură dată (wrapper-ul Gradle e binar și nu e comis):
+
+```bash
+gradle wrapper --gradle-version 8.9
+```
+
+Apoi:
+
 ```bash
 ./gradlew :app:assembleDebug
 adb devices                 # telefonul trebuie să apară, cu „USB debugging" activat
@@ -32,12 +40,9 @@ Verificări:
 bash tools/check-no-internet.sh       # eșuează dacă a apărut permisiunea INTERNET
 ```
 
-> Wrapper-ul Gradle (`gradlew`, `gradle/wrapper/gradle-wrapper.jar`) este fișier binar și nu poate fi comis prin API. Se generează local o singură dată:
-> `gradle wrapper --gradle-version 8.9`
-
 ## Stadiu
 
-- [ ] M0 — schelet: Gradle, temă, navigare cu 5 ecrane, script de verificare
+- [x] M0 — schelet: Gradle, temă, navigare cu 5 ecrane, script de verificare
 - [ ] M1 — bază de date + clienți și lucrări
 - [ ] M2 — etape, șabloane, zile lucrate
 - [ ] M3 — rest de făcut, materiale, blocaje
