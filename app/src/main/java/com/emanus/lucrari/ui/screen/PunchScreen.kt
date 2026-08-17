@@ -1,10 +1,12 @@
 package com.emanus.lucrari.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.emanus.lucrari.R
 import com.emanus.lucrari.ui.component.Placeholder
 
 @Composable
 fun PunchScreen() = Placeholder(
-	title = "Rest de făcut",
-	subtitle = "Tot ce a rămas nefăcut, din toate lucrările, grupat pe client și stradă. Se implementează în M3.",
+	title = stringResource(R.string.screen_punch_title),
+	subtitle = stringResource(R.string.screen_punch_subtitle),
 )

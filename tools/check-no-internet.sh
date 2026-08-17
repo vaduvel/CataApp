@@ -21,7 +21,9 @@ check_file() {
 	local file="$1"
 	local perm
 	for perm in "${FORBIDDEN[@]}"; do
-		if grep -q "$perm" "$file" 2>/dev/null; then
+		# Caută doar declarații reale de permisiune, nu mențiuni în comentarii.
+		if grep -q "android:name=\"$perm\"" "$file" 2>/dev/null \
+			|| grep -q "android:name='$perm'" "$file" 2>/dev/null; then
 			echo "EȘEC: $perm apare în $file"
 			fail=1
 		fi

@@ -1,10 +1,12 @@
 package com.emanus.lucrari.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.emanus.lucrari.R
 import com.emanus.lucrari.ui.component.Placeholder
 
 @Composable
 fun JobsScreen() = Placeholder(
-	title = "Lucrări",
-	subtitle = "Lista lucrărilor, cu filtre pe status și căutare după client sau stradă. Se implementează în M1.",
+	title = stringResource(R.string.screen_jobs_title),
+	subtitle = stringResource(R.string.screen_jobs_subtitle),
 )

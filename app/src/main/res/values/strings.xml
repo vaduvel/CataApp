@@ -7,4 +7,15 @@
 	<string name="tab_punch">Rest</string>
 	<string name="tab_money">Bani</string>
 	<string name="tab_more">Mai mult</string>
+
+	<string name="screen_today_title">Azi</string>
+	<string name="screen_today_subtitle">Lucrările active, memento-urile de azi și butonul „Am lucrat azi aici". Se implementează în M2.</string>
+	<string name="screen_jobs_title">Lucrări</string>
+	<string name="screen_jobs_subtitle">Lista lucrărilor, cu filtre pe status și căutare după client sau stradă. Se implementează în M1.</string>
+	<string name="screen_punch_title">Rest de făcut</string>
+	<string name="screen_punch_subtitle">Tot ce a rămas nefăcut, din toate lucrările, grupat pe client și stradă. Se implementează în M3.</string>
+	<string name="screen_money_title">Bani</string>
+	<string name="screen_money_subtitle">De încasat, restanțe peste 30 de zile, încasat luna asta. „Facturat" și „încasat" rămân două cifre separate. Se implementează în M5.</string>
+	<string name="screen_more_title">Mai mult</string>
+	<string name="screen_more_subtitle">Clienți, șabloane de etape, backup și export. Se implementează în M1 și M7.</string>
 </resources>
