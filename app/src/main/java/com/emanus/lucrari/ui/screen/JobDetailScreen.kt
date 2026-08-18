@@ -2,6 +2,7 @@ package com.emanus.lucrari.ui.screen
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,19 +22,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -41,6 +48,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,7 +68,14 @@ import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.Stage
+import com.emanus.lucrari.data.WorkDay
+import com.emanus.lucrari.domain.Dates
+import com.emanus.lucrari.domain.Progress
+import com.emanus.lucrari.domain.Templates
+import com.emanus.lucrari.ui.component.DaySheet
+import com.emanus.lucrari.ui.component.TextSheet
 import com.emanus.lucrari.ui.component.labelRes
+import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -68,7 +84,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class JobDetailViewModel(app: App, jobId: String) : ViewModel() {
+class JobDetailViewModel(app: App, private val jobId: String) : ViewModel() {
 
 	private val repo = app.repo
 
@@ -76,6 +92,9 @@ class JobDetailViewModel(app: App, jobId: String) : ViewModel() {
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
 	val stages: StateFlow<List<Stage>> = repo.stages(jobId)
+		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+	val days: StateFlow<List<WorkDay>> = repo.days(jobId)
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 	@OptIn(ExperimentalCoroutinesApi::class)
@@ -96,6 +115,40 @@ class JobDetailViewModel(app: App, jobId: String) : ViewModel() {
 		}
 	}
 
+	fun toggleStage(stage: Stage) {
+		viewModelScope.launch { repo.toggleStage(stage) }
+	}
+
+	fun addStage(name: String) {
+		viewModelScope.launch { repo.addStage(jobId, name) }
+	}
+
+	fun deleteStage(stage: Stage) {
+		viewModelScope.launch { repo.deleteStage(stage) }
+	}
+
+	fun applyTemplate(type: String) {
+		viewModelScope.launch { repo.applyTemplate(jobId, type) }
+	}
+
+	fun logToday(onResult: (Boolean) -> Unit) {
+		viewModelScope.launch { onResult(repo.logDay(jobId)) }
+	}
+
+	/** O singură zi per dată: dacă ziua există deja, se completează, nu se dublează. */
+	fun saveDay(existing: WorkDay?, date: LocalDate, what: String, hours: Double?) {
+		viewModelScope.launch {
+			val target = existing ?: days.value.firstOrNull { it.date == date }
+			val day = target?.copy(date = date, what = what, hours = hours)
+				?: WorkDay(jobId = jobId, date = date, what = what, hours = hours)
+			repo.saveDay(day)
+		}
+	}
+
+	fun deleteDay(day: WorkDay) {
+		viewModelScope.launch { repo.deleteDay(day) }
+	}
+
 	companion object {
 		fun factory(jobId: String): ViewModelProvider.Factory = viewModelFactory {
 			initializer {
@@ -113,9 +166,19 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 	val jobState by vm.job.collectAsState()
 	val client by vm.client.collectAsState()
 	val stages by vm.stages.collectAsState()
+	val days by vm.days.collectAsState()
 	val context = LocalContext.current
+	val snackbarHost = remember { SnackbarHostState() }
+	val scope = rememberCoroutineScope()
+	val loggedMessage = stringResource(R.string.today_logged_snack)
+	val alreadyMessage = stringResource(R.string.today_already_snack)
 	var confirmDelete by remember { mutableStateOf(false) }
+	var showStageSheet by rememberSaveable { mutableStateOf(false) }
+	var showNewDay by rememberSaveable { mutableStateOf(false) }
+	var editingDayId by rememberSaveable { mutableStateOf<String?>(null) }
 	val job = jobState
+	val editingDay = days.firstOrNull { it.id == editingDayId }
+	val stagesDone = stages.count { it.done }
 
 	Scaffold(
 		topBar = {
@@ -139,6 +202,7 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 				},
 			)
 		},
+		snackbarHost = { SnackbarHost(snackbarHost) },
 	) { padding ->
 		if (job == null) {
 			Box(
@@ -171,10 +235,33 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 							if (where.isNotEmpty()) {
 								Text(text = where, style = MaterialTheme.typography.bodyLarge)
 							}
+							if (stages.isNotEmpty()) {
+								LinearProgressIndicator(
+									progress = { Progress.ofStages(stagesDone, stages.size) },
+									modifier = Modifier.fillMaxWidth(),
+								)
+								Text(
+									text = stringResource(R.string.jobs_stages, stagesDone, stages.size),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+							}
 							val estimate = job.estDays
 							if (estimate != null) {
 								Text(
-									text = stringResource(R.string.job_estimate, estimate),
+									text = stringResource(R.string.job_days_estimate, estimate, days.size),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+								val over = Progress.daysVsEstimate(estimate, days.size)
+								if (over != null && over > 0) {
+									Text(
+										text = stringResource(R.string.job_days_over, over),
+										style = MaterialTheme.typography.bodyMedium,
+										color = MaterialTheme.colorScheme.error,
+									)
+								}
+							} else if (days.isNotEmpty()) {
+								Text(
+									text = stringResource(R.string.jobs_days, days.size),
 									style = MaterialTheme.typography.bodyMedium,
 								)
 							}
@@ -231,10 +318,19 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 					}
 				}
 				item {
-					Text(
-						text = stringResource(R.string.job_stages_title),
-						style = MaterialTheme.typography.titleMedium,
-					)
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						Text(
+							text = stringResource(R.string.job_stages_title),
+							style = MaterialTheme.typography.titleMedium,
+						)
+						TextButton(onClick = { showStageSheet = true }) {
+							Text(stringResource(R.string.job_stages_add))
+						}
+					}
 				}
 				if (stages.isEmpty()) {
 					item {
@@ -243,10 +339,34 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 							style = MaterialTheme.typography.bodyMedium,
 						)
 					}
+					item {
+						Text(
+							text = stringResource(R.string.job_template_title),
+							style = MaterialTheme.typography.bodySmall,
+						)
+					}
+					item {
+						Row(
+							modifier = Modifier
+								.fillMaxWidth()
+								.horizontalScroll(rememberScrollState()),
+							horizontalArrangement = Arrangement.spacedBy(8.dp),
+						) {
+							Templates.names.forEach { name ->
+								FilterChip(
+									selected = false,
+									onClick = { vm.applyTemplate(name) },
+									label = { Text(name) },
+								)
+							}
+						}
+					}
 				} else {
 					items(stages, key = { it.id }) { stage ->
 						Row(
-							modifier = Modifier.fillMaxWidth(),
+							modifier = Modifier
+								.fillMaxWidth()
+								.clickable { vm.toggleStage(stage) },
 							horizontalArrangement = Arrangement.spacedBy(12.dp),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
@@ -256,12 +376,132 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 								Icons.Outlined.RadioButtonUnchecked
 							}
 							Icon(icon, contentDescription = null)
-							Text(text = stage.name, style = MaterialTheme.typography.bodyLarge)
+							Text(
+								text = stage.name,
+								style = MaterialTheme.typography.bodyLarge,
+								modifier = Modifier.weight(1f),
+							)
+							IconButton(onClick = { vm.deleteStage(stage) }) {
+								Icon(
+									Icons.Outlined.Close,
+									contentDescription = stringResource(R.string.stage_delete),
+								)
+							}
+						}
+					}
+				}
+				item {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						Text(
+							text = stringResource(R.string.job_days_title),
+							style = MaterialTheme.typography.titleMedium,
+						)
+						TextButton(onClick = { showNewDay = true }) {
+							Text(stringResource(R.string.job_day_add))
+						}
+					}
+				}
+				item {
+					Button(
+						onClick = {
+							vm.logToday { saved ->
+								scope.launch {
+									snackbarHost.showSnackbar(
+										if (saved) loggedMessage else alreadyMessage,
+									)
+								}
+							}
+						},
+						modifier = Modifier
+							.fillMaxWidth()
+							.height(56.dp),
+					) {
+						Text(
+							text = stringResource(R.string.today_log),
+							style = MaterialTheme.typography.titleMedium,
+						)
+					}
+				}
+				if (days.isEmpty()) {
+					item {
+						Text(
+							text = stringResource(R.string.job_days_empty),
+							style = MaterialTheme.typography.bodyMedium,
+						)
+					}
+				} else {
+					items(days, key = { it.id }) { day ->
+						Row(
+							modifier = Modifier
+								.fillMaxWidth()
+								.clickable { editingDayId = day.id },
+							horizontalArrangement = Arrangement.spacedBy(12.dp),
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							Text(
+								text = Dates.dayMonth(day.date),
+								style = MaterialTheme.typography.titleSmall,
+							)
+							Column(modifier = Modifier.weight(1f)) {
+								val what = day.what
+								if (!what.isNullOrBlank()) {
+									Text(text = what, style = MaterialTheme.typography.bodyMedium)
+								}
+								val hours = day.hours
+								if (hours != null) {
+									Text(
+										text = stringResource(R.string.job_day_hours, Dates.hours(hours)),
+										style = MaterialTheme.typography.bodySmall,
+									)
+								}
+							}
 						}
 					}
 				}
 			}
 		}
+	}
+
+	if (showStageSheet) {
+		TextSheet(
+			title = stringResource(R.string.stage_new_title),
+			label = stringResource(R.string.stage_name),
+			onDismiss = { showStageSheet = false },
+			onSave = { name ->
+				vm.addStage(name)
+				showStageSheet = false
+			},
+		)
+	}
+
+	if (showNewDay || editingDay != null) {
+		val current = editingDay
+		DaySheet(
+			day = current,
+			title = if (current == null) {
+				stringResource(R.string.day_new_title)
+			} else {
+				stringResource(R.string.day_edit_title, Dates.dayMonth(current.date))
+			},
+			onDismiss = {
+				showNewDay = false
+				editingDayId = null
+			},
+			onDelete = {
+				if (current != null) vm.deleteDay(current)
+				showNewDay = false
+				editingDayId = null
+			},
+			onSave = { date, what, hours ->
+				vm.saveDay(current, date, what, hours)
+				showNewDay = false
+				editingDayId = null
+			},
+		)
 	}
 
 	if (confirmDelete) {
