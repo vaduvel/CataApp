@@ -124,6 +124,39 @@
 	<string name="material_shop">De unde</string>
 	<string name="material_delete">Șterge materialul</string>
 
+	<!-- Măsurători -->
+	<string name="job_measures_title">Măsurători</string>
+	<string name="job_measures_empty">Nicio măsurătoare trecută.</string>
+	<string name="job_measure_add">Adaugă</string>
+	<string name="measures_total">Total măsurători: %1$s</string>
+	<string name="measure_new_title">Măsurătoare</string>
+	<string name="measure_edit_title">Modifică măsurătoarea</string>
+	<string name="measure_place">Unde: cameră, perete, etaj</string>
+	<string name="measure_work">Ce lucrare, dacă vrei</string>
+	<string name="measure_qty">Cât</string>
+	<string name="measure_unit">Unitate</string>
+	<string name="measure_price">Preț pe unitate, dacă se plătește la măsură</string>
+	<string name="measure_line">%1$s pe unitate = %2$s</string>
+	<string name="measure_total_line">Face %1$s</string>
+	<string name="measure_delete">Șterge măsurătoarea</string>
+
+	<!-- Extra -->
+	<string name="job_extras_title">Extra</string>
+	<string name="job_extras_empty">Niciun extra cerut.</string>
+	<string name="job_extra_add">Adaugă</string>
+	<string name="extras_total">Extra acceptate: %1$s</string>
+	<string name="extras_not_accepted">%1$d fără înțelegere</string>
+	<string name="extra_new_title">Extra cerut de client</string>
+	<string name="extra_edit_title">Modifică extra</string>
+	<string name="extra_what">Ce s-a cerut în plus</string>
+	<string name="extra_price">Cât costă</string>
+	<string name="extra_accepted">Ne-am înțeles cu clientul</string>
+	<string name="extra_proof">Cum ne-am înțeles: vocală, mesaj, față în față</string>
+	<string name="extra_billable">Se pune pe factură</string>
+	<string name="extra_not_billable">Nu se pune pe factură</string>
+	<string name="extra_no_deal">Fără înțelegere</string>
+	<string name="extra_delete">Șterge extra</string>
+
 	<!-- Reguli de status -->
 	<string name="done_confirm_title">Terminat cu resturi?</string>
 	<string name="done_confirm_text">Mai sunt %1$d lucruri nefăcute la lucrarea asta.</string>
@@ -147,4 +180,5 @@
 	<string name="cancel">Renunță</string>
 	<string name="delete">Șterge</string>
 	<string name="back">Înapoi</string>
+	<string name="date_when">Când</string>
 </resources>
