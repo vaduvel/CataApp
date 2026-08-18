@@ -164,6 +164,13 @@ interface StageDao {
 	/** Ultima poziție folosită, ca o etapă nouă să ajungă la coadă. */
 	@Query("SELECT MAX(sort) FROM stages WHERE jobId = :jobId")
 	suspend fun maxSort(jobId: String): Int?
+
+	@Query("SELECT COUNT(*) FROM stages WHERE jobId = :jobId")
+	suspend fun count(jobId: String): Int
+
+	/** Câte etape au rămas nebifate, pentru regulile din SPEC §5.6. */
+	@Query("SELECT COUNT(*) FROM stages WHERE jobId = :jobId AND done = 0")
+	suspend fun openCount(jobId: String): Int
 }
 
 @Dao
@@ -213,6 +220,10 @@ interface TodoDao {
 		"""
 	)
 	fun observeOpenAll(): Flow<List<TodoWithJob>>
+
+	/** Câte resturi nebifate are lucrarea: se întreabă înainte de Terminat (SPEC §5.6). */
+	@Query("SELECT COUNT(*) FROM todos WHERE jobId = :jobId AND done = 0")
+	suspend fun openCount(jobId: String): Int
 }
 
 @Dao

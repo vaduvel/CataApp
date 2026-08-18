@@ -6,10 +6,15 @@ import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.JobToday
 import com.emanus.lucrari.data.JobWithTotals
+import com.emanus.lucrari.data.Material
+import com.emanus.lucrari.data.Reason
 import com.emanus.lucrari.data.Stage
+import com.emanus.lucrari.data.Todo
+import com.emanus.lucrari.data.TodoWithJob
 import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.data.now
 import com.emanus.lucrari.data.today
+import com.emanus.lucrari.domain.Rules
 import com.emanus.lucrari.domain.Templates
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +46,13 @@ class JobRepo(private val db: AppDb) {
 	fun stages(jobId: String): Flow<List<Stage>> = db.stages().observeByJob(jobId)
 
 	fun days(jobId: String): Flow<List<WorkDay>> = db.workDays().observeByJobDesc(jobId)
+
+	fun todos(jobId: String): Flow<List<Todo>> = db.todos().observeByJob(jobId)
+
+	/** Tot ce a rămas nefăcut, din toate lucrările, cel mai apropiat termen primul (SPEC §11). */
+	fun openTodos(): Flow<List<TodoWithJob>> = db.todos().observeOpenAll()
+
+	fun materials(jobId: String): Flow<List<Material>> = db.materials().observeByJob(jobId)
 
 	fun clients(): Flow<List<Client>> = db.clients().observeAll()
 
@@ -120,8 +132,20 @@ class JobRepo(private val db: AppDb) {
 		return true
 	}
 
+	/**
+	 * SPEC §5.6: o zi în care s-a stat degeaba trage lucrarea în Așteptare. Nu atinge
+	 * lucrările deja închise, ca să nu reînvie una terminată.
+	 */
 	suspend fun saveDay(day: WorkDay) {
-		db.workDays().upsert(day.copy(what = day.what?.trim()?.ifBlank { null }))
+		val clean = day.copy(
+			what = day.what?.trim()?.ifBlank { null },
+			blocked = day.blocked?.trim()?.ifBlank { null },
+		)
+		db.workDays().upsert(clean)
+		if (clean.blocked == null) return
+		val job = db.jobs().byId(clean.jobId) ?: return
+		val next = Rules.statusAfterBlockedDay(job.status) ?: return
+		db.jobs().upsert(job.copy(status = next))
 	}
 
 	suspend fun deleteDay(day: WorkDay) {
@@ -161,6 +185,86 @@ class JobRepo(private val db: AppDb) {
 		if (job.type.isNullOrBlank()) {
 			db.jobs().upsert(job.copy(type = type))
 		}
+	}
+
+	/**
+	 * Rest de făcut (SPEC §11). Locul e camera sau bucata de lucrare, ca să știe unde se
+	 * întoarce: "baia", "scara B". Motivul și termenul sunt opționale.
+	 */
+	suspend fun addTodo(
+		jobId: String,
+		what: String,
+		place: String? = null,
+		reason: Reason? = null,
+		due: LocalDate? = null,
+	) {
+		val clean = what.trim()
+		if (clean.isEmpty()) return
+		db.todos().upsert(
+			Todo(
+				jobId = jobId,
+				place = place?.trim()?.ifBlank { null },
+				what = clean,
+				reason = reason,
+				due = due,
+			),
+		)
+	}
+
+	suspend fun saveTodo(todo: Todo) {
+		val clean = todo.what.trim()
+		if (clean.isEmpty()) return
+		db.todos().upsert(
+			todo.copy(what = clean, place = todo.place?.trim()?.ifBlank { null }),
+		)
+	}
+
+	/** Bifarea e reversibilă: dacă a bifat din greșeală, o apasă din nou. */
+	suspend fun toggleTodo(todo: Todo) {
+		val done = !todo.done
+		db.todos().upsert(todo.copy(done = done, doneAt = if (done) now() else null))
+	}
+
+	suspend fun deleteTodo(todo: Todo) {
+		db.todos().delete(todo)
+	}
+
+	suspend fun addMaterial(jobId: String, what: String, qty: String? = null, shop: String? = null) {
+		val clean = what.trim()
+		if (clean.isEmpty()) return
+		db.materials().upsert(
+			Material(
+				jobId = jobId,
+				what = clean,
+				qty = qty?.trim()?.ifBlank { null },
+				shop = shop?.trim()?.ifBlank { null },
+			),
+		)
+	}
+
+	suspend fun toggleMaterial(material: Material) {
+		db.materials().upsert(material.copy(bought = !material.bought))
+	}
+
+	suspend fun deleteMaterial(material: Material) {
+		db.materials().delete(material)
+	}
+
+	/** Câte resturi nebifate are lucrarea. Interfața întreabă înainte să pună Terminat. */
+	suspend fun openTodoCount(jobId: String): Int = db.todos().openCount(jobId)
+
+	/**
+	 * Toate etapele bifate, dar au rămas resturi: propune De finisat în loc de Terminat
+	 * (SPEC §5.6). Doar propune; apasă omul.
+	 */
+	suspend fun suggestsDeFinisat(jobId: String): Boolean {
+		val job = db.jobs().byId(jobId) ?: return false
+		return Rules.suggestsDeFinisat(
+			current = job.status,
+			stageCount = db.stages().count(jobId),
+			openStages = db.stages().openCount(jobId),
+			openTodos = db.todos().openCount(jobId),
+		)
 	}
 
 	companion object {
