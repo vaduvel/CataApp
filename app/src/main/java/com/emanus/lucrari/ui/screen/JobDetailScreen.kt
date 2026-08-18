@@ -65,19 +65,26 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.emanus.lucrari.App
 import com.emanus.lucrari.R
 import com.emanus.lucrari.data.Client
+import com.emanus.lucrari.data.Extra
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.Material
+import com.emanus.lucrari.data.Measure
+import com.emanus.lucrari.data.MeasureUnit
 import com.emanus.lucrari.data.Reason
 import com.emanus.lucrari.data.Stage
 import com.emanus.lucrari.data.Todo
 import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.domain.Dates
+import com.emanus.lucrari.domain.Measures
+import com.emanus.lucrari.domain.Money
 import com.emanus.lucrari.domain.Progress
 import com.emanus.lucrari.domain.Rules
 import com.emanus.lucrari.domain.Templates
 import com.emanus.lucrari.ui.component.DaySheet
+import com.emanus.lucrari.ui.component.ExtraSheet
 import com.emanus.lucrari.ui.component.MaterialSheet
+import com.emanus.lucrari.ui.component.MeasureSheet
 import com.emanus.lucrari.ui.component.TextSheet
 import com.emanus.lucrari.ui.component.TodoSheet
 import com.emanus.lucrari.ui.component.labelRes
@@ -107,6 +114,12 @@ class JobDetailViewModel(app: App, private val jobId: String) : ViewModel() {
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 	val materials: StateFlow<List<Material>> = repo.materials(jobId)
+		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+	val measures: StateFlow<List<Measure>> = repo.measures(jobId)
+		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+	val extras: StateFlow<List<Extra>> = repo.extras(jobId)
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 	@OptIn(ExperimentalCoroutinesApi::class)
@@ -197,6 +210,107 @@ class JobDetailViewModel(app: App, private val jobId: String) : ViewModel() {
 		viewModelScope.launch { repo.deleteMaterial(material) }
 	}
 
+	fun addMeasure(
+		place: String,
+		work: String,
+		qty: Double,
+		unit: MeasureUnit,
+		unitPriceCents: Long?,
+		date: LocalDate,
+	) {
+		viewModelScope.launch {
+			repo.addMeasure(
+				jobId = jobId,
+				place = place,
+				qty = qty,
+				unit = unit,
+				work = work,
+				unitPriceCents = unitPriceCents,
+				date = date,
+			)
+		}
+	}
+
+	fun saveMeasure(
+		measure: Measure,
+		place: String,
+		work: String,
+		qty: Double,
+		unit: MeasureUnit,
+		unitPriceCents: Long?,
+		date: LocalDate,
+	) {
+		viewModelScope.launch {
+			repo.saveMeasure(
+				measure.copy(
+					place = place,
+					work = work,
+					qty = qty,
+					unit = unit,
+					unitPriceCents = unitPriceCents,
+					date = date,
+				),
+			)
+		}
+	}
+
+	fun deleteMeasure(measure: Measure) {
+		viewModelScope.launch { repo.deleteMeasure(measure) }
+	}
+
+	fun addExtra(
+		what: String,
+		priceCents: Long,
+		accepted: Boolean,
+		proof: String,
+		billable: Boolean,
+		date: LocalDate,
+	) {
+		viewModelScope.launch {
+			repo.addExtra(
+				jobId = jobId,
+				what = what,
+				priceCents = priceCents,
+				accepted = accepted,
+				proof = proof,
+				billable = billable,
+				date = date,
+			)
+		}
+	}
+
+	fun saveExtra(
+		extra: Extra,
+		what: String,
+		priceCents: Long,
+		accepted: Boolean,
+		proof: String,
+		billable: Boolean,
+		date: LocalDate,
+	) {
+		viewModelScope.launch {
+			repo.saveExtra(
+				extra.copy(
+					what = what,
+					priceCents = priceCents,
+					accepted = accepted,
+					proof = proof,
+					billable = billable,
+					date = date,
+				),
+			)
+		}
+	}
+
+	/** Înțelegerea se bifează din buton, ca orice bifă din aplicație. */
+	fun toggleExtraAccepted(extra: Extra) {
+		viewModelScope.launch { repo.toggleExtraAccepted(extra) }
+	}
+
+	fun deleteExtra(extra: Extra) {
+		viewModelScope.launch { repo.deleteExtra(extra) }
+	}
+
 	companion object {
 		fun factory(jobId: String): ViewModelProvider.Factory = viewModelFactory {
 			initializer {
@@ -217,6 +331,8 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 	val days by vm.days.collectAsState()
 	val todos by vm.todos.collectAsState()
 	val materials by vm.materials.collectAsState()
+	val measures by vm.measures.collectAsState()
+	val extras by vm.extras.collectAsState()
 	val context = LocalContext.current
 	val snackbarHost = remember { SnackbarHostState() }
 	val scope = rememberCoroutineScope()
@@ -230,11 +346,19 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 	var showNewTodo by rememberSaveable { mutableStateOf(false) }
 	var editingTodoId by rememberSaveable { mutableStateOf<String?>(null) }
 	var showNewMaterial by rememberSaveable { mutableStateOf(false) }
+	var showNewMeasure by rememberSaveable { mutableStateOf(false) }
+	var editingMeasureId by rememberSaveable { mutableStateOf<String?>(null) }
+	var showNewExtra by rememberSaveable { mutableStateOf(false) }
+	var editingExtraId by rememberSaveable { mutableStateOf<String?>(null) }
 	val job = jobState
 	val editingDay = days.firstOrNull { it.id == editingDayId }
 	val editingTodo = todos.firstOrNull { it.id == editingTodoId }
+	val editingMeasure = measures.firstOrNull { it.id == editingMeasureId }
+	val editingExtra = extras.firstOrNull { it.id == editingExtraId }
 	val stagesDone = stages.count { it.done }
 	val openTodos = todos.count { !it.done }
+	val extrasAcceptedCents = extras.filter { it.accepted && it.billable }.sumOf { it.priceCents }
+	val extrasNotAccepted = extras.count { !it.accepted }
 
 	Scaffold(
 		topBar = {
@@ -699,6 +823,184 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 						}
 					}
 				}
+				item {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						Text(
+							text = stringResource(R.string.job_measures_title),
+							style = MaterialTheme.typography.titleMedium,
+						)
+						TextButton(onClick = { showNewMeasure = true }) {
+							Text(stringResource(R.string.job_measure_add))
+						}
+					}
+				}
+				if (measures.isEmpty()) {
+					item {
+						Text(
+							text = stringResource(R.string.job_measures_empty),
+							style = MaterialTheme.typography.bodyMedium,
+						)
+					}
+				} else {
+					// Măsurătoarea nu se bifează, deci rândul se deschide la atingere pe text.
+					items(measures, key = { it.id }) { measure ->
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							Column(
+								modifier = Modifier
+									.weight(1f)
+									.clickable { editingMeasureId = measure.id },
+							) {
+								val work = measure.work
+								val head = if (work.isNullOrBlank()) {
+									measure.place
+								} else {
+									measure.place + " — " + work
+								}
+								Text(text = head, style = MaterialTheme.typography.bodyLarge)
+								Text(
+									text = Measures.formatQtyWithUnit(measure),
+									style = MaterialTheme.typography.titleSmall,
+								)
+								val unitPrice = measure.unitPriceCents
+								val lineCents = Measures.lineCents(measure)
+								if (unitPrice != null && lineCents != null) {
+									Text(
+										text = stringResource(
+											R.string.measure_line,
+											Money.format(unitPrice),
+											Money.format(lineCents),
+										),
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.onSurfaceVariant,
+									)
+								}
+							}
+							IconButton(onClick = { vm.deleteMeasure(measure) }) {
+								Icon(
+									Icons.Outlined.Close,
+									contentDescription = stringResource(R.string.measure_delete),
+								)
+							}
+						}
+					}
+					if (Measures.anyPriced(measures)) {
+						item {
+							Text(
+								text = stringResource(
+									R.string.measures_total,
+									Money.format(Measures.totalCents(measures)),
+								),
+								style = MaterialTheme.typography.titleMedium,
+							)
+						}
+					}
+				}
+				item {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						Text(
+							text = stringResource(R.string.job_extras_title),
+							style = MaterialTheme.typography.titleMedium,
+						)
+						TextButton(onClick = { showNewExtra = true }) {
+							Text(stringResource(R.string.job_extra_add))
+						}
+					}
+				}
+				if (extras.isEmpty()) {
+					item {
+						Text(
+							text = stringResource(R.string.job_extras_empty),
+							style = MaterialTheme.typography.bodyMedium,
+						)
+					}
+				} else {
+					items(extras, key = { it.id }) { extra ->
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							IconButton(onClick = { vm.toggleExtraAccepted(extra) }) {
+								val icon = if (extra.accepted) {
+									Icons.Outlined.Check
+								} else {
+									Icons.Outlined.RadioButtonUnchecked
+								}
+								Icon(icon, contentDescription = null)
+							}
+							Column(
+								modifier = Modifier
+									.weight(1f)
+									.clickable { editingExtraId = extra.id },
+							) {
+								Text(text = extra.what, style = MaterialTheme.typography.bodyLarge)
+								Text(
+									text = Money.format(extra.priceCents) + " · " +
+										Dates.dayMonth(extra.date),
+									style = MaterialTheme.typography.titleSmall,
+								)
+								val proof = extra.proof
+								if (!proof.isNullOrBlank()) {
+									Text(
+										text = proof,
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.onSurfaceVariant,
+									)
+								}
+								if (!extra.accepted) {
+									Text(
+										text = stringResource(R.string.extra_no_deal),
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.error,
+									)
+								}
+								if (!extra.billable) {
+									Text(
+										text = stringResource(R.string.extra_not_billable),
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.onSurfaceVariant,
+									)
+								}
+							}
+							IconButton(onClick = { vm.deleteExtra(extra) }) {
+								Icon(
+									Icons.Outlined.Close,
+									contentDescription = stringResource(R.string.extra_delete),
+								)
+							}
+						}
+					}
+					item {
+						Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+							Text(
+								text = stringResource(
+									R.string.extras_total,
+									Money.format(extrasAcceptedCents),
+								),
+								style = MaterialTheme.typography.titleMedium,
+							)
+							if (extrasNotAccepted > 0) {
+								Text(
+									text = stringResource(R.string.extras_not_accepted, extrasNotAccepted),
+									style = MaterialTheme.typography.bodyMedium,
+									color = MaterialTheme.colorScheme.error,
+								)
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -780,6 +1082,66 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 			onSave = { what, qty, shop ->
 				vm.addMaterial(what, qty, shop)
 				showNewMaterial = false
+			},
+		)
+	}
+
+	if (showNewMeasure || editingMeasure != null) {
+		val current = editingMeasure
+		MeasureSheet(
+			measure = current,
+			title = if (current == null) {
+				stringResource(R.string.measure_new_title)
+			} else {
+				stringResource(R.string.measure_edit_title)
+			},
+			onDismiss = {
+				showNewMeasure = false
+				editingMeasureId = null
+			},
+			onDelete = {
+				if (current != null) vm.deleteMeasure(current)
+				showNewMeasure = false
+				editingMeasureId = null
+			},
+			onSave = { place, work, qty, unit, unitPrice, date ->
+				if (current == null) {
+					vm.addMeasure(place, work, qty, unit, unitPrice, date)
+				} else {
+					vm.saveMeasure(current, place, work, qty, unit, unitPrice, date)
+				}
+				showNewMeasure = false
+				editingMeasureId = null
+			},
+		)
+	}
+
+	if (showNewExtra || editingExtra != null) {
+		val current = editingExtra
+		ExtraSheet(
+			extra = current,
+			title = if (current == null) {
+				stringResource(R.string.extra_new_title)
+			} else {
+				stringResource(R.string.extra_edit_title)
+			},
+			onDismiss = {
+				showNewExtra = false
+				editingExtraId = null
+			},
+			onDelete = {
+				if (current != null) vm.deleteExtra(current)
+				showNewExtra = false
+				editingExtraId = null
+			},
+			onSave = { what, priceCents, accepted, proof, billable, date ->
+				if (current == null) {
+					vm.addExtra(what, priceCents, accepted, proof, billable, date)
+				} else {
+					vm.saveExtra(current, what, priceCents, accepted, proof, billable, date)
+				}
+				showNewExtra = false
+				editingExtraId = null
 			},
 		)
 	}
