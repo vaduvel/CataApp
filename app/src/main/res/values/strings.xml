@@ -14,7 +14,6 @@
 	<string name="screen_jobs_subtitle">Toate lucrările, cu filtre și căutare.</string>
 	<string name="screen_punch_title">Rest de făcut</string>
 	<string name="screen_money_title">Bani</string>
-	<string name="screen_money_subtitle">De încasat, restanțe peste 30 de zile, încasat luna asta. Facturat și încasat rămân două cifre separate. Se implementează în M5.</string>
 	<string name="screen_more_title">Mai mult</string>
 	<string name="screen_more_subtitle">Șabloane de etape, backup, export și import: se implementează în M7.</string>
 
@@ -156,6 +155,72 @@
 	<string name="extra_not_billable">Nu se pune pe factură</string>
 	<string name="extra_no_deal">Fără înțelegere</string>
 	<string name="extra_delete">Șterge extra</string>
+
+	<!-- Ecranul Bani -->
+	<string name="money_outstanding">De încasat</string>
+	<string name="money_overdue">Restanțe peste 30 de zile</string>
+	<string name="money_this_month">Încasat luna asta</string>
+	<string name="money_to_invoice_title">De facturat</string>
+	<string name="money_to_invoice_empty">Nimic de facturat acum.</string>
+	<string name="money_all_jobs">Toate lucrările</string>
+	<string name="money_empty">Nicio lucrare încă.</string>
+	<string name="money_row_invoiced">Facturat %1$s · Încasat %2$s</string>
+	<string name="money_row_rest">Rest de încasat: %1$s</string>
+	<string name="money_row_settled">Totul încasat</string>
+
+	<!-- Banii unei lucrări -->
+	<string name="job_money_title">Bani</string>
+	<string name="money_billing">Cum se plătește</string>
+	<string name="billing_corp">La corp</string>
+	<string name="billing_masura">La măsură</string>
+	<string name="billing_zile">Pe zi</string>
+	<string name="money_agreed_price">Prețul convenit</string>
+	<string name="money_day_rate">Cât pe zi</string>
+	<string name="money_billing_save">Salvează prețul</string>
+	<string name="money_base">Lucrarea</string>
+	<string name="money_base_masura">Din măsurători</string>
+	<string name="money_base_zile">%1$s pe zi × %2$d zile</string>
+	<string name="money_extras">Extra acceptate</string>
+	<string name="money_total">Total</string>
+	<string name="money_invoiced">Facturat</string>
+	<string name="money_to_invoice">De facturat</string>
+	<string name="money_collected">Încasat</string>
+	<string name="money_rest">Rest de încasat</string>
+	<string name="money_note_split">Facturat și încasat sunt două cifre separate: una spune ce ai cerut, cealaltă ce a intrat.</string>
+	<string name="money_over_invoiced">Ai facturat mai mult decât valorează lucrarea.</string>
+
+	<!-- Încasări -->
+	<string name="payments_title">Bani intrați</string>
+	<string name="payments_empty">N-a intrat niciun ban încă.</string>
+	<string name="payment_add">Adaugă</string>
+	<string name="payment_new_title">Bani intrați</string>
+	<string name="payment_edit_title">Modifică încasarea</string>
+	<string name="payment_amount">Cât a intrat</string>
+	<string name="payment_method">Cum</string>
+	<string name="payment_note">Notă, dacă vrei</string>
+	<string name="payment_delete">Șterge încasarea</string>
+	<string name="method_cash">Cash</string>
+	<string name="method_bonifico">Bancă</string>
+	<string name="method_altul">Altfel</string>
+
+	<!-- Facturi -->
+	<string name="invoices_title">Facturi trimise</string>
+	<string name="invoices_empty">Nicio factură trecută.</string>
+	<string name="invoice_add">Adaugă</string>
+	<string name="invoice_new_title">Factură trimisă</string>
+	<string name="invoice_edit_title">Modifică factura</string>
+	<string name="invoice_number">Numărul facturii</string>
+	<string name="invoice_amount">Suma de pe factură</string>
+	<string name="invoice_kind">Ce fel</string>
+	<string name="invoice_paid">Încasată</string>
+	<string name="invoice_not_paid">Neîncasată</string>
+	<string name="invoice_overdue">Neîncasată de peste 30 de zile</string>
+	<string name="invoice_no_number">Fără număr</string>
+	<string name="invoice_delete">Șterge factura</string>
+	<string name="invoice_note_app">Aplicația nu emite facturi. Aici scrii doar ce ai trimis deja, ca să știi unde ești.</string>
+	<string name="kind_aconto">Acont</string>
+	<string name="kind_saldo">Rest</string>
+	<string name="kind_unica">Toată</string>
 
 	<!-- Reguli de status -->
 	<string name="done_confirm_title">Terminat cu resturi?</string>
