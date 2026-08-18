@@ -36,7 +36,8 @@ import java.time.LocalDate
 
 /**
  * Ziua lucrată (SPEC §7). Data vine gata pusă pe azi; dacă a uitat să treacă ieri,
- * schimbă cu o apăsare. Orele sunt opționale și stau ascunse până le cere.
+ * schimbă cu o apăsare. Orele și blocajul sunt opționale și stau ascunse până le cere.
+ * O zi cu blocaj trece lucrarea în Așteptare (SPEC §5.6).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +46,7 @@ fun DaySheet(
 	title: String,
 	onDismiss: () -> Unit,
 	onDelete: () -> Unit,
-	onSave: (date: LocalDate, what: String, hours: Double?) -> Unit,
+	onSave: (date: LocalDate, what: String, hours: Double?, blocked: String) -> Unit,
 ) {
 	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	val dayId = day?.id
@@ -55,6 +56,8 @@ fun DaySheet(
 		mutableStateOf(day?.hours?.let { Dates.hours(it) }.orEmpty())
 	}
 	var showHours by rememberSaveable(dayId) { mutableStateOf(day?.hours != null) }
+	var blocked by rememberSaveable(dayId) { mutableStateOf(day?.blocked.orEmpty()) }
+	var showBlocked by rememberSaveable(dayId) { mutableStateOf(day?.blocked != null) }
 	val date = LocalDate.ofEpochDay(epochDay)
 
 	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -113,8 +116,28 @@ fun DaySheet(
 				}
 			}
 
+			if (showBlocked) {
+				OutlinedTextField(
+					value = blocked,
+					onValueChange = { blocked = it },
+					label = { Text(stringResource(R.string.day_blocked)) },
+					minLines = 2,
+					modifier = Modifier.fillMaxWidth(),
+				)
+				Text(
+					text = stringResource(R.string.day_blocked_note),
+					style = MaterialTheme.typography.bodySmall,
+				)
+			} else {
+				TextButton(onClick = { showBlocked = true }) {
+					Text(stringResource(R.string.day_blocked_add))
+				}
+			}
+
 			Button(
-				onClick = { onSave(date, what, hours.replace(',', '.').toDoubleOrNull()) },
+				onClick = {
+					onSave(date, what, hours.replace(',', '.').toDoubleOrNull(), blocked)
+				},
 				modifier = Modifier
 					.fillMaxWidth()
 					.height(56.dp),

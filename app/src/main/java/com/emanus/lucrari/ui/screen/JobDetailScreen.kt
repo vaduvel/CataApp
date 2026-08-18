@@ -67,13 +67,19 @@ import com.emanus.lucrari.R
 import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
+import com.emanus.lucrari.data.Material
+import com.emanus.lucrari.data.Reason
 import com.emanus.lucrari.data.Stage
+import com.emanus.lucrari.data.Todo
 import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.domain.Dates
 import com.emanus.lucrari.domain.Progress
+import com.emanus.lucrari.domain.Rules
 import com.emanus.lucrari.domain.Templates
 import com.emanus.lucrari.ui.component.DaySheet
+import com.emanus.lucrari.ui.component.MaterialSheet
 import com.emanus.lucrari.ui.component.TextSheet
+import com.emanus.lucrari.ui.component.TodoSheet
 import com.emanus.lucrari.ui.component.labelRes
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -95,6 +101,12 @@ class JobDetailViewModel(app: App, private val jobId: String) : ViewModel() {
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 	val days: StateFlow<List<WorkDay>> = repo.days(jobId)
+		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+	val todos: StateFlow<List<Todo>> = repo.todos(jobId)
+		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+	val materials: StateFlow<List<Material>> = repo.materials(jobId)
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
 	@OptIn(ExperimentalCoroutinesApi::class)
@@ -136,17 +148,53 @@ class JobDetailViewModel(app: App, private val jobId: String) : ViewModel() {
 	}
 
 	/** O singură zi per dată: dacă ziua există deja, se completează, nu se dublează. */
-	fun saveDay(existing: WorkDay?, date: LocalDate, what: String, hours: Double?) {
+	fun saveDay(existing: WorkDay?, date: LocalDate, what: String, hours: Double?, blocked: String) {
 		viewModelScope.launch {
 			val target = existing ?: days.value.firstOrNull { it.date == date }
-			val day = target?.copy(date = date, what = what, hours = hours)
-				?: WorkDay(jobId = jobId, date = date, what = what, hours = hours)
+			val day = target?.copy(date = date, what = what, hours = hours, blocked = blocked)
+				?: WorkDay(
+					jobId = jobId,
+					date = date,
+					what = what,
+					hours = hours,
+					blocked = blocked,
+				)
 			repo.saveDay(day)
 		}
 	}
 
 	fun deleteDay(day: WorkDay) {
 		viewModelScope.launch { repo.deleteDay(day) }
+	}
+
+	fun addTodo(what: String, place: String, reason: Reason?, due: LocalDate?) {
+		viewModelScope.launch { repo.addTodo(jobId, what, place, reason, due) }
+	}
+
+	fun saveTodo(todo: Todo, what: String, place: String, reason: Reason?, due: LocalDate?) {
+		viewModelScope.launch {
+			repo.saveTodo(todo.copy(what = what, place = place, reason = reason, due = due))
+		}
+	}
+
+	fun toggleTodo(todo: Todo) {
+		viewModelScope.launch { repo.toggleTodo(todo) }
+	}
+
+	fun deleteTodo(todo: Todo) {
+		viewModelScope.launch { repo.deleteTodo(todo) }
+	}
+
+	fun addMaterial(what: String, qty: String, shop: String) {
+		viewModelScope.launch { repo.addMaterial(jobId, what, qty, shop) }
+	}
+
+	fun toggleMaterial(material: Material) {
+		viewModelScope.launch { repo.toggleMaterial(material) }
+	}
+
+	fun deleteMaterial(material: Material) {
+		viewModelScope.launch { repo.deleteMaterial(material) }
 	}
 
 	companion object {
@@ -167,18 +215,26 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 	val client by vm.client.collectAsState()
 	val stages by vm.stages.collectAsState()
 	val days by vm.days.collectAsState()
+	val todos by vm.todos.collectAsState()
+	val materials by vm.materials.collectAsState()
 	val context = LocalContext.current
 	val snackbarHost = remember { SnackbarHostState() }
 	val scope = rememberCoroutineScope()
 	val loggedMessage = stringResource(R.string.today_logged_snack)
 	val alreadyMessage = stringResource(R.string.today_already_snack)
 	var confirmDelete by remember { mutableStateOf(false) }
+	var confirmDone by remember { mutableStateOf(false) }
 	var showStageSheet by rememberSaveable { mutableStateOf(false) }
 	var showNewDay by rememberSaveable { mutableStateOf(false) }
 	var editingDayId by rememberSaveable { mutableStateOf<String?>(null) }
+	var showNewTodo by rememberSaveable { mutableStateOf(false) }
+	var editingTodoId by rememberSaveable { mutableStateOf<String?>(null) }
+	var showNewMaterial by rememberSaveable { mutableStateOf(false) }
 	val job = jobState
 	val editingDay = days.firstOrNull { it.id == editingDayId }
+	val editingTodo = todos.firstOrNull { it.id == editingTodoId }
 	val stagesDone = stages.count { it.done }
+	val openTodos = todos.count { !it.done }
 
 	Scaffold(
 		topBar = {
@@ -265,6 +321,12 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 									style = MaterialTheme.typography.bodyMedium,
 								)
 							}
+							if (openTodos > 0) {
+								Text(
+									text = stringResource(R.string.jobs_open_todos, openTodos),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+							}
 							Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
 								val phone = client?.phone
 								if (!phone.isNullOrBlank()) {
@@ -311,9 +373,37 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 						JobStatus.entries.forEach { status ->
 							FilterChip(
 								selected = job.status == status,
-								onClick = { vm.setStatus(status) },
+								onClick = {
+									val ask = status == JobStatus.TERMINAT &&
+										Rules.needsConfirmForDone(openTodos)
+									if (ask) confirmDone = true else vm.setStatus(status)
+								},
 								label = { Text(stringResource(status.labelRes)) },
 							)
+						}
+					}
+				}
+				val suggestDeFinisat = Rules.suggestsDeFinisat(
+					current = job.status,
+					stageCount = stages.size,
+					openStages = stages.size - stagesDone,
+					openTodos = openTodos,
+				)
+				if (suggestDeFinisat) {
+					item {
+						Card(modifier = Modifier.fillMaxWidth()) {
+							Column(
+								modifier = Modifier.padding(16.dp),
+								verticalArrangement = Arrangement.spacedBy(8.dp),
+							) {
+								Text(
+									text = stringResource(R.string.definisat_suggest),
+									style = MaterialTheme.typography.bodyMedium,
+								)
+								TextButton(onClick = { vm.setStatus(JobStatus.DE_FINISAT) }) {
+									Text(stringResource(R.string.definisat_apply))
+								}
+							}
 						}
 					}
 				}
@@ -458,6 +548,151 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 										style = MaterialTheme.typography.bodySmall,
 									)
 								}
+								val blocked = day.blocked
+								if (!blocked.isNullOrBlank()) {
+									Text(
+										text = blocked,
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.error,
+									)
+								}
+							}
+						}
+					}
+				}
+				item {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						Text(
+							text = stringResource(R.string.job_todos_title),
+							style = MaterialTheme.typography.titleMedium,
+						)
+						TextButton(onClick = { showNewTodo = true }) {
+							Text(stringResource(R.string.job_todo_add))
+						}
+					}
+				}
+				if (todos.isEmpty()) {
+					item {
+						Text(
+							text = stringResource(R.string.job_todos_empty),
+							style = MaterialTheme.typography.bodyMedium,
+						)
+					}
+				} else {
+					items(todos, key = { it.id }) { todo ->
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							IconButton(onClick = { vm.toggleTodo(todo) }) {
+								val icon = if (todo.done) {
+									Icons.Outlined.Check
+								} else {
+									Icons.Outlined.RadioButtonUnchecked
+								}
+								Icon(icon, contentDescription = null)
+							}
+							Column(
+								modifier = Modifier
+									.weight(1f)
+									.clickable { editingTodoId = todo.id },
+							) {
+								val place = todo.place
+								val line = if (place.isNullOrBlank()) {
+									todo.what
+								} else {
+									place + ": " + todo.what
+								}
+								Text(text = line, style = MaterialTheme.typography.bodyLarge)
+								val due = todo.due
+								if (due != null) {
+									Text(
+										text = stringResource(R.string.punch_due, Dates.dayMonth(due)),
+										style = MaterialTheme.typography.bodySmall,
+									)
+								}
+								val reason = todo.reason
+								if (reason != null) {
+									Text(
+										text = stringResource(reason.labelRes),
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.onSurfaceVariant,
+									)
+								}
+							}
+							IconButton(onClick = { vm.deleteTodo(todo) }) {
+								Icon(
+									Icons.Outlined.Close,
+									contentDescription = stringResource(R.string.todo_delete),
+								)
+							}
+						}
+					}
+				}
+				item {
+					Row(
+						modifier = Modifier.fillMaxWidth(),
+						horizontalArrangement = Arrangement.SpaceBetween,
+						verticalAlignment = Alignment.CenterVertically,
+					) {
+						Text(
+							text = stringResource(R.string.job_materials_title),
+							style = MaterialTheme.typography.titleMedium,
+						)
+						TextButton(onClick = { showNewMaterial = true }) {
+							Text(stringResource(R.string.job_material_add))
+						}
+					}
+				}
+				if (materials.isEmpty()) {
+					item {
+						Text(
+							text = stringResource(R.string.job_materials_empty),
+							style = MaterialTheme.typography.bodyMedium,
+						)
+					}
+				} else {
+					items(materials, key = { it.id }) { material ->
+						Row(
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							IconButton(onClick = { vm.toggleMaterial(material) }) {
+								val icon = if (material.bought) {
+									Icons.Outlined.Check
+								} else {
+									Icons.Outlined.RadioButtonUnchecked
+								}
+								Icon(icon, contentDescription = null)
+							}
+							Column(modifier = Modifier.weight(1f)) {
+								val qty = material.qty
+								val line = if (qty.isNullOrBlank()) {
+									material.what
+								} else {
+									material.what + " · " + qty
+								}
+								Text(text = line, style = MaterialTheme.typography.bodyLarge)
+								val shop = material.shop
+								if (!shop.isNullOrBlank()) {
+									Text(
+										text = shop,
+										style = MaterialTheme.typography.bodySmall,
+										color = MaterialTheme.colorScheme.onSurfaceVariant,
+									)
+								}
+							}
+							IconButton(onClick = { vm.deleteMaterial(material) }) {
+								Icon(
+									Icons.Outlined.Close,
+									contentDescription = stringResource(R.string.material_delete),
+								)
 							}
 						}
 					}
@@ -496,10 +731,76 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 				showNewDay = false
 				editingDayId = null
 			},
-			onSave = { date, what, hours ->
-				vm.saveDay(current, date, what, hours)
+			onSave = { date, what, hours, blocked ->
+				vm.saveDay(current, date, what, hours, blocked)
 				showNewDay = false
 				editingDayId = null
+			},
+		)
+	}
+
+	if (showNewTodo || editingTodo != null) {
+		val current = editingTodo
+		TodoSheet(
+			todo = current,
+			title = if (current == null) {
+				stringResource(R.string.todo_new_title)
+			} else {
+				stringResource(R.string.todo_edit_title)
+			},
+			onDismiss = {
+				showNewTodo = false
+				editingTodoId = null
+			},
+			onDelete = {
+				if (current != null) vm.deleteTodo(current)
+				showNewTodo = false
+				editingTodoId = null
+			},
+			onSave = { what, place, reason, due ->
+				if (current == null) {
+					vm.addTodo(what, place, reason, due)
+				} else {
+					vm.saveTodo(current, what, place, reason, due)
+				}
+				showNewTodo = false
+				editingTodoId = null
+			},
+		)
+	}
+
+	if (showNewMaterial) {
+		MaterialSheet(
+			material = null,
+			title = stringResource(R.string.material_new_title),
+			onDismiss = { showNewMaterial = false },
+			onDelete = { showNewMaterial = false },
+			onSave = { what, qty, shop ->
+				vm.addMaterial(what, qty, shop)
+				showNewMaterial = false
+			},
+		)
+	}
+
+	if (confirmDone) {
+		AlertDialog(
+			onDismissRequest = { confirmDone = false },
+			title = { Text(stringResource(R.string.done_confirm_title)) },
+			text = { Text(stringResource(R.string.done_confirm_text, openTodos)) },
+			confirmButton = {
+				TextButton(
+					onClick = {
+						confirmDone = false
+						vm.setStatus(JobStatus.TERMINAT)
+					},
+				) {
+					Text(stringResource(R.string.done_confirm_yes))
+				}
+			},
+			dismissButton = {
+				TextButton(onClick = { confirmDone = false }) {
+					Text(stringResource(R.string.cancel))
+				}
 			},
 		)
 	}
