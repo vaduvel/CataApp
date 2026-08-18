@@ -10,8 +10,6 @@
 	<string name="tab_more">Mai mult</string>
 
 	<!-- Ecrane care se implementează la milestone-urile următoare -->
-	<string name="screen_today_title">Azi</string>
-	<string name="screen_today_subtitle">Lucrările active, memento-urile de azi și butonul „Am lucrat azi aici”. Se implementează în M2.</string>
 	<string name="screen_jobs_title">Lucrări</string>
 	<string name="screen_jobs_subtitle">Toate lucrările, cu filtre și căutare.</string>
 	<string name="screen_punch_title">Rest de făcut</string>
@@ -31,13 +29,21 @@
 	<string name="status_anulat">Anulat</string>
 	<string name="filter_all">Toate</string>
 
+	<!-- Azi -->
+	<string name="today_empty">Nicio lucrare activă acum. Deschide o lucrare din Lucrări și pune-o în lucru.</string>
+	<string name="today_log">Am lucrat azi aici</string>
+	<string name="today_logged_button">Trecut azi</string>
+	<string name="today_logged_snack">Am trecut ziua de azi.</string>
+	<string name="today_already_snack">Ziua de azi era deja trecută.</string>
+	<string name="today_next">Urmează: %1$s</string>
+
 	<!-- Lista de lucrări -->
 	<string name="jobs_search_hint">Caută după stradă sau client</string>
 	<string name="jobs_new">Lucrare nouă</string>
 	<string name="jobs_empty">Nicio lucrare încă. Apasă pe Lucrare nouă.</string>
 	<string name="jobs_empty_search">Nicio lucrare pentru căutarea asta.</string>
-	<string name="jobs_stages">%1$d din %2$d etape</string>
-	<string name="jobs_days">%1$d zile lucrate</string>
+	<string name="jobs_stages">Etape: %1$d din %2$d</string>
+	<string name="jobs_days">Zile lucrate: %1$d</string>
 	<string name="jobs_open_todos">%1$d de făcut</string>
 
 	<!-- Lucrare nouă -->
@@ -53,12 +59,32 @@
 	<!-- Detaliu lucrare -->
 	<string name="job_status">Status</string>
 	<string name="job_stages_title">Etape</string>
-	<string name="job_no_stages">Fără etape. Alege un șablon când faci lucrarea.</string>
-	<string name="job_estimate">%1$d zile estimate</string>
+	<string name="job_no_stages">Fără etape încă.</string>
+	<string name="job_stages_add">Adaugă etapă</string>
+	<string name="job_template_title">Alege un șablon de etape</string>
+	<string name="stage_new_title">Etapă nouă</string>
+	<string name="stage_name">Numele etapei</string>
+	<string name="stage_delete">Șterge etapa</string>
 	<string name="job_call">Sună</string>
 	<string name="job_map">Hartă</string>
 	<string name="job_delete">Șterge lucrarea</string>
 	<string name="job_delete_confirm">Se șterge lucrarea și tot ce ține de ea: etape, zile, resturi, măsurători, bani.</string>
+
+	<!-- Zile lucrate -->
+	<string name="job_days_title">Zile lucrate</string>
+	<string name="job_days_empty">Nicio zi trecută încă.</string>
+	<string name="job_days_estimate">Estimat: %1$d zile · Lucrate: %2$d</string>
+	<string name="job_days_over">Peste estimat: +%1$d</string>
+	<string name="job_day_add">Adaugă o zi</string>
+	<string name="job_day_hours">%1$s ore</string>
+	<string name="day_new_title">Zi lucrată</string>
+	<string name="day_edit_title">Ziua de %1$s</string>
+	<string name="day_today">Azi</string>
+	<string name="day_yesterday">Ieri</string>
+	<string name="day_what">Ce s-a lucrat</string>
+	<string name="day_hours">Ore</string>
+	<string name="day_hours_add">Adaugă ore</string>
+	<string name="day_delete">Șterge ziua</string>
 
 	<!-- Clienți -->
 	<string name="more_clients">Clienți</string>
