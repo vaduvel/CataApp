@@ -102,6 +102,8 @@ fun AppRoot() {
 				JobDetailScreen(
 					jobId = entry.arguments?.getString("id").orEmpty(),
 					onBack = { navController.popBackStack() },
+					onOpenMoney = { id -> navController.navigate("money/" + id) },
+					onOpenDescrizione = { id -> navController.navigate("descrizione/" + id) },
 				)
 			}
 			composable(
