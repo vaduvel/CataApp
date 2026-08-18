@@ -21,6 +21,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -62,8 +63,11 @@ class MoneyViewModel(app: Application) : AndroidViewModel(app) {
 }
 
 /**
- * Ecranul Bani (SPEC §5.3): trei cifre sus, lucrările care așteaptă o factură dedesubt,
- * apoi toate lucrările. Nu se emite nimic aici, doar se vede unde stau banii.
+ * Ecranul Bani (SPEC §5.3): trei cifre sus, lucrările care așteaptă o factură dedesubt, apoi
+ * restul lucrărilor. Nu se emite nimic aici, doar se vede unde stau banii.
+ *
+ * O lucrare apare o singură dată pe ecran: ce e în De facturat nu se mai repetă jos, ca să nu
+ * pară că sunt doi bani diferiți de luat.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +77,11 @@ fun MoneyScreen(
 ) {
 	val summary by vm.summary.collectAsState()
 	val board by vm.board.collectAsState()
+
+	val others = remember(board, summary) {
+		val shown = summary.toInvoice.map { it.job.id }.toSet()
+		board.filter { !shown.contains(it.job.id) }
+	}
 
 	Scaffold(
 		topBar = { TopAppBar(title = { Text(stringResource(R.string.screen_money_title)) }) },
@@ -121,12 +130,6 @@ fun MoneyScreen(
 				)
 			}
 
-			item {
-				Text(
-					text = stringResource(R.string.money_all_jobs),
-					style = MaterialTheme.typography.titleMedium,
-				)
-			}
 			if (board.isEmpty()) {
 				item {
 					Text(
@@ -134,13 +137,20 @@ fun MoneyScreen(
 						style = MaterialTheme.typography.bodyMedium,
 					)
 				}
-			}
-			items(board, key = { "toate-" + it.job.id }) { row ->
-				JobMoneyRow(
-					row = row,
-					bigCents = row.totals.totalCents,
-					onClick = { onOpenJobMoney(row.job.id) },
-				)
+			} else if (others.isNotEmpty()) {
+				item {
+					Text(
+						text = stringResource(R.string.money_other_jobs),
+						style = MaterialTheme.typography.titleMedium,
+					)
+				}
+				items(others, key = { "toate-" + it.job.id }) { row ->
+					JobMoneyRow(
+						row = row,
+						bigCents = row.totals.totalCents,
+						onClick = { onOpenJobMoney(row.job.id) },
+					)
+				}
 			}
 		}
 	}

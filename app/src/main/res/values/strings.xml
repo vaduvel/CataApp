@@ -67,6 +67,8 @@
 	<string name="job_map">Hartă</string>
 	<string name="job_delete">Șterge lucrarea</string>
 	<string name="job_delete_confirm">Se șterge lucrarea și tot ce ține de ea: etape, zile, resturi, măsurători, bani.</string>
+	<string name="job_money_open">Banii lucrării</string>
+	<string name="job_descrizione_open">Descriere pentru factură</string>
 
 	<!-- Zile lucrate -->
 	<string name="job_days_title">Zile lucrate</string>
@@ -162,7 +164,7 @@
 	<string name="money_this_month">Încasat luna asta</string>
 	<string name="money_to_invoice_title">De facturat</string>
 	<string name="money_to_invoice_empty">Nimic de facturat acum.</string>
-	<string name="money_all_jobs">Toate lucrările</string>
+	<string name="money_other_jobs">Restul lucrărilor</string>
 	<string name="money_empty">Nicio lucrare încă.</string>
 	<string name="money_row_invoiced">Facturat %1$s · Încasat %2$s</string>
 	<string name="money_row_rest">Rest de încasat: %1$s</string>
@@ -221,6 +223,14 @@
 	<string name="kind_aconto">Acont</string>
 	<string name="kind_saldo">Rest</string>
 	<string name="kind_unica">Toată</string>
+
+	<!-- Descriere pentru factură -->
+	<string name="descrizione_title">Descriere pentru factură</string>
+	<string name="descrizione_hint">Textul e scris în italiană, gata de dat contabilului. Aplicația nu emite facturi: aici scrie doar ce s-a lucrat, cât s-a măsurat și ce s-a vorbit.</string>
+	<string name="descrizione_copy">Copiază textul</string>
+	<string name="descrizione_send">Trimite</string>
+	<string name="descrizione_copied">Text copiat.</string>
+	<string name="descrizione_empty">Nu e nimic de scris încă. Treci zilele lucrate, bifează etapele sau adaugă măsurători.</string>
 
 	<!-- Reguli de status -->
 	<string name="done_confirm_title">Terminat cu resturi?</string>

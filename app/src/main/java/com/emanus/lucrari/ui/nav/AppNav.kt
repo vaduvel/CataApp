@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.emanus.lucrari.R
 import com.emanus.lucrari.ui.screen.ClientsScreen
+import com.emanus.lucrari.ui.screen.DescrizioneScreen
 import com.emanus.lucrari.ui.screen.JobDetailScreen
 import com.emanus.lucrari.ui.screen.JobMoneyScreen
 import com.emanus.lucrari.ui.screen.JobsScreen
@@ -45,6 +46,7 @@ enum class Tab(val route: String, @StringRes val labelRes: Int, val icon: ImageV
 
 const val ROUTE_JOB_DETAIL = "job/{id}"
 const val ROUTE_JOB_MONEY = "money/{id}"
+const val ROUTE_DESCRIZIONE = "descrizione/{id}"
 const val ROUTE_CLIENTS = "clients"
 
 @Composable
@@ -111,6 +113,15 @@ fun AppRoot() {
 					onBack = { navController.popBackStack() },
 				)
 			}
+			composable(
+				route = ROUTE_DESCRIZIONE,
+				arguments = listOf(navArgument("id") { type = NavType.StringType }),
+			) { entry ->
+				DescrizioneScreen(
+					jobId = entry.arguments?.getString("id").orEmpty(),
+					onBack = { navController.popBackStack() },
+				)
+			}
 			composable(ROUTE_CLIENTS) {
 				ClientsScreen(onBack = { navController.popBackStack() })
 			}
@@ -123,6 +134,7 @@ private fun isSelected(tab: Tab, route: String?): Boolean = when {
 	route == null -> false
 	route == tab.route -> true
 	tab == Tab.JOBS && route.startsWith("job/") -> true
+	tab == Tab.JOBS && route.startsWith("descrizione/") -> true
 	tab == Tab.MONEY && route.startsWith("money/") -> true
 	tab == Tab.MORE && route == ROUTE_CLIENTS -> true
 	else -> false
