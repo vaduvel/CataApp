@@ -2,11 +2,14 @@ package com.emanus.lucrari.data.repo
 
 import com.emanus.lucrari.data.AppDb
 import com.emanus.lucrari.data.Client
+import com.emanus.lucrari.data.Extra
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.JobToday
 import com.emanus.lucrari.data.JobWithTotals
 import com.emanus.lucrari.data.Material
+import com.emanus.lucrari.data.Measure
+import com.emanus.lucrari.data.MeasureUnit
 import com.emanus.lucrari.data.Reason
 import com.emanus.lucrari.data.Stage
 import com.emanus.lucrari.data.Todo
@@ -53,6 +56,10 @@ class JobRepo(private val db: AppDb) {
 	fun openTodos(): Flow<List<TodoWithJob>> = db.todos().observeOpenAll()
 
 	fun materials(jobId: String): Flow<List<Material>> = db.materials().observeByJob(jobId)
+
+	fun measures(jobId: String): Flow<List<Measure>> = db.measures().observeByJob(jobId)
+
+	fun extras(jobId: String): Flow<List<Extra>> = db.extras().observeByJob(jobId)
 
 	fun clients(): Flow<List<Client>> = db.clients().observeAll()
 
@@ -189,7 +196,7 @@ class JobRepo(private val db: AppDb) {
 
 	/**
 	 * Rest de făcut (SPEC §11). Locul e camera sau bucata de lucrare, ca să știe unde se
-	 * întoarce: "baia", "scara B". Motivul și termenul sunt opționale.
+	 * întoarce: baia, scara B. Motivul și termenul sunt opționale.
 	 */
 	suspend fun addTodo(
 		jobId: String,
@@ -248,6 +255,92 @@ class JobRepo(private val db: AppDb) {
 
 	suspend fun deleteMaterial(material: Material) {
 		db.materials().delete(material)
+	}
+
+	/**
+	 * Măsurătoare (SPEC §4). Locul e obligatoriu, prețul pe unitate nu: la lucrările la corp
+	 * măsura se notează doar pentru textul facturii. Cantitatea rămâne Double.
+	 */
+	suspend fun addMeasure(
+		jobId: String,
+		place: String,
+		qty: Double,
+		unit: MeasureUnit,
+		work: String? = null,
+		unitPriceCents: Long? = null,
+		date: LocalDate = today(),
+	) {
+		val clean = place.trim()
+		if (clean.isEmpty()) return
+		db.measures().upsert(
+			Measure(
+				jobId = jobId,
+				place = clean,
+				work = work?.trim()?.ifBlank { null },
+				qty = qty,
+				unit = unit,
+				unitPriceCents = unitPriceCents,
+				date = date,
+			),
+		)
+	}
+
+	suspend fun saveMeasure(measure: Measure) {
+		val clean = measure.place.trim()
+		if (clean.isEmpty()) return
+		db.measures().upsert(
+			measure.copy(place = clean, work = measure.work?.trim()?.ifBlank { null }),
+		)
+	}
+
+	suspend fun deleteMeasure(measure: Measure) {
+		db.measures().delete(measure)
+	}
+
+	/**
+	 * Extra (SPEC §4 și §5.1): ce a cerut clientul peste ce s-a vorbit. Se ține minte și
+	 * dovada înțelegerii, ca la sfârșit să nu fie discuție. Un extra făcut din bunăvoință
+	 * rămâne nebifat la se pune pe factură, deci nu intră în bani.
+	 */
+	suspend fun addExtra(
+		jobId: String,
+		what: String,
+		priceCents: Long = 0,
+		accepted: Boolean = false,
+		proof: String? = null,
+		billable: Boolean = true,
+		date: LocalDate = today(),
+	) {
+		val clean = what.trim()
+		if (clean.isEmpty()) return
+		db.extras().upsert(
+			Extra(
+				jobId = jobId,
+				what = clean,
+				date = date,
+				priceCents = priceCents,
+				accepted = accepted,
+				proof = proof?.trim()?.ifBlank { null },
+				billable = billable,
+			),
+		)
+	}
+
+	suspend fun saveExtra(extra: Extra) {
+		val clean = extra.what.trim()
+		if (clean.isEmpty()) return
+		db.extras().upsert(
+			extra.copy(what = clean, proof = extra.proof?.trim()?.ifBlank { null }),
+		)
+	}
+
+	/** Înțelegerea se bifează și se debifează dintr-o apăsare, ca orice bifă. */
+	suspend fun toggleExtraAccepted(extra: Extra) {
+		db.extras().upsert(extra.copy(accepted = !extra.accepted))
+	}
+
+	suspend fun deleteExtra(extra: Extra) {
+		db.extras().delete(extra)
 	}
 
 	/** Câte resturi nebifate are lucrarea. Interfața întreabă înainte să pună Terminat. */
