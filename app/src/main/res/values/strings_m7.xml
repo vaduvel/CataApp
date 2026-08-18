@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<!-- Memento-uri -->
 	<string name="reminder_channel_name">Memento-uri lucrări</string>
 	<string name="reminder_channel_description">Resturi, facturi și oferte care cer atenție</string>
 	<string name="reminder_notification_title">Lucrări</string>
@@ -11,4 +12,41 @@
 	<string name="reminder_overdue">Neîncasat de %1$d zile: %2$s</string>
 	<string name="reminder_offer">Sună în legătură cu oferta: %1$s</string>
 	<string name="reminder_todo">Rest de făcut azi: %1$s</string>
+	<string name="reminders_title">Memento-uri</string>
+	<string name="reminders_empty">Nimic de amintit acum.</string>
+	<string name="reminders_enable_notifications">Activează notificările</string>
+	<string name="reminder_done">Rezolvat</string>
+
+	<!-- Poze -->
+	<string name="more_photos">Poze</string>
+	<string name="more_photos_hint">Poze înainte, în timpul și după lucrare</string>
+	<string name="photos_title">Poze lucrări</string>
+	<string name="photos_choose_job">Alege lucrarea</string>
+	<string name="photos_no_jobs">Nu există nicio lucrare pentru poze.</string>
+	<string name="photos_phase">Momentul pozei</string>
+	<string name="photo_before">Înainte</string>
+	<string name="photo_during">În timpul lucrării</string>
+	<string name="photo_after">După</string>
+	<string name="photos_link_todo">Leagă poza de un rest, dacă vrei</string>
+	<string name="photos_job_only">Doar lucrarea</string>
+	<string name="photos_take">Fă o poză</string>
+	<string name="photos_empty">Nicio poză la lucrarea aceasta.</string>
+	<string name="photo_saved">Poza a fost salvată.</string>
+	<string name="photo_failed">Poza nu a putut fi salvată.</string>
+	<string name="photo_delete">Șterge poza</string>
+	<string name="photo_content_description">Fotografie de la lucrare</string>
+
+	<!-- Backup -->
+	<string name="backup_title">Backup</string>
+	<string name="backup_hint">Aplicația păstrează automat ultimele 7 backup-uri zilnice. Exportul și importul folosesc selectorul Android, fără permisiune de storage.</string>
+	<string name="backup_export">Exportă backup</string>
+	<string name="backup_import">Importă backup</string>
+	<string name="backup_share">Trimite ultimul backup</string>
+	<string name="backup_export_done">Backup exportat.</string>
+	<string name="backup_import_done">Datele au fost importate.</string>
+	<string name="backup_failed">Operația de backup a eșuat. Datele existente nu au fost șterse.</string>
+	<string name="backup_import_mode_title">Cum import datele?</string>
+	<string name="backup_import_mode_text">Înlocuiește tot șterge datele actuale numai după ce arhiva a fost verificată. Adaugă ce lipsește păstrează rândurile existente și folosește UUID-urile ca să nu dubleze.</string>
+	<string name="backup_replace">Înlocuiește tot</string>
+	<string name="backup_merge">Adaugă ce lipsește</string>
 </resources>

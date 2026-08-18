@@ -32,6 +32,7 @@ import com.emanus.lucrari.ui.screen.JobMoneyScreen
 import com.emanus.lucrari.ui.screen.JobsScreen
 import com.emanus.lucrari.ui.screen.MoneyScreen
 import com.emanus.lucrari.ui.screen.MoreScreen
+import com.emanus.lucrari.ui.screen.PhotosScreen
 import com.emanus.lucrari.ui.screen.PunchScreen
 import com.emanus.lucrari.ui.screen.TodayScreen
 
@@ -48,6 +49,7 @@ const val ROUTE_JOB_DETAIL = "job/{id}"
 const val ROUTE_JOB_MONEY = "money/{id}"
 const val ROUTE_DESCRIZIONE = "descrizione/{id}"
 const val ROUTE_CLIENTS = "clients"
+const val ROUTE_PHOTOS = "photos"
 
 @Composable
 fun AppRoot() {
@@ -93,7 +95,10 @@ fun AppRoot() {
 				MoneyScreen(onOpenJobMoney = { id -> navController.navigate("money/" + id) })
 			}
 			composable(Tab.MORE.route) {
-				MoreScreen(onOpenClients = { navController.navigate(ROUTE_CLIENTS) })
+				MoreScreen(
+					onOpenClients = { navController.navigate(ROUTE_CLIENTS) },
+					onOpenPhotos = { navController.navigate(ROUTE_PHOTOS) },
+				)
 			}
 			composable(
 				route = ROUTE_JOB_DETAIL,
@@ -127,17 +132,20 @@ fun AppRoot() {
 			composable(ROUTE_CLIENTS) {
 				ClientsScreen(onBack = { navController.popBackStack() })
 			}
+			composable(ROUTE_PHOTOS) {
+				PhotosScreen(onBack = { navController.popBackStack() })
+			}
 		}
 	}
 }
 
-/** Tabul rămâne aprins și când ești pe un ecran copil (detaliu lucrare, bani pe lucrare, clienți). */
+/** Tabul rămâne aprins și când ești pe un ecran copil. */
 private fun isSelected(tab: Tab, route: String?): Boolean = when {
 	route == null -> false
 	route == tab.route -> true
 	tab == Tab.JOBS && route.startsWith("job/") -> true
 	tab == Tab.JOBS && route.startsWith("descrizione/") -> true
 	tab == Tab.MONEY && route.startsWith("money/") -> true
-	tab == Tab.MORE && route == ROUTE_CLIENTS -> true
+	tab == Tab.MORE && (route == ROUTE_CLIENTS || route == ROUTE_PHOTOS) -> true
 	else -> false
 }
