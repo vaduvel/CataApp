@@ -13,7 +13,6 @@
 	<string name="screen_jobs_title">Lucrări</string>
 	<string name="screen_jobs_subtitle">Toate lucrările, cu filtre și căutare.</string>
 	<string name="screen_punch_title">Rest de făcut</string>
-	<string name="screen_punch_subtitle">Tot ce a rămas nefăcut, din toate lucrările, grupat pe client și stradă. Se implementează în M3.</string>
 	<string name="screen_money_title">Bani</string>
 	<string name="screen_money_subtitle">De încasat, restanțe peste 30 de zile, încasat luna asta. Facturat și încasat rămân două cifre separate. Se implementează în M5.</string>
 	<string name="screen_more_title">Mai mult</string>
@@ -85,6 +84,52 @@
 	<string name="day_hours">Ore</string>
 	<string name="day_hours_add">Adaugă ore</string>
 	<string name="day_delete">Șterge ziua</string>
+	<string name="day_blocked_add">S-a stat degeaba</string>
+	<string name="day_blocked">De ce nu s-a putut lucra</string>
+	<string name="day_blocked_note">Ziua cu blocaj trece lucrarea în Așteptare.</string>
+
+	<!-- Rest de făcut -->
+	<string name="punch_empty">Nimic nefăcut. Toate resturile sunt bifate.</string>
+	<string name="punch_due">Termen: %1$s</string>
+	<string name="punch_overdue">Termen depășit: %1$s</string>
+	<string name="job_todos_title">Rest de făcut</string>
+	<string name="job_todos_empty">Nimic nefăcut aici.</string>
+	<string name="job_todo_add">Adaugă</string>
+	<string name="todo_new_title">Ce a rămas</string>
+	<string name="todo_edit_title">Modifică restul</string>
+	<string name="todo_what">Ce a rămas de făcut</string>
+	<string name="todo_place">Unde: cameră, scară</string>
+	<string name="todo_reason">De ce a rămas</string>
+	<string name="todo_due">Termen</string>
+	<string name="todo_due_none">Fără termen</string>
+	<string name="todo_due_today">Azi</string>
+	<string name="todo_due_tomorrow">Mâine</string>
+	<string name="todo_due_week">Peste o săptămână</string>
+	<string name="todo_delete">Șterge restul</string>
+	<string name="reason_material">Lipsă material</string>
+	<string name="reason_decizie_client">Așteaptă clientul</string>
+	<string name="reason_alt_meserias">Alt meseriaș</string>
+	<string name="reason_vremea">Vremea</string>
+	<string name="reason_lipsa_timp">N-a fost timp</string>
+	<string name="reason_altul">Altul</string>
+
+	<!-- Materiale -->
+	<string name="job_materials_title">Materiale</string>
+	<string name="job_materials_empty">Niciun material trecut.</string>
+	<string name="job_material_add">Adaugă</string>
+	<string name="material_new_title">Material</string>
+	<string name="material_edit_title">Modifică materialul</string>
+	<string name="material_what">Ce material</string>
+	<string name="material_qty">Cât</string>
+	<string name="material_shop">De unde</string>
+	<string name="material_delete">Șterge materialul</string>
+
+	<!-- Reguli de status -->
+	<string name="done_confirm_title">Terminat cu resturi?</string>
+	<string name="done_confirm_text">Mai sunt %1$d lucruri nefăcute la lucrarea asta.</string>
+	<string name="done_confirm_yes">Pune Terminat</string>
+	<string name="definisat_suggest">Toate etapele sunt bifate, dar au rămas resturi.</string>
+	<string name="definisat_apply">Pune De finisat</string>
 
 	<!-- Clienți -->
 	<string name="more_clients">Clienți</string>

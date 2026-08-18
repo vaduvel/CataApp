@@ -82,7 +82,9 @@ fun AppRoot() {
 			composable(Tab.JOBS.route) {
 				JobsScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
 			}
-			composable(Tab.PUNCH.route) { PunchScreen() }
+			composable(Tab.PUNCH.route) {
+				PunchScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
+			}
 			composable(Tab.MONEY.route) { MoneyScreen() }
 			composable(Tab.MORE.route) {
 				MoreScreen(onOpenClients = { navController.navigate(ROUTE_CLIENTS) })
