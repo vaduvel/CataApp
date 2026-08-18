@@ -44,7 +44,7 @@ Păstrează `~/.android/debug.keystore` într-un loc sigur, în afara repo-ului.
 - [x] M0 — schelet: Gradle, temă, navigare cu 5 ecrane, script de verificare
 - [x] M1 — bază de date + clienți și lucrări
 - [x] M2 — etape, șabloane, zile lucrate
-- [ ] M3 — rest de făcut, materiale, blocaje
+- [x] M3 — rest de făcut, materiale, blocaje
 - [ ] M4 — măsurători și extra
 - [ ] M5 — bani: încasări, evidență facturi
 - [ ] M6 — „Descriere pentru factură” + copiere
