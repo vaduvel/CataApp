@@ -76,7 +76,9 @@ fun AppRoot() {
 			startDestination = Tab.TODAY.route,
 			modifier = Modifier.padding(padding),
 		) {
-			composable(Tab.TODAY.route) { TodayScreen() }
+			composable(Tab.TODAY.route) {
+				TodayScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
+			}
 			composable(Tab.JOBS.route) {
 				JobsScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
 			}
