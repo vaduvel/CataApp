@@ -9,8 +9,9 @@ Specificația de implementare (sursa de adevăr): `SPEC.md`. Reguli de lucru pen
 1. **Fără rețea.** Aplicația nu cere niciodată permisiuni de rețea. `tools/check-no-internet.sh` sparge build-ul dacă apare vreuna.
 2. **Sumele se țin în cenți** (`Long`). Niciodată `Double`/`Float` pentru bani.
 3. **Aplicația nu emite facturi.** Produce evidența și *textul* care ajunge pe factură. Zero XML, zero SdI, zero TVA.
-4. Interfața e în **română**. Textele generate pentru client/contabil rămân în **italiană**.
-5. Fără cont, fără cloud, fără sincronizare. Instalare prin cablu.
+4. **Facturat și încasat sunt două cifre separate.** Una spune ce a cerut pe hârtie, cealaltă ce a intrat în mână.
+5. Interfața e în **română**. Textele generate pentru client/contabil rămân în **italiană**.
+6. Fără cont, fără cloud, fără sincronizare. Instalare prin cablu.
 
 ## Cerințe
 
@@ -46,7 +47,7 @@ Păstrează `~/.android/debug.keystore` într-un loc sigur, în afara repo-ului.
 - [x] M2 — etape, șabloane, zile lucrate
 - [x] M3 — rest de făcut, materiale, blocaje
 - [x] M4 — măsurători și extra
-- [ ] M5 — bani: încasări, evidență facturi
+- [x] M5 — bani: încasări, evidență facturi
 - [ ] M6 — „Descriere pentru factură” + copiere
 - [ ] M7 — poze, backup, memento-uri (obligatoriu înainte de livrare)
 - [ ] M8 — finisaje
