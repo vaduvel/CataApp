@@ -24,7 +24,9 @@ import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Map
+import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -323,7 +325,12 @@ class JobDetailViewModel(app: App, private val jobId: String) : ViewModel() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
+fun JobDetailScreen(
+	jobId: String,
+	onBack: () -> Unit,
+	onOpenMoney: (String) -> Unit,
+	onOpenDescrizione: (String) -> Unit,
+) {
 	val vm: JobDetailViewModel = viewModel(factory = JobDetailViewModel.factory(jobId))
 	val jobState by vm.job.collectAsState()
 	val client by vm.client.collectAsState()
@@ -477,6 +484,28 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 										Text(stringResource(R.string.job_map))
 									}
 								}
+							}
+							// Banii lucrării și textul de factură stau la vedere, nu îngropate
+							// în alt tab: de pe șantier se intră direct din lucrare.
+							OutlinedButton(
+								onClick = { onOpenMoney(job.id) },
+								modifier = Modifier
+									.fillMaxWidth()
+									.height(56.dp),
+							) {
+								Icon(Icons.Outlined.Payments, contentDescription = null)
+								Spacer(Modifier.width(8.dp))
+								Text(stringResource(R.string.job_money_open))
+							}
+							OutlinedButton(
+								onClick = { onOpenDescrizione(job.id) },
+								modifier = Modifier
+									.fillMaxWidth()
+									.height(56.dp),
+							) {
+								Icon(Icons.Outlined.Description, contentDescription = null)
+								Spacer(Modifier.width(8.dp))
+								Text(stringResource(R.string.job_descrizione_open))
 							}
 						}
 					}
