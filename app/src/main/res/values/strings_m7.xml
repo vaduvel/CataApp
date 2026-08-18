@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="reminder_channel_name">Memento-uri lucrări</string>
+	<string name="reminder_channel_description">Resturi, facturi și oferte care cer atenție</string>
+	<string name="reminder_notification_title">Lucrări</string>
+	<string name="reminder_prefix_to_invoice">De trimis la facturat:</string>
+	<string name="reminder_prefix_overdue">Neîncasat de </string>
+	<string name="reminder_prefix_offer">Sună în legătură cu oferta:</string>
+	<string name="reminder_prefix_todo">Rest de făcut azi:</string>
+	<string name="reminder_to_invoice">De trimis la facturat: %1$s</string>
+	<string name="reminder_overdue">Neîncasat de %1$d zile: %2$s</string>
+	<string name="reminder_offer">Sună în legătură cu oferta: %1$s</string>
+	<string name="reminder_todo">Rest de făcut azi: %1$s</string>
+</resources>

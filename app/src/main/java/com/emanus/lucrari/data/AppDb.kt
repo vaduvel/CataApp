@@ -51,6 +51,8 @@ abstract class AppDb : RoomDatabase() {
 
 	abstract fun reminders(): ReminderDao
 
+	abstract fun backup(): BackupDao
+
 	companion object {
 		const val NAME = "lucrari.db"
 
