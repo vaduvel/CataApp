@@ -23,6 +23,7 @@ Wrapper-ul Gradle 8.9 **este comis**. Folosește `./gradlew`, niciodată `gradle
 
 1. **Fără rețea.** Nu adăuga permisiuni de rețea (INTERNET, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE). Dacă o funcție are nevoie de internet, nu intră în aplicație. Verifică cu `tools/check-no-internet.sh`.
 2. **Banii se țin în cenți**, ca `Long`. Niciodată `Double`/`Float` pentru sume. Cantitățile de măsurători sunt `Double`.
+	- Scrierea și citirea sumelor trec **doar** prin `domain/Money.kt`, iar cantitățile prin `domain/Measures.kt`. Fără `NumberFormat` și fără `String.format` pentru bani: formatul trebuie să fie identic pe orice telefon, indiferent de limba sistemului, pentru că testul golden din M6 compară șir cu șir.
 3. **Aplicația nu emite facturi.** Produce evidența și *textul* care ajunge pe factură. Zero XML, zero SdI, zero TVA, zero date fiscale ale clientului.
 4. **„Facturat” și „încasat” sunt două cifre separate.** Nu presupune niciodată că sunt egale (vezi SPEC §5.2).
 5. **Limbi:** cod și identificatori în engleză; textele din interfață în română, **doar** în `strings.xml`, niciodată scrise direct în composable-uri; textele generate pentru client sau contabil în italiană, doar în `domain/Descrizione.kt` și `domain/Dictionary.kt`.
@@ -67,4 +68,5 @@ Commit-uri: Conventional Commits, ex. `feat(money): rest de incasat pe lucrare`.
 - **M1 — gata:** modelul Room complet din SPEC §4 (12 entități, convertoare, DAO-uri), `domain/Seed.kt` cu lucrarea demo, `domain/Templates.kt` cu șabloanele din SPEC §14, ecranele Lucrări (listă, căutare după stradă, filtre, lucrare nouă în 4 câmpuri), Detaliu lucrare (status, etape, sunat, hartă, ștergere) și Clienți. `DbTest` acoperă seed-ul, căutarea și ștergerea în cascadă.
 - **M2 — gata, verificat și pe emulator:** etape bifabile cu șabloane, „Am lucrat azi aici” dintr-o apăsare de pe ecranul Azi (idempotent pe zi), bara de avansare, estimat vs. real. `ProgressTest` 7/7, `DbTest` 4/4 pe API 36.
 - **M3 — gata, verificat pe emulator:** rest de făcut per lucrare și pe tot ecranul Rest (grupat pe lucrare, cu motiv și termen), materiale, ziua cu blocaj și regulile de status din `domain/Rules.kt`. Regula blocaj → Așteptare și dialogul de confirmare la Terminat au fost confirmate pe dispozitiv.
-- **Urmează M4:** măsurători (`Measure`) și extra acceptate, cu dovada înțelegerii.
+- **M4 — gata, de verificat local:** măsurători și extra în detaliul lucrării, `domain/Money.kt` (cenți ↔ text, format italian și românesc) și `domain/Measures.kt` (cantitate × preț unitar, rotunjit la cent). Extra are bifă de înțelegere, rând de dovadă și bifă separată de facturare. Teste noi: `MoneyTest` 9, `MeasuresTest` 6. Schema bazei de date nu se schimbă: `measures` și `extras` existau din M1.
+- **Urmează M5:** banii pe lucrare, cele trei cifre mari și lista „De facturat” (SPEC §5).
