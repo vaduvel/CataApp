@@ -1,8 +1,11 @@
 package com.emanus.lucrari.data.repo
 
 import com.emanus.lucrari.data.AppDb
+import com.emanus.lucrari.data.Billing
 import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Extra
+import com.emanus.lucrari.data.InvoiceKind
+import com.emanus.lucrari.data.InvoiceRef
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.JobToday
@@ -10,6 +13,8 @@ import com.emanus.lucrari.data.JobWithTotals
 import com.emanus.lucrari.data.Material
 import com.emanus.lucrari.data.Measure
 import com.emanus.lucrari.data.MeasureUnit
+import com.emanus.lucrari.data.Method
+import com.emanus.lucrari.data.Payment
 import com.emanus.lucrari.data.Reason
 import com.emanus.lucrari.data.Stage
 import com.emanus.lucrari.data.Todo
@@ -17,11 +22,35 @@ import com.emanus.lucrari.data.TodoWithJob
 import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.data.now
 import com.emanus.lucrari.data.today
+import com.emanus.lucrari.domain.JobTotals
 import com.emanus.lucrari.domain.Rules
 import com.emanus.lucrari.domain.Templates
+import com.emanus.lucrari.domain.Totals
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+
+/** O lucrare cu banii ei, așa cum apare în lista de pe ecranul Bani. */
+data class JobMoney(
+	val job: Job,
+	val clientName: String,
+	val totals: JobTotals,
+)
+
+/**
+ * Cele trei cifre mari de sus (SPEC §5.3) plus lucrările care așteaptă o factură.
+ * Ofertele nu intră nicăieri: o ofertă nu e încă bani.
+ */
+data class MoneySummary(
+	val outstandingCents: Long,
+	val overdueCents: Long,
+	val collectedThisMonthCents: Long,
+	val toInvoice: List<JobMoney>,
+)
+
+/** Facturat și încasat, adunate separat pentru o singură lucrare. */
+private data class Sums(val invoicedCents: Long, val collectedCents: Long)
 
 /**
  * Singurul drum dintre interfață și baza de date. Composable-urile nu ating niciodată DAO-urile.
@@ -60,6 +89,10 @@ class JobRepo(private val db: AppDb) {
 	fun measures(jobId: String): Flow<List<Measure>> = db.measures().observeByJob(jobId)
 
 	fun extras(jobId: String): Flow<List<Extra>> = db.extras().observeByJob(jobId)
+
+	fun payments(jobId: String): Flow<List<Payment>> = db.payments().observeByJob(jobId)
+
+	fun invoices(jobId: String): Flow<List<InvoiceRef>> = db.invoices().observeByJob(jobId)
 
 	fun clients(): Flow<List<Client>> = db.clients().observeAll()
 
@@ -342,6 +375,192 @@ class JobRepo(private val db: AppDb) {
 	suspend fun deleteExtra(extra: Extra) {
 		db.extras().delete(extra)
 	}
+
+	/**
+	 * Cum se plătește lucrarea și cât s-a vorbit (SPEC §5.1). Prețul care nu mai are sens
+	 * se șterge: la plata pe zile nu rămâne agățat un preț la corp din greșeală.
+	 */
+	suspend fun setBilling(
+		job: Job,
+		billing: Billing,
+		agreedPriceCents: Long?,
+		dayRateCents: Long?,
+	) {
+		db.jobs().upsert(
+			job.copy(
+				billing = billing,
+				agreedPriceCents = if (billing == Billing.CORP) agreedPriceCents else null,
+				dayRateCents = if (billing == Billing.ZILE) dayRateCents else null,
+			),
+		)
+	}
+
+	/**
+	 * Bani intrați (SPEC §5.2). Suma zero nu se salvează: n-are ce să însemne o încasare
+	 * de nimic, iar o apăsare greșită nu are voie să umple lista.
+	 */
+	suspend fun addPayment(
+		jobId: String,
+		amountCents: Long,
+		method: Method = Method.BONIFICO,
+		date: LocalDate = today(),
+		note: String? = null,
+	) {
+		if (amountCents == 0L) return
+		db.payments().upsert(
+			Payment(
+				jobId = jobId,
+				date = date,
+				amountCents = amountCents,
+				method = method,
+				note = note?.trim()?.ifBlank { null },
+			),
+		)
+	}
+
+	suspend fun savePayment(payment: Payment) {
+		if (payment.amountCents == 0L) return
+		db.payments().upsert(payment.copy(note = payment.note?.trim()?.ifBlank { null }))
+	}
+
+	suspend fun deletePayment(payment: Payment) {
+		db.payments().delete(payment)
+	}
+
+	/**
+	 * Evidența facturilor trimise (SPEC §5.2). Aplicația nu emite nimic: ține minte doar
+	 * numărul, suma și data, ca să știe ce a cerut deja. Bifa de încasat e separată,
+	 * pentru că o factură trimisă nu înseamnă bani în mână.
+	 */
+	suspend fun addInvoice(
+		jobId: String,
+		amountCents: Long,
+		number: String? = null,
+		kind: InvoiceKind = InvoiceKind.SALDO,
+		date: LocalDate? = today(),
+		due: LocalDate? = null,
+		paid: Boolean = false,
+	) {
+		if (amountCents == 0L) return
+		db.invoices().upsert(
+			InvoiceRef(
+				jobId = jobId,
+				number = number?.trim()?.ifBlank { null },
+				date = date,
+				amountCents = amountCents,
+				kind = kind,
+				due = due,
+				paid = paid,
+			),
+		)
+	}
+
+	suspend fun saveInvoice(invoice: InvoiceRef) {
+		if (invoice.amountCents == 0L) return
+		db.invoices().upsert(invoice.copy(number = invoice.number?.trim()?.ifBlank { null }))
+	}
+
+	/**
+	 * Bifa de încasat schimbă doar starea facturii. Nu creează o încasare: banii se trec
+	 * separat, cu data lor, altfel cele două cifre s-ar amesteca (SPEC §5.2).
+	 */
+	suspend fun toggleInvoicePaid(invoice: InvoiceRef) {
+		db.invoices().upsert(invoice.copy(paid = !invoice.paid))
+	}
+
+	suspend fun deleteInvoice(invoice: InvoiceRef) {
+		db.invoices().delete(invoice)
+	}
+
+	/** Facturat și încasat pentru o lucrare, adunate din rândurile lor. */
+	private fun sums(jobId: String): Flow<Sums> =
+		combine(
+			db.invoices().observeByJob(jobId),
+			db.payments().observeByJob(jobId),
+		) { invoices, payments ->
+			Sums(
+				invoicedCents = invoices.sumOf { it.amountCents },
+				collectedCents = payments.sumOf { it.amountCents },
+			)
+		}
+
+	/**
+	 * Toate cifrele unei lucrări, recalculate singure la orice schimbare: o zi trecută, o
+	 * măsurătoare, un extra acceptat, o factură sau o încasare.
+	 */
+	fun jobTotals(jobId: String): Flow<JobTotals?> =
+		combine(
+			db.jobs().observe(jobId),
+			db.workDays().observeByJob(jobId),
+			db.measures().observeByJob(jobId),
+			db.extras().observeByJob(jobId),
+			sums(jobId),
+		) { job, days, measures, extras, sums ->
+			if (job == null) {
+				null
+			} else {
+				Totals.of(
+					job = job,
+					workedDays = days.size,
+					measures = measures,
+					extras = extras,
+					invoicedCents = sums.invoicedCents,
+					collectedCents = sums.collectedCents,
+				)
+			}
+		}
+
+	/**
+	 * Banii pe toate lucrările. Măsurătorile și extra-urile se citesc o dată, dintr-o
+	 * bucată, și se împart pe lucrări în memorie: la câteva zeci de lucrări e mai ieftin
+	 * decât o interogare pentru fiecare. Lucrările anulate nu apar nicăieri.
+	 */
+	fun moneyBoard(): Flow<List<JobMoney>> =
+		combine(
+			db.jobs().observeBoard(),
+			db.measures().observeAll(),
+			db.extras().observeAll(),
+		) { rows, measures, extras ->
+			val measuresByJob = measures.groupBy { it.jobId }
+			val extrasByJob = extras.groupBy { it.jobId }
+			rows.filter { it.job.status != JobStatus.ANULAT }
+				.map { row ->
+					JobMoney(
+						job = row.job,
+						clientName = row.clientName,
+						totals = Totals.of(
+							job = row.job,
+							workedDays = row.workedDays,
+							measures = measuresByJob[row.job.id].orEmpty(),
+							extras = extrasByJob[row.job.id].orEmpty(),
+							invoicedCents = row.invoicedCents,
+							collectedCents = row.collectedCents,
+						),
+					)
+				}
+		}
+
+	/**
+	 * Cele trei cifre mari și lista De facturat (SPEC §5.3). Data vine de afară, ca ecranul
+	 * să arate corect și dacă telefonul a rămas deschis peste noapte.
+	 */
+	fun moneySummary(date: LocalDate): Flow<MoneySummary> =
+		combine(
+			moneyBoard(),
+			db.payments().observeCollectedSince(date.withDayOfMonth(1)),
+			db.invoices().observeOverdueBefore(date.minusDays(30)),
+		) { rows, collectedThisMonth, overdue ->
+			val live = rows.filter { it.job.status != JobStatus.OFERTAT }
+			MoneySummary(
+				// O lucrare încasată în plus nu are voie să acopere alta neîncasată.
+				outstandingCents = live.sumOf { it.totals.outstandingCents.coerceAtLeast(0L) },
+				overdueCents = overdue,
+				collectedThisMonthCents = collectedThisMonth,
+				toInvoice = live
+					.filter { it.totals.toInvoiceCents > 0 }
+					.sortedByDescending { it.totals.toInvoiceCents },
+			)
+		}
 
 	/** Câte resturi nebifate are lucrarea. Interfața întreabă înainte să pună Terminat. */
 	suspend fun openTodoCount(jobId: String): Int = db.todos().openCount(jobId)

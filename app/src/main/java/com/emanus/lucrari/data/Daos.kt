@@ -254,6 +254,14 @@ interface MeasureDao {
 
 	@Query("SELECT * FROM measures WHERE jobId = :jobId ORDER BY date, place")
 	fun observeByJob(jobId: String): Flow<List<Measure>>
+
+	/**
+	 * Toate măsurătorile deodată. Ecranul Bani are nevoie de ele ca să calculeze baza
+	 * lucrărilor plătite la măsură, iar o casă cu câteva zeci de lucrări încape lejer
+	 * în memorie: mai ieftin decât o interogare pe fiecare lucrare.
+	 */
+	@Query("SELECT * FROM measures")
+	fun observeAll(): Flow<List<Measure>>
 }
 
 @Dao
@@ -269,6 +277,10 @@ interface ExtraDao {
 
 	@Query("SELECT * FROM extras WHERE jobId = :jobId ORDER BY date")
 	fun observeByJob(jobId: String): Flow<List<Extra>>
+
+	/** Toate extra-urile deodată, pentru cifrele de pe ecranul Bani. */
+	@Query("SELECT * FROM extras")
+	fun observeAll(): Flow<List<Extra>>
 }
 
 @Dao
@@ -284,6 +296,10 @@ interface PaymentDao {
 
 	@Query("SELECT * FROM payments WHERE jobId = :jobId ORDER BY date DESC")
 	fun observeByJob(jobId: String): Flow<List<Payment>>
+
+	/** Cât a intrat în mână de la o dată încoace: cifra Încasat luna asta (SPEC §5.3). */
+	@Query("SELECT IFNULL(SUM(amountCents), 0) FROM payments WHERE date >= :from")
+	fun observeCollectedSince(from: LocalDate): Flow<Long>
 }
 
 @Dao
@@ -299,6 +315,14 @@ interface InvoiceDao {
 
 	@Query("SELECT * FROM invoices WHERE jobId = :jobId ORDER BY date DESC")
 	fun observeByJob(jobId: String): Flow<List<InvoiceRef>>
+
+	/**
+	 * Facturi trimise, neîncasate și mai vechi decât data dată: restanțele de pe ecranul
+	 * Bani (SPEC §5.3). Facturile fără dată nu intră, pentru că nu se știe de când curge
+	 * termenul.
+	 */
+	@Query("SELECT IFNULL(SUM(amountCents), 0) FROM invoices WHERE paid = 0 AND date IS NOT NULL AND date <= :before")
+	fun observeOverdueBefore(before: LocalDate): Flow<Long>
 }
 
 @Dao
