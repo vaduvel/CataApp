@@ -27,6 +27,7 @@ import androidx.navigation.navArgument
 import com.emanus.lucrari.R
 import com.emanus.lucrari.ui.screen.ClientsScreen
 import com.emanus.lucrari.ui.screen.JobDetailScreen
+import com.emanus.lucrari.ui.screen.JobMoneyScreen
 import com.emanus.lucrari.ui.screen.JobsScreen
 import com.emanus.lucrari.ui.screen.MoneyScreen
 import com.emanus.lucrari.ui.screen.MoreScreen
@@ -43,6 +44,7 @@ enum class Tab(val route: String, @StringRes val labelRes: Int, val icon: ImageV
 }
 
 const val ROUTE_JOB_DETAIL = "job/{id}"
+const val ROUTE_JOB_MONEY = "money/{id}"
 const val ROUTE_CLIENTS = "clients"
 
 @Composable
@@ -85,7 +87,9 @@ fun AppRoot() {
 			composable(Tab.PUNCH.route) {
 				PunchScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
 			}
-			composable(Tab.MONEY.route) { MoneyScreen() }
+			composable(Tab.MONEY.route) {
+				MoneyScreen(onOpenJobMoney = { id -> navController.navigate("money/" + id) })
+			}
 			composable(Tab.MORE.route) {
 				MoreScreen(onOpenClients = { navController.navigate(ROUTE_CLIENTS) })
 			}
@@ -98,6 +102,15 @@ fun AppRoot() {
 					onBack = { navController.popBackStack() },
 				)
 			}
+			composable(
+				route = ROUTE_JOB_MONEY,
+				arguments = listOf(navArgument("id") { type = NavType.StringType }),
+			) { entry ->
+				JobMoneyScreen(
+					jobId = entry.arguments?.getString("id").orEmpty(),
+					onBack = { navController.popBackStack() },
+				)
+			}
 			composable(ROUTE_CLIENTS) {
 				ClientsScreen(onBack = { navController.popBackStack() })
 			}
@@ -105,11 +118,12 @@ fun AppRoot() {
 	}
 }
 
-/** Tabul rămâne aprins și când ești pe un ecran copil (detaliu lucrare, clienți). */
+/** Tabul rămâne aprins și când ești pe un ecran copil (detaliu lucrare, bani pe lucrare, clienți). */
 private fun isSelected(tab: Tab, route: String?): Boolean = when {
 	route == null -> false
 	route == tab.route -> true
 	tab == Tab.JOBS && route.startsWith("job/") -> true
+	tab == Tab.MONEY && route.startsWith("money/") -> true
 	tab == Tab.MORE && route == ROUTE_CLIENTS -> true
 	else -> false
 }
