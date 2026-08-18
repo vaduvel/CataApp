@@ -2,20 +2,78 @@
 <resources>
 	<string name="app_name">Lucrări</string>
 
+	<!-- Bara de jos -->
 	<string name="tab_today">Azi</string>
 	<string name="tab_jobs">Lucrări</string>
 	<string name="tab_punch">Rest</string>
 	<string name="tab_money">Bani</string>
 	<string name="tab_more">Mai mult</string>
 
+	<!-- Ecrane care se implementează la milestone-urile următoare -->
 	<string name="screen_today_title">Azi</string>
-	<string name="screen_today_subtitle">Lucrările active, memento-urile de azi și butonul „Am lucrat azi aici". Se implementează în M2.</string>
+	<string name="screen_today_subtitle">Lucrările active, memento-urile de azi și butonul „Am lucrat azi aici”. Se implementează în M2.</string>
 	<string name="screen_jobs_title">Lucrări</string>
-	<string name="screen_jobs_subtitle">Lista lucrărilor, cu filtre pe status și căutare după client sau stradă. Se implementează în M1.</string>
+	<string name="screen_jobs_subtitle">Toate lucrările, cu filtre și căutare.</string>
 	<string name="screen_punch_title">Rest de făcut</string>
 	<string name="screen_punch_subtitle">Tot ce a rămas nefăcut, din toate lucrările, grupat pe client și stradă. Se implementează în M3.</string>
 	<string name="screen_money_title">Bani</string>
-	<string name="screen_money_subtitle">De încasat, restanțe peste 30 de zile, încasat luna asta. „Facturat" și „încasat" rămân două cifre separate. Se implementează în M5.</string>
+	<string name="screen_money_subtitle">De încasat, restanțe peste 30 de zile, încasat luna asta. Facturat și încasat rămân două cifre separate. Se implementează în M5.</string>
 	<string name="screen_more_title">Mai mult</string>
-	<string name="screen_more_subtitle">Clienți, șabloane de etape, backup și export. Se implementează în M1 și M7.</string>
+	<string name="screen_more_subtitle">Șabloane de etape, backup, export și import: se implementează în M7.</string>
+
+	<!-- Statusuri -->
+	<string name="status_ofertat">Ofertat</string>
+	<string name="status_programat">Programat</string>
+	<string name="status_in_lucru">În lucru</string>
+	<string name="status_asteptare">Așteptare</string>
+	<string name="status_de_finisat">De finisat</string>
+	<string name="status_terminat">Terminat</string>
+	<string name="status_anulat">Anulat</string>
+	<string name="filter_all">Toate</string>
+
+	<!-- Lista de lucrări -->
+	<string name="jobs_search_hint">Caută după stradă sau client</string>
+	<string name="jobs_new">Lucrare nouă</string>
+	<string name="jobs_empty">Nicio lucrare încă. Apasă pe Lucrare nouă.</string>
+	<string name="jobs_empty_search">Nicio lucrare pentru căutarea asta.</string>
+	<string name="jobs_stages">%1$d din %2$d etape</string>
+	<string name="jobs_days">%1$d zile lucrate</string>
+	<string name="jobs_open_todos">%1$d de făcut</string>
+
+	<!-- Lucrare nouă -->
+	<string name="new_job_title">Lucrare nouă</string>
+	<string name="new_job_client">Client</string>
+	<string name="new_job_address">Stradă</string>
+	<string name="new_job_address_hint">Ex.: Via 23, Milano</string>
+	<string name="new_job_what">Ce lucrare</string>
+	<string name="new_job_days">Câte zile</string>
+	<string name="new_job_client_unnamed">Client fără nume</string>
+	<string name="new_job_untitled">Lucrare</string>
+
+	<!-- Detaliu lucrare -->
+	<string name="job_status">Status</string>
+	<string name="job_stages_title">Etape</string>
+	<string name="job_no_stages">Fără etape. Alege un șablon când faci lucrarea.</string>
+	<string name="job_estimate">%1$d zile estimate</string>
+	<string name="job_call">Sună</string>
+	<string name="job_map">Hartă</string>
+	<string name="job_delete">Șterge lucrarea</string>
+	<string name="job_delete_confirm">Se șterge lucrarea și tot ce ține de ea: etape, zile, resturi, măsurători, bani.</string>
+
+	<!-- Clienți -->
+	<string name="more_clients">Clienți</string>
+	<string name="more_clients_hint">Lista clienților și lucrările fiecăruia</string>
+	<string name="clients_title">Clienți</string>
+	<string name="clients_new">Client nou</string>
+	<string name="clients_empty">Niciun client încă.</string>
+	<string name="client_name">Nume</string>
+	<string name="client_phone">Telefon</string>
+	<string name="client_note">Notă</string>
+	<string name="client_jobs">%1$d lucrări</string>
+
+	<!-- Comune -->
+	<string name="save">Salvează</string>
+	<string name="cancel">Renunță</string>
+	<string name="delete">Șterge</string>
+	<string name="back">Înapoi</string>
 </resources>
