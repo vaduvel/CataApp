@@ -48,6 +48,6 @@ Păstrează `~/.android/debug.keystore` într-un loc sigur, în afara repo-ului.
 - [x] M3 — rest de făcut, materiale, blocaje
 - [x] M4 — măsurători și extra
 - [x] M5 — bani: încasări, evidență facturi
-- [ ] M6 — „Descriere pentru factură” + copiere
+- [x] M6 — „Descriere pentru factură” + copiere
 - [ ] M7 — poze, backup, memento-uri (obligatoriu înainte de livrare)
 - [ ] M8 — finisaje

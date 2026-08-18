@@ -24,6 +24,7 @@ Wrapper-ul Gradle 8.9 **este comis**. Folosește `./gradlew`, niciodată `gradle
 1. **Fără rețea.** Nu adăuga permisiuni de rețea (INTERNET, ACCESS_NETWORK_STATE, ACCESS_WIFI_STATE). Dacă o funcție are nevoie de internet, nu intră în aplicație. Verifică cu `tools/check-no-internet.sh`.
 2. **Banii se țin în cenți**, ca `Long`. Niciodată `Double`/`Float` pentru sume. Cantitățile de măsurători sunt `Double`.
 	- Scrierea și citirea sumelor trec **doar** prin `domain/Money.kt`, iar cantitățile prin `domain/Measures.kt`. Fără `NumberFormat` și fără `String.format` pentru bani: formatul trebuie să fie identic pe orice telefon, indiferent de limba sistemului, pentru că testul golden din M6 compară șir cu șir.
+	- SPEC §5.5 cerea inițial `NumberFormat` cu `Locale.ITALY`. Indicația era greșită: pe un telefon cu altă limbă de sistem ar fi ieșit alt text, iar golden-ul ar fi picat. Specul a fost corectat, formatarea rămâne manuală, în `domain/`.
 	- Aritmetica banilor stă în `domain/Totals.kt`. Ecranele nu adună și nu scad sume singure.
 3. **Aplicația nu emite facturi.** Produce evidența și *textul* care ajunge pe factură. Zero XML, zero SdI, zero TVA, zero date fiscale ale clientului.
 4. **„Facturat” și „încasat” sunt două cifre separate.** Nu presupune niciodată că sunt egale (vezi SPEC §5.2). Bifa „încasată” de pe o factură nu creează o încasare și nu mișcă cifra de încasat: banii intrați se trec separat, cu data lor.
@@ -60,6 +61,7 @@ Aplicația se folosește pe șantier, cu mâna murdară și din mers. De aici re
 - Butoanele principale au **56 dp** înălțime; butoanele-pictogramă se scriu ca `IconButton`, care are deja ținta de 48 dp.
 - Acțiunea care șterge stă la marginea opusă a rândului față de cea care bifează. Unde rândul are deja cerc de bifă și editare, ștergerea stă în foaia de editare, nu pe rând.
 - Fiecare lucrare apare o singură dată pe un ecran (regula 6 de mai sus).
+- Textul pentru contabil nu se salvează nicăieri. Se compune la deschiderea ecranului din datele lucrării, ca să nu existe două adevăruri diferite: unul în bază și unul pe hârtie.
 
 ## Definition of done pentru orice milestone
 
@@ -75,4 +77,6 @@ Commit-uri: Conventional Commits, ex. `feat(money): rest de incasat pe lucrare`.
 - **M3 — gata, verificat pe emulator:** rest de făcut per lucrare și pe tot ecranul Rest (grupat pe lucrare, cu motiv și termen), materiale, ziua cu blocaj și regulile de status din `domain/Rules.kt`. Regula blocaj → Așteptare și dialogul de confirmare la Terminat au fost confirmate pe dispozitiv.
 - **M4 — gata, verificat pe emulator:** măsurători și extra în detaliul lucrării, `domain/Money.kt` (cenți ↔ text) și `domain/Measures.kt` (cantitate × preț unitar, rotunjit la cent). Extra are bifă de înțelegere, rând de dovadă și bifă separată de facturare. Teste: 32/32.
 - **M5 — gata, verificat pe emulator:** `domain/Totals.kt` (baza după felul plății, extra acceptate și facturabile, total, de facturat, rest de încasat), încasări și evidența facturilor pe lucrare, ecranul Bani cu cele trei cifre mari și lista „De facturat”. Teste: 41/41 unitare, `DbTest` 4/4 pe dispozitiv, schema neschimbată.
-- **Urmează M6:** „Descriere pentru factură” în italiană (`domain/Descrizione.kt`), dicționarul RO → IT din SPEC §15, testul golden byte cu byte, butonul de copiere și trimitere, legătura din detaliul lucrării către banii ei și curățarea ecranului Bani: lucrările din „De facturat” nu se mai repetă în lista de dedesubt, care devine „Restul lucrărilor”.
+- **M6 — împins, de verificat pe emulator:** `domain/Dictionary.kt` (43 de perechi RO → IT din SPEC §15) și `domain/Descrizione.kt` (textul în italiană, cu perioada, lucrările executate, măsurătorile, extra acceptate și cifrele), ecranul „Descriere pentru factură” cu copiere și trimitere prin `ACTION_SEND`, intrările din detaliul lucrării către banii ei și către descriere, ecranul Bani dedublat („Restul lucrărilor”). Teste așteptate: 49 unitare, dintre care 8 în `DescrizioneTest`, cu golden byte cu byte pe lucrarea demo.
+	- Abatere declarată față de §5.5: rândul de măsurătoare se scrie cu `place`, fără `work`, exact ca exemplul din spec. Dacă vrea și lucrarea acolo, se adaugă în M8 și se schimbă și golden-ul.
+- **Urmează M7 (obligatoriu înainte de livrare):** poze pe lucrare și pe rest, backup zilnic automat plus export și import prin SAF, memento-urile de la 19:00 (`ReminderWorker`).
