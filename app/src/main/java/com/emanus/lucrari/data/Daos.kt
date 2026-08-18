@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Embedded
 import androidx.room.Query
 import androidx.room.Upsert
+import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -21,6 +22,20 @@ data class JobWithTotals(
 	val openTodos: Int,
 	val invoicedCents: Long,
 	val collectedCents: Long,
+)
+
+/**
+ * Lucrarea așa cum apare pe ecranul Azi: cât a avansat, dacă ziua de azi e deja trecută
+ * și care e următoarea etapă nebifată.
+ */
+data class JobToday(
+	@Embedded val job: Job,
+	val clientName: String,
+	val workedDays: Int,
+	val stageCount: Int,
+	val stagesDone: Int,
+	val loggedToday: Int,
+	val nextStage: String?,
 )
 
 /** Un rest de făcut, cu lucrarea și adresa lui, pentru ecranul global din M3. */
@@ -66,6 +81,9 @@ interface JobDao {
 	@Query("SELECT * FROM jobs WHERE id = :id")
 	fun observe(id: String): Flow<Job?>
 
+	@Query("SELECT * FROM jobs WHERE id = :id")
+	suspend fun byId(id: String): Job?
+
 	@Query("SELECT * FROM jobs ORDER BY createdAt DESC")
 	fun observeAll(): Flow<List<Job>>
 
@@ -107,6 +125,26 @@ interface JobDao {
 		"""
 	)
 	fun searchByStreetOrClient(q: String): Flow<List<JobWithTotals>>
+
+	/**
+	 * Ecranul Azi (SPEC §6). Statusurile vin ca parametru, nu ca text în SQL, ca să nu
+	 * depindă de felul în care sunt scrise enum-urile în baza de date.
+	 */
+	@Query(
+		"""
+		SELECT j.*, c.name AS clientName,
+			(SELECT COUNT(*) FROM work_days w WHERE w.jobId = j.id) AS workedDays,
+			(SELECT COUNT(*) FROM stages s WHERE s.jobId = j.id) AS stageCount,
+			(SELECT COUNT(*) FROM stages s WHERE s.jobId = j.id AND s.done = 1) AS stagesDone,
+			(SELECT COUNT(*) FROM work_days w WHERE w.jobId = j.id AND w.date = :date) AS loggedToday,
+			(SELECT s.name FROM stages s WHERE s.jobId = j.id AND s.done = 0 ORDER BY s.sort LIMIT 1) AS nextStage
+		FROM jobs j
+		JOIN clients c ON c.id = j.clientId
+		WHERE j.status IN (:statuses)
+		ORDER BY j.createdAt DESC
+		"""
+	)
+	fun observeToday(date: LocalDate, statuses: List<JobStatus>): Flow<List<JobToday>>
 }
 
 @Dao
@@ -122,6 +160,10 @@ interface StageDao {
 
 	@Query("SELECT * FROM stages WHERE jobId = :jobId ORDER BY sort")
 	fun observeByJob(jobId: String): Flow<List<Stage>>
+
+	/** Ultima poziție folosită, ca o etapă nouă să ajungă la coadă. */
+	@Query("SELECT MAX(sort) FROM stages WHERE jobId = :jobId")
+	suspend fun maxSort(jobId: String): Int?
 }
 
 @Dao
@@ -137,6 +179,13 @@ interface WorkDayDao {
 
 	@Query("SELECT * FROM work_days WHERE jobId = :jobId ORDER BY date")
 	fun observeByJob(jobId: String): Flow<List<WorkDay>>
+
+	@Query("SELECT * FROM work_days WHERE jobId = :jobId ORDER BY date DESC")
+	fun observeByJobDesc(jobId: String): Flow<List<WorkDay>>
+
+	/** O singură zi per lucrare per dată: a doua apăsare nu dublează nimic. */
+	@Query("SELECT * FROM work_days WHERE jobId = :jobId AND date = :date LIMIT 1")
+	suspend fun byJobAndDate(jobId: String, date: LocalDate): WorkDay?
 }
 
 @Dao
