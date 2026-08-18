@@ -26,7 +26,7 @@ Wrapper-ul Gradle 8.9 **este comis**. Folosește `./gradlew`, niciodată `gradle
 3. **Aplicația nu emite facturi.** Produce evidența și *textul* care ajunge pe factură. Zero XML, zero SdI, zero TVA, zero date fiscale ale clientului.
 4. **„Facturat” și „încasat” sunt două cifre separate.** Nu presupune niciodată că sunt egale (vezi SPEC §5.2).
 5. **Limbi:** cod și identificatori în engleză; textele din interfață în română, **doar** în `strings.xml`, niciodată scrise direct în composable-uri; textele generate pentru client sau contabil în italiană, doar în `domain/Descrizione.kt` și `domain/Dictionary.kt`.
-	- Ghilimelele românești „…” se scriu doar în `strings.xml`. Într-un literal Kotlin, un `\"` ASCII folosit ca ghilimea de închidere termină string-ul mai devreme și produce erori derutante de tip `Unresolved reference`. Diacriticele nu sunt problema, ghilimelele sunt. Dacă ai nevoie de ghilimele în cod, folosește `\\"`.
+	- Ghilimelele românești „…” se scriu doar în `strings.xml`. Într-un literal Kotlin, o ghilimea dreaptă ASCII folosită ca ghilimea de închidere termină string-ul mai devreme și produce erori derutante de tip `Unresolved reference`. Diacriticele nu sunt problema, ghilimelele sunt. Dacă ai nevoie de ghilimele în cod, scapă-le cu backslash.
 	- Excepție: numele șabloanelor și ale etapelor din `domain/Templates.kt` sunt **date**, nu texte de interfață. Ele sunt și cheile din dicționarul RO → IT, deci rămân în cod și se scriu exact ca în SPEC §14.
 6. **Logica de business stă în `domain/`**, pură, testabilă fără Android. Zero logică de calcul în composable-uri.
 7. Fără `!!`, fără `GlobalScope`, fără operații de bază de date pe main thread.
@@ -47,6 +47,14 @@ Sunt funcții pure în `domain/Rules.kt`, acoperite de `RulesTest`. Regulile **p
 - `TERMINAT` cu resturi nebifate cere confirmare, nu se refuză.
 - Toate etapele bifate + resturi rămase → se propune `DE_FINISAT`.
 
+## Interfața
+
+Aplicația se folosește pe șantier, cu mâna murdară și din mers. De aici trei reguli care nu se negociază:
+
+- **Bifa se schimbă doar din butonul de bifă**, niciodată prin apucarea rândului întreg. O atingere greșită nu are voie să debifeze tăcut o etapă terminată sau un rest rezolvat. Apăsarea pe textul rândului deschide sau editează, atât.
+- Butoanele principale au **56 dp** înălțime; butoanele-pictogramă se scriu ca `IconButton`, care are deja ținta de 48 dp.
+- Acțiunea care șterge stă la marginea opusă a rândului față de cea care bifează.
+
 ## Definition of done pentru orice milestone
 
 `./gradlew :app:testDebugUnitTest :app:assembleDebug` trece, `bash tools/check-no-internet.sh` trece, și criteriile din SPEC §10 pentru milestone-ul respectiv sunt bifate.
@@ -58,5 +66,5 @@ Commit-uri: Conventional Commits, ex. `feat(money): rest de incasat pe lucrare`.
 - **M0 — gata, build verificat local:** schelet Gradle, temă, navigare cu 5 ecrane, script de verificare offline.
 - **M1 — gata:** modelul Room complet din SPEC §4 (12 entități, convertoare, DAO-uri), `domain/Seed.kt` cu lucrarea demo, `domain/Templates.kt` cu șabloanele din SPEC §14, ecranele Lucrări (listă, căutare după stradă, filtre, lucrare nouă în 4 câmpuri), Detaliu lucrare (status, etape, sunat, hartă, ștergere) și Clienți. `DbTest` acoperă seed-ul, căutarea și ștergerea în cascadă.
 - **M2 — gata, verificat și pe emulator:** etape bifabile cu șabloane, „Am lucrat azi aici” dintr-o apăsare de pe ecranul Azi (idempotent pe zi), bara de avansare, estimat vs. real. `ProgressTest` 7/7, `DbTest` 4/4 pe API 36.
-- **M3 — gata:** rest de făcut per lucrare și pe tot ecranul Rest (grupat pe lucrare, cu motiv și termen), materiale, ziua cu blocaj și regulile de status din `domain/Rules.kt`.
+- **M3 — gata, verificat pe emulator:** rest de făcut per lucrare și pe tot ecranul Rest (grupat pe lucrare, cu motiv și termen), materiale, ziua cu blocaj și regulile de status din `domain/Rules.kt`. Regula blocaj → Așteptare și dialogul de confirmare la Terminat au fost confirmate pe dispozitiv.
 - **Urmează M4:** măsurători (`Measure`) și extra acceptate, cu dovada înțelegerii.

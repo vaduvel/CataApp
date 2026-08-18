@@ -452,20 +452,22 @@ fun JobDetailScreen(jobId: String, onBack: () -> Unit) {
 						}
 					}
 				} else {
+					// Bifa se schimbă doar din buton. Pe șantier, o atingere greșită pe rând
+					// nu are voie să debifeze tăcut o etapă terminată.
 					items(stages, key = { it.id }) { stage ->
 						Row(
-							modifier = Modifier
-								.fillMaxWidth()
-								.clickable { vm.toggleStage(stage) },
-							horizontalArrangement = Arrangement.spacedBy(12.dp),
+							modifier = Modifier.fillMaxWidth(),
+							horizontalArrangement = Arrangement.spacedBy(4.dp),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
-							val icon = if (stage.done) {
-								Icons.Outlined.Check
-							} else {
-								Icons.Outlined.RadioButtonUnchecked
+							IconButton(onClick = { vm.toggleStage(stage) }) {
+								val icon = if (stage.done) {
+									Icons.Outlined.Check
+								} else {
+									Icons.Outlined.RadioButtonUnchecked
+								}
+								Icon(icon, contentDescription = null)
 							}
-							Icon(icon, contentDescription = null)
 							Text(
 								text = stage.name,
 								style = MaterialTheme.typography.bodyLarge,
