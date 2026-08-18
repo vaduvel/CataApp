@@ -185,3 +185,16 @@ data class Photo(
 	val phase: Phase = Phase.DURING,
 	val takenAt: Long = now(),
 )
+
+// Memento-ul poate fi legat de o lucrare, de un client sau de nimic (notare liberă),
+// de aceea nu are chei străine, doar indici.
+@Entity(tableName = "reminders", indices = [Index("jobId"), Index("clientId")])
+data class Reminder(
+	@PrimaryKey val id: String = uuid(),
+	val jobId: String? = null,
+	val clientId: String? = null,
+	val text: String,
+	val dueAt: Long,
+	val auto: Boolean = false,
+	val done: Boolean = false,
+)
