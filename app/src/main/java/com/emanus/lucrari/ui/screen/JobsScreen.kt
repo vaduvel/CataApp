@@ -142,6 +142,7 @@ fun JobsScreen(
 	val query by vm.query.collectAsState()
 	val filter by vm.filter.collectAsState()
 	val listState = rememberLazyListState()
+	var lastTopRowId by rememberSaveable { mutableStateOf<String?>(null) }
 	var showNew by rememberSaveable { mutableStateOf(false) }
 	val unnamedClient = stringResource(R.string.new_job_client_unnamed)
 	val untitled = stringResource(R.string.new_job_untitled)
@@ -152,11 +153,17 @@ fun JobsScreen(
 	// LazyColumn ține poziția după cheia primului rând vizibil, ca să nu-ți sară conținutul
 	// sub deget. Când o lucrare nouă intră în capul listei, poziția urmează cheia veche la
 	// noul ei index, iar rândul nou rămâne desenat deasupra marginii de sus: lista pare că
-	// nu l-a primit, deși îl are. Aici e invers decât vrea el: a salvat ceva și trebuie să
-	// vadă ce a salvat, deci ne întoarcem în cap când se schimbă primul rând.
+	// nu l-a primit, deși îl are.
+	//
+	// Ne întoarcem în cap doar când chiar se schimbă primul rând, nu la fiecare intrare pe
+	// ecran: cine deschide o lucrare din mijlocul listei și se întoarce trebuie să găsească
+	// lista unde a lăsat-o. De aceea ținem minte ultimul cap de listă văzut și comparăm.
 	val topRowId = jobs.firstOrNull()?.job?.id
 	LaunchedEffect(topRowId) {
-		if (topRowId != null) listState.scrollToItem(0)
+		if (topRowId == null) return@LaunchedEffect
+		val previous = lastTopRowId
+		lastTopRowId = topRowId
+		if (previous != null && previous != topRowId) listState.scrollToItem(0)
 	}
 
 	Scaffold(
