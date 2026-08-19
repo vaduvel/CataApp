@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.emanus.lucrari.R
+import com.emanus.lucrari.ui.screen.CalendarScreen
 import com.emanus.lucrari.ui.screen.ClientsScreen
 import com.emanus.lucrari.ui.screen.DescrizioneScreen
 import com.emanus.lucrari.ui.screen.JobDetailScreen
@@ -50,6 +51,7 @@ const val ROUTE_JOB_MONEY = "money/{id}"
 const val ROUTE_DESCRIZIONE = "descrizione/{id}"
 const val ROUTE_CLIENTS = "clients"
 const val ROUTE_PHOTOS = "photos"
+const val ROUTE_CALENDAR = "calendar"
 
 @Composable
 fun AppRoot() {
@@ -86,7 +88,10 @@ fun AppRoot() {
 				TodayScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
 			}
 			composable(Tab.JOBS.route) {
-				JobsScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
+				JobsScreen(
+					onOpenJob = { id -> navController.navigate("job/" + id) },
+					onOpenCalendar = { navController.navigate(ROUTE_CALENDAR) },
+				)
 			}
 			composable(Tab.PUNCH.route) {
 				PunchScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
@@ -135,6 +140,12 @@ fun AppRoot() {
 			composable(ROUTE_PHOTOS) {
 				PhotosScreen(onBack = { navController.popBackStack() })
 			}
+			composable(ROUTE_CALENDAR) {
+				CalendarScreen(
+					onBack = { navController.popBackStack() },
+					onOpenJob = { id -> navController.navigate("job/" + id) },
+				)
+			}
 		}
 	}
 }
@@ -145,6 +156,7 @@ private fun isSelected(tab: Tab, route: String?): Boolean = when {
 	route == tab.route -> true
 	tab == Tab.JOBS && route.startsWith("job/") -> true
 	tab == Tab.JOBS && route.startsWith("descrizione/") -> true
+	tab == Tab.JOBS && route == ROUTE_CALENDAR -> true
 	tab == Tab.MONEY && route.startsWith("money/") -> true
 	tab == Tab.MORE && (route == ROUTE_CLIENTS || route == ROUTE_PHOTOS) -> true
 	else -> false

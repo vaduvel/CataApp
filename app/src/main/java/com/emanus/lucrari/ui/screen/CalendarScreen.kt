@@ -1,6 +1,7 @@
 package com.emanus.lucrari.ui.screen
 
 import android.app.Application
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -79,8 +81,8 @@ class CalendarViewModel(app: Application) : AndroidViewModel(app) {
 
 /**
  * Calendarul de lucru (SPEC §11, M8): ce e programat și când. O lucrare ocupă toate zilele
- * din interval, nu doar ziua de început, ca să vadă dintr-o privire când e liber. Atinge o
- * zi și vezi ce e în ea; atinge lucrarea și intri în ea.
+ * din intervalul ei, nu doar ziua de început, ca să vadă dintr-o privire când e liber.
+ * Atinge o zi și vezi ce e în ea; atinge lucrarea și intri în ea.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -240,55 +242,40 @@ private fun DayCell(
 		count > 0 -> MaterialTheme.colorScheme.onPrimaryContainer
 		else -> MaterialTheme.colorScheme.onSurface
 	}
+	// Ziua de azi se vede prin contur, ca să nu se bată cu fundalul zilelor ocupate.
+	val outline = if (isToday && !isSelected) {
+		MaterialTheme.colorScheme.primary
+	} else {
+		Color.Transparent
+	}
 	Box(
 		modifier = modifier
-			.height(56.dp)
 			.padding(2.dp)
-			.border(
-				width = if (isToday && !isSelected) 2.dp else 0.dp,
-				color = if (isToday && !isSelected) {
-					MaterialTheme.colorScheme.primary
-				} else {
-					Color.Transparent
-				},
-				shape = shape,
-			)
+			.height(56.dp)
+			.clip(shape)
+			.background(background)
+			.border(width = 2.dp, color = outline, shape = shape)
 			.clickable { onClick() },
 		contentAlignment = Alignment.Center,
 	) {
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(2.dp),
-			contentAlignment = Alignment.Center,
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.spacedBy(2.dp),
 		) {
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.spacedBy(2.dp),
-			) {
+			Text(
+				text = date.dayOfMonth.toString(),
+				style = MaterialTheme.typography.bodyLarge,
+				color = content,
+			)
+			if (count > 0) {
 				Text(
-					text = date.dayOfMonth.toString(),
-					style = MaterialTheme.typography.bodyLarge,
+					text = "•".repeat(minOf(count, 3)),
+					style = MaterialTheme.typography.bodySmall,
 					color = content,
 				)
-				if (count > 0) {
-					Text(
-						text = "•".repeat(minOf(count, 3)),
-						style = MaterialTheme.typography.bodySmall,
-						color = content,
-					)
-				}
 			}
 		}
 	}
-	Box(
-		modifier = Modifier
-			.height(0.dp)
-			.padding(0.dp),
-	) {
-		// Fundalul se desenează pe caseta de mai sus; aici nu mai e nimic de pus.
-	}
-	if (background == Color.Transparent) return
 }
 
 /** O lucrare din ziua atinsă: titlu, status, unde și intervalul ei. */

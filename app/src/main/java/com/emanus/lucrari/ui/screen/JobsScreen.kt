@@ -11,16 +11,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -115,7 +118,11 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 }
 
 @Composable
-fun JobsScreen(onOpenJob: (String) -> Unit, vm: JobsViewModel = viewModel()) {
+fun JobsScreen(
+	onOpenJob: (String) -> Unit,
+	onOpenCalendar: () -> Unit,
+	vm: JobsViewModel = viewModel(),
+) {
 	val jobs by vm.jobs.collectAsState()
 	val query by vm.query.collectAsState()
 	val filter by vm.filter.collectAsState()
@@ -137,16 +144,31 @@ fun JobsScreen(onOpenJob: (String) -> Unit, vm: JobsViewModel = viewModel()) {
 				.fillMaxSize()
 				.padding(padding),
 		) {
-			OutlinedTextField(
-				value = query,
-				onValueChange = { vm.setQuery(it) },
-				label = { Text(stringResource(R.string.jobs_search_hint)) },
-				leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
-				singleLine = true,
+			Row(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(horizontal = 16.dp, vertical = 8.dp),
-			)
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				OutlinedTextField(
+					value = query,
+					onValueChange = { vm.setQuery(it) },
+					label = { Text(stringResource(R.string.jobs_search_hint)) },
+					leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+					singleLine = true,
+					modifier = Modifier.weight(1f),
+				)
+				IconButton(
+					onClick = onOpenCalendar,
+					modifier = Modifier.size(56.dp),
+				) {
+					Icon(
+						Icons.Outlined.CalendarMonth,
+						contentDescription = stringResource(R.string.calendar_open),
+					)
+				}
+			}
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -281,4 +303,5 @@ private fun JobCard(row: JobWithTotals, onClick: () -> Unit) {
 			}
 		}
 	}
+}
 }
