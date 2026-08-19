@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<!-- M8: programarea lucrărilor -->
+	<string name="new_job_start">Când începe</string>
+	<string name="new_job_start_none">Fără dată</string>
+	<string name="new_job_start_today">Azi</string>
+	<string name="new_job_start_tomorrow">Mâine</string>
+	<string name="new_job_start_pick">Altă zi</string>
+	<string name="new_job_start_chosen">Începe %1$s</string>
+	<string name="new_job_period">Începe %1$s, gata %2$s</string>
+	<string name="jobs_planned">Programat: %1$s</string>
+	<string name="jobs_planned_period">Programat: %1$s → %2$s</string>
+	<string name="date_pick_ok">Alege</string>
+
+</resources>

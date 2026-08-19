@@ -43,10 +43,13 @@ import com.emanus.lucrari.App
 import com.emanus.lucrari.R
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.JobWithTotals
+import com.emanus.lucrari.domain.Dates
+import com.emanus.lucrari.domain.Schedule
 import com.emanus.lucrari.domain.Templates
 import com.emanus.lucrari.ui.component.NewJobSheet
 import com.emanus.lucrari.ui.component.StatusChip
 import com.emanus.lucrari.ui.component.labelRes
+import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -61,6 +64,7 @@ import kotlinx.coroutines.launch
 class JobsViewModel(app: Application) : AndroidViewModel(app) {
 
 	private val repo = (app as App).repo
+	private val schedule = (app as App).scheduleRepo
 
 	private val _query = MutableStateFlow("")
 	val query: StateFlow<String> = _query.asStateFlow()
@@ -92,6 +96,7 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 		what: String,
 		template: String?,
 		days: Int?,
+		start: LocalDate?,
 		onCreated: (String) -> Unit,
 	) {
 		viewModelScope.launch {
@@ -102,6 +107,8 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 				type = template,
 				estDays = days,
 			)
+			// Data vine după creare: pune și statusul potrivit (Programat pentru viitor).
+			if (start != null) schedule.setPlannedStart(id, start)
 			onCreated(id)
 		}
 	}
@@ -191,13 +198,14 @@ fun JobsScreen(onOpenJob: (String) -> Unit, vm: JobsViewModel = viewModel()) {
 		NewJobSheet(
 			templates = Templates.names,
 			onDismiss = { showNew = false },
-			onSave = { client, address, what, template, days ->
+			onSave = { client, address, what, template, days, start ->
 				vm.create(
 					client = client.ifBlank { unnamedClient },
 					address = address,
 					what = what.ifBlank { template ?: untitled },
 					template = template,
 					days = days,
+					start = start,
 				) { id ->
 					showNew = false
 					onOpenJob(id)
@@ -232,6 +240,23 @@ private fun JobCard(row: JobWithTotals, onClick: () -> Unit) {
 			}
 			val where = listOfNotNull(row.clientName, row.job.street, row.job.city)
 			Text(text = where.joinToString(", "), style = MaterialTheme.typography.bodyMedium)
+			val planned = row.job.plannedStart
+			if (planned != null && row.job.status == JobStatus.PROGRAMAT) {
+				val end = Schedule.endDate(planned, row.job.estDays)
+				Text(
+					text = if (end == planned) {
+						stringResource(R.string.jobs_planned, Dates.dayMonth(planned))
+					} else {
+						stringResource(
+							R.string.jobs_planned_period,
+							Dates.dayMonth(planned),
+							Dates.dayMonth(end),
+						)
+					},
+					style = MaterialTheme.typography.bodySmall,
+					color = MaterialTheme.colorScheme.primary,
+				)
+			}
 			if (row.stageCount > 0) {
 				LinearProgressIndicator(
 					progress = { row.stagesDone.toFloat() / row.stageCount },

@@ -7,6 +7,7 @@ import com.emanus.lucrari.data.repo.BackupRepo
 import com.emanus.lucrari.data.repo.JobRepo
 import com.emanus.lucrari.data.repo.PhotoStore
 import com.emanus.lucrari.data.repo.ReminderRepo
+import com.emanus.lucrari.data.repo.ScheduleRepo
 import com.emanus.lucrari.domain.Seed
 import com.emanus.lucrari.work.ReminderNotifier
 import com.emanus.lucrari.work.WorkScheduler
@@ -26,6 +27,7 @@ class App : Application() {
 	val backupRepo: BackupRepo by lazy { BackupRepo(this, db) }
 	val photoStore: PhotoStore by lazy { PhotoStore(this, db) }
 	val reminderRepo: ReminderRepo by lazy { ReminderRepo(db) }
+	val scheduleRepo: ScheduleRepo by lazy { ScheduleRepo(db) }
 	val prefs: AppPrefs by lazy { AppPrefs(this) }
 
 	private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
