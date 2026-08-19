@@ -41,10 +41,17 @@ private data class ReminderData(
 	val reminders: List<Reminder>,
 )
 
+/**
+ * Rulează de două ori pe zi cu aceeași clasă: seara la 19:00 pentru tot ce ține de
+ * bani, oferte și resturi, dimineața la 07:30 doar pentru lucrările care încep azi.
+ * Rularea de dimineață e marcată cu [WorkScheduler.KEY_MORNING].
+ */
 class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 	override suspend fun doWork(): Result {
 		val app = applicationContext as? App ?: return Result.failure()
 		return runCatching {
+			val morning = inputData.getBoolean(WorkScheduler.KEY_MORNING, false)
+			val kinds = if (morning) ReminderRules.MORNING_KINDS else ReminderRules.EVENING_KINDS
 			val data = app.db.withTransaction {
 				val dao = app.db.backup()
 				ReminderData(
@@ -68,6 +75,7 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
 				invoices = data.invoices,
 				todos = data.todos,
 				existingOpen = existing,
+				kinds = kinds,
 			)
 			for (candidate in candidates) {
 				val message = text.format(candidate)
@@ -90,12 +98,18 @@ private class ReminderText(private val context: Context) {
 	private val overduePrefix = context.getString(R.string.reminder_prefix_overdue)
 	private val offerPrefix = context.getString(R.string.reminder_prefix_offer)
 	private val todoPrefix = context.getString(R.string.reminder_prefix_todo)
+	private val startSoonPrefix = context.getString(R.string.reminder_prefix_start_soon)
+	private val startTomorrowPrefix = context.getString(R.string.reminder_prefix_start_tomorrow)
+	private val startTodayPrefix = context.getString(R.string.reminder_prefix_start_today)
 
 	fun kindOf(text: String): ReminderKind? = when {
 		text.startsWith(toInvoicePrefix) -> ReminderKind.TO_INVOICE
 		text.startsWith(overduePrefix) -> ReminderKind.OVERDUE_INVOICE
 		text.startsWith(offerPrefix) -> ReminderKind.OFFER_FOLLOW_UP
 		text.startsWith(todoPrefix) -> ReminderKind.TODO_DUE
+		text.startsWith(startSoonPrefix) -> ReminderKind.START_SOON
+		text.startsWith(startTomorrowPrefix) -> ReminderKind.START_TOMORROW
+		text.startsWith(startTodayPrefix) -> ReminderKind.START_TODAY
 		else -> null
 	}
 
@@ -108,6 +122,12 @@ private class ReminderText(private val context: Context) {
 		)
 		ReminderKind.OFFER_FOLLOW_UP -> context.getString(R.string.reminder_offer, candidate.jobTitle)
 		ReminderKind.TODO_DUE -> context.getString(R.string.reminder_todo, candidate.jobTitle)
+		ReminderKind.START_SOON -> context.getString(R.string.reminder_start_soon, candidate.jobTitle)
+		ReminderKind.START_TOMORROW -> context.getString(
+			R.string.reminder_start_tomorrow,
+			candidate.jobTitle,
+		)
+		ReminderKind.START_TODAY -> context.getString(R.string.reminder_start_today, candidate.jobTitle)
 	}
 }
 

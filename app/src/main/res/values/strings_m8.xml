@@ -31,4 +31,13 @@
 		<item>D</item>
 	</string-array>
 
+	<!-- M8: memento-uri de început. Prefixele trebuie să rămână începutul exact al
+		textelor de mai jos, pentru că worker-ul recunoaște tipul după prefix. -->
+	<string name="reminder_prefix_start_soon">Peste 3 zile începe</string>
+	<string name="reminder_prefix_start_tomorrow">Mâine începe</string>
+	<string name="reminder_prefix_start_today">Azi începe</string>
+	<string name="reminder_start_soon">Peste 3 zile începe %1$s. Ai materialele?</string>
+	<string name="reminder_start_tomorrow">Mâine începe %1$s.</string>
+	<string name="reminder_start_today">Azi începe %1$s.</string>
+
 </resources>

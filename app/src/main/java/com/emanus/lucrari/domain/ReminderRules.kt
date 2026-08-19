@@ -13,7 +13,15 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
-enum class ReminderKind { TO_INVOICE, OVERDUE_INVOICE, OFFER_FOLLOW_UP, TODO_DUE }
+enum class ReminderKind {
+	TO_INVOICE,
+	OVERDUE_INVOICE,
+	OFFER_FOLLOW_UP,
+	TODO_DUE,
+	START_SOON,
+	START_TOMORROW,
+	START_TODAY,
+}
 
 data class ReminderKey(val jobId: String, val kind: ReminderKind)
 
@@ -25,8 +33,26 @@ data class ReminderCandidate(
 	val overdueDays: Long? = null,
 )
 
-/** Regulile pure din SPEC §5.4. Worker-ul doar citește, salvează și notifică. */
+/**
+ * Regulile pure din SPEC §5.4, plus memento-urile de început de lucrare (M8).
+ * Worker-ul doar citește, salvează și notifică.
+ *
+ * Memento-urile de început se uită la [Job.plannedStart] al lucrărilor rămase pe
+ * `PROGRAMAT`: cu 3 zile înainte (să aibă timp de materiale), în ajun și în
+ * dimineața zilei. Primele două au sens seara, ultimul are sens dimineața, așa că
+ * rularea de la 07:30 cere doar [MORNING_KINDS], iar cea de la 19:00 [EVENING_KINDS].
+ *
+ * Regula se uită la ziua exactă, nu la un interval: dacă telefonul e stins toată
+ * ziua și worker-ul prinde abia ziua următoare, memento-ul acelei zile se pierde.
+ * Următorul prag (ajunul, apoi dimineața) prinde oricum lucrarea.
+ */
 object ReminderRules {
+	/** Rularea de seară caută tot, în afară de memento-ul care are sens dimineața. */
+	val EVENING_KINDS: Set<ReminderKind> = ReminderKind.entries.toSet() - ReminderKind.START_TODAY
+
+	/** Rularea de dimineață caută doar lucrările care încep azi. */
+	val MORNING_KINDS: Set<ReminderKind> = setOf(ReminderKind.START_TODAY)
+
 	fun candidates(
 		today: LocalDate,
 		zoneId: ZoneId,
@@ -37,24 +63,39 @@ object ReminderRules {
 		invoices: List<InvoiceRef>,
 		todos: List<Todo>,
 		existingOpen: Set<ReminderKey>,
+		kinds: Set<ReminderKind> = ReminderKind.entries.toSet(),
 	): List<ReminderCandidate> {
 		val daysByJob = workDays.groupBy { it.jobId }
 		val measuresByJob = measures.groupBy { it.jobId }
 		val extrasByJob = extras.groupBy { it.jobId }
 		val invoicesByJob = invoices.groupBy { it.jobId }
 		val todosByJob = todos.groupBy { it.jobId }
-		val dueAt = today.atTime(LocalTime.of(19, 0)).atZone(zoneId).toInstant().toEpochMilli()
+		val eveningAt = today.atTime(LocalTime.of(19, 0)).atZone(zoneId).toInstant().toEpochMilli()
+		val morningAt = today.atTime(LocalTime.of(7, 30)).atZone(zoneId).toInstant().toEpochMilli()
 		val added = existingOpen.toMutableSet()
 		val result = mutableListOf<ReminderCandidate>()
 
 		fun add(job: Job, kind: ReminderKind, overdueDays: Long? = null) {
+			if (kind !in kinds) return
 			val key = ReminderKey(job.id, kind)
 			if (!added.add(key)) return
+			val dueAt = if (kind == ReminderKind.START_TODAY) morningAt else eveningAt
 			result += ReminderCandidate(job.id, kind, job.title, dueAt, overdueDays)
 		}
 
 		for (job in jobs) {
 			if (job.status == JobStatus.ANULAT) continue
+
+			val start = job.plannedStart
+			if (job.status == JobStatus.PROGRAMAT && start != null) {
+				when (ChronoUnit.DAYS.between(today, start)) {
+					3L -> add(job, ReminderKind.START_SOON)
+					1L -> add(job, ReminderKind.START_TOMORROW)
+					0L -> add(job, ReminderKind.START_TODAY)
+					else -> Unit
+				}
+			}
+
 			val jobInvoices = invoicesByJob[job.id].orEmpty()
 
 			if (job.status == JobStatus.TERMINAT && job.closedAt != null) {
