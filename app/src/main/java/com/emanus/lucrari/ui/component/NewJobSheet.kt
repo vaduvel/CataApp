@@ -24,7 +24,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -44,6 +43,9 @@ private const val MILLIS_PER_DAY = 86_400_000L
  * Lucrare nouă (SPEC §7): client, adresă, ce lucrare, câte zile și când începe. Butonul de
  * salvare e activ mereu; nimic nu blochează salvarea. Data e opțională: fără ea lucrarea
  * rămâne ofertă, cu ea intră pe Programat și apare în calendar (M8).
+ *
+ * Tot ce a tastat se ține cu `rememberSaveable`: dacă rotește telefonul cu formularul
+ * deschis, sau dacă Android îi ia procesul cât răspunde la telefon, nu rescrie nimic.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,11 +62,11 @@ fun NewJobSheet(
 	) -> Unit,
 ) {
 	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-	var client by remember { mutableStateOf("") }
-	var address by remember { mutableStateOf("") }
-	var what by remember { mutableStateOf("") }
-	var template by remember { mutableStateOf<String?>(null) }
-	var days by remember { mutableStateOf("") }
+	var client by rememberSaveable { mutableStateOf("") }
+	var address by rememberSaveable { mutableStateOf("") }
+	var what by rememberSaveable { mutableStateOf("") }
+	var template by rememberSaveable { mutableStateOf<String?>(null) }
+	var days by rememberSaveable { mutableStateOf("") }
 	var startEpoch by rememberSaveable { mutableStateOf<Long?>(null) }
 	var showPicker by rememberSaveable { mutableStateOf(false) }
 
