@@ -304,4 +304,3 @@ private fun JobCard(row: JobWithTotals, onClick: () -> Unit) {
 		}
 	}
 }
-}
