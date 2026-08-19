@@ -28,11 +28,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -95,6 +97,16 @@ fun CalendarScreen(
 	val byDay by vm.byDay.collectAsState()
 	var selectedEpoch by rememberSaveable { mutableStateOf<Long?>(null) }
 	val todayDate = today()
+	val scroll = rememberScrollState()
+
+	// Panoul zilei atinse stă sub grilă, iar pe un telefon înalt rămâne sub pliu: pare că
+	// atingerea zilei nu face nimic. După un cadru (cât intră panoul în layout) coborâm
+	// singuri la el, ca să nu caute nimeni cu degetul.
+	LaunchedEffect(selectedEpoch) {
+		if (selectedEpoch == null) return@LaunchedEffect
+		withFrameNanos { /* un cadru, cât se măsoară panoul zilei */ }
+		scroll.animateScrollTo(scroll.maxValue)
+	}
 
 	Scaffold(
 		topBar = {
@@ -115,7 +127,7 @@ fun CalendarScreen(
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(padding)
-				.verticalScroll(rememberScrollState())
+				.verticalScroll(scroll)
 				.padding(horizontal = 16.dp)
 				.padding(bottom = 24.dp),
 			verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -251,7 +263,7 @@ private fun DayCell(
 	Box(
 		modifier = modifier
 			.padding(2.dp)
-			.height(56.dp)
+			.height(48.dp)
 			.clip(shape)
 			.background(background)
 			.border(width = 2.dp, color = outline, shape = shape)
