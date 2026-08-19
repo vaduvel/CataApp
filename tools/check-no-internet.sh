@@ -7,7 +7,7 @@
 # Iese cu cod 1 dacă a apărut o permisiune de rețea, fie scrisă de noi în manifest,
 # fie adusă de o bibliotecă și fuzionată în manifestul final.
 # Caută doar declarații reale, adică atributul android:name, nu mențiuni în comentarii
-# sau în documentație.
+# sau markere explicite tools:node="remove" folosite pentru manifest merger.
 
 set -uo pipefail
 
@@ -22,9 +22,13 @@ fail=0
 check_file() {
 	local file="$1"
 	local perm
+	local matches
 	for perm in "${FORBIDDEN[@]}"; do
 		# Acceptă spații în jurul semnului egal și oricare tip de ghilimele.
-		if grep -Eq "android:name[[:space:]]*=[[:space:]]*[\"']$perm[\"']" "$file" 2>/dev/null; then
+		# O linie cu tools:node="remove" elimină permisiunea din manifestul final,
+		# deci nu este o cerere de permisiune și nu trebuie raportată ca încălcare.
+		matches="$(grep -E "android:name[[:space:]]*=[[:space:]]*[\"']$perm[\"']" "$file" 2>/dev/null || true)"
+		if [ -n "$matches" ] && printf '%s\n' "$matches" | grep -Evq "tools:node[[:space:]]*=[[:space:]]*[\"']remove[\"']"; then
 			echo "EȘEC: $perm apare în $file"
 			fail=1
 		fi
