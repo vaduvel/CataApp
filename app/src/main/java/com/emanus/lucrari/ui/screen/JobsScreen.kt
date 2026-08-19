@@ -75,15 +75,27 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 	private val _filter = MutableStateFlow<JobStatus?>(null)
 	val filter: StateFlow<JobStatus?> = _filter.asStateFlow()
 
+	/**
+	 * Semnal de recitire. Pe telefon s-a văzut că anunțul de schimbare al bazei nu ajunge
+	 * mereu la interogarea listei după un rând nou, iar lucrarea proaspăt creată nu apărea
+	 * până la repornire. După ce scriem, ridicăm numărul de aici și interogarea se reface
+	 * de la zero: câteva rânduri citite din baza locală, deci nu se simte.
+	 */
+	private val _reload = MutableStateFlow(0)
+
 	@OptIn(ExperimentalCoroutinesApi::class)
-	val jobs: StateFlow<List<JobWithTotals>> = combine(_query, _filter, ::Pair)
-		.flatMapLatest { pair ->
-			val status = pair.second
-			repo.board(pair.first).map { list ->
-				if (status == null) list else list.filter { it.job.status == status }
+	val jobs: StateFlow<List<JobWithTotals>> =
+		combine(_query, _filter, _reload) { q, f, _ -> q to f }
+			.flatMapLatest { pair ->
+				val status = pair.second
+				repo.board(pair.first).map { list ->
+					if (status == null) list else list.filter { it.job.status == status }
+				}
 			}
-		}
-		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+			// Fără fereastra de 5 secunde: la fiecare intrare pe ecran se citește din nou, ca
+			// lista să nu rămână cea de dinainte. Valoarea veche se păstrează cât se citește,
+			// deci ecranul nu clipește gol.
+			.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
 	fun setQuery(value: String) {
 		_query.value = value
@@ -112,6 +124,8 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 			)
 			// Data vine după creare: pune și statusul potrivit (Programat pentru viitor).
 			if (start != null) schedule.setPlannedStart(id, start)
+			// Lucrarea e în bază: cerem listei să se citească din nou, ca să apară imediat.
+			_reload.value += 1
 			onCreated(id)
 		}
 	}
