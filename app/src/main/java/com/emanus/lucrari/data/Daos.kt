@@ -106,6 +106,37 @@ interface JobDao {
 	)
 	fun observeBoard(): Flow<List<JobWithTotals>>
 
+	/**
+	 * Aceleași rânduri ca `observeBoard`, dar citite o singură dată, la cerere, și cu
+	 * căutarea în aceeași interogare (`:q` gol înseamnă toate lucrările).
+	 *
+	 * De ce există: pe telefonul lui, lucrarea nou creată nu apărea în listă, deși baza o
+	 * avea și celelalte ecrane o vedeau — detaliul lucrării, deschis imediat după salvare,
+	 * arăta rândul corect. Rămânea în urmă doar abonamentul lung la interogarea listei, care
+	 * nu mai livra mulțimea nouă nici după re-abonare forțată. O citire scurtă, la fiecare
+	 * intrare pe ecran, nu are cum să rămână în urmă.
+	 */
+	@Query(
+		"""
+		SELECT j.*, c.name AS clientName, c.phone AS clientPhone,
+			(SELECT COUNT(*) FROM work_days w WHERE w.jobId = j.id) AS workedDays,
+			(SELECT COUNT(*) FROM stages s WHERE s.jobId = j.id) AS stageCount,
+			(SELECT COUNT(*) FROM stages s WHERE s.jobId = j.id AND s.done = 1) AS stagesDone,
+			(SELECT COUNT(*) FROM todos t WHERE t.jobId = j.id AND t.done = 0) AS openTodos,
+			(SELECT IFNULL(SUM(i.amountCents), 0) FROM invoices i WHERE i.jobId = j.id) AS invoicedCents,
+			(SELECT IFNULL(SUM(p.amountCents), 0) FROM payments p WHERE p.jobId = j.id) AS collectedCents
+		FROM jobs j
+		JOIN clients c ON c.id = j.clientId
+		WHERE :q = ''
+			OR j.title LIKE '%' || :q || '%'
+			OR IFNULL(j.street, '') LIKE '%' || :q || '%'
+			OR IFNULL(j.city, '') LIKE '%' || :q || '%'
+			OR c.name LIKE '%' || :q || '%'
+		ORDER BY j.createdAt DESC
+		"""
+	)
+	suspend fun boardOnce(q: String): List<JobWithTotals>
+
 	@Query(
 		"""
 		SELECT j.*, c.name AS clientName, c.phone AS clientPhone,

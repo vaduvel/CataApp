@@ -30,6 +30,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,14 +54,11 @@ import com.emanus.lucrari.ui.component.NewJobSheet
 import com.emanus.lucrari.ui.component.StatusChip
 import com.emanus.lucrari.ui.component.labelRes
 import java.time.LocalDate
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -76,29 +74,28 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 	val filter: StateFlow<JobStatus?> = _filter.asStateFlow()
 
 	/**
-	 * Semnal de recitire. Pe telefon s-a văzut că anunțul de schimbare al bazei nu ajunge
-	 * mereu la interogarea listei după un rând nou, iar lucrarea proaspăt creată nu apărea
-	 * până la repornire. După ce scriem, ridicăm numărul de aici și interogarea se reface
-	 * de la zero: câteva rânduri citite din baza locală, deci nu se simte.
+	 * Rândurile citite ultima dată din bază. Nu stăm abonați la interogarea listei: pe
+	 * telefonul lui, o lucrare nouă nu ajungea niciodată în lista abonată, deși baza o avea
+	 * și detaliul ei, deschis imediat după salvare, o arăta corect. Citim scurt și la
+	 * momente clare — la intrarea pe ecran, la scris în căutare, după creare — și atunci
+	 * lista nu are de unde să rămână veche.
 	 */
-	private val _reload = MutableStateFlow(0)
+	private val _rows = MutableStateFlow<List<JobWithTotals>>(emptyList())
 
-	@OptIn(ExperimentalCoroutinesApi::class)
+	/** Filtrul de status se aplică în memorie: apăsarea unui coș nu mai atinge baza. */
 	val jobs: StateFlow<List<JobWithTotals>> =
-		combine(_query, _filter, _reload) { q, f, _ -> q to f }
-			.flatMapLatest { pair ->
-				val status = pair.second
-				repo.board(pair.first).map { list ->
-					if (status == null) list else list.filter { it.job.status == status }
-				}
-			}
-			// Fără fereastra de 5 secunde: la fiecare intrare pe ecran se citește din nou, ca
-			// lista să nu rămână cea de dinainte. Valoarea veche se păstrează cât se citește,
-			// deci ecranul nu clipește gol.
-			.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+		combine(_rows, _filter) { rows, status ->
+			if (status == null) rows else rows.filter { it.job.status == status }
+		}.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+	/** Recitește lista. Câteva zeci de rânduri din baza locală: nu se simte. */
+	fun refresh() {
+		viewModelScope.launch { _rows.value = repo.boardOnce(_query.value) }
+	}
 
 	fun setQuery(value: String) {
 		_query.value = value
+		refresh()
 	}
 
 	fun setFilter(value: JobStatus?) {
@@ -124,8 +121,8 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 			)
 			// Data vine după creare: pune și statusul potrivit (Programat pentru viitor).
 			if (start != null) schedule.setPlannedStart(id, start)
-			// Lucrarea e în bază: cerem listei să se citească din nou, ca să apară imediat.
-			_reload.value += 1
+			// Citim din nou aici, înainte să plecăm spre detaliu: la întoarcere lista o are.
+			_rows.value = repo.boardOnce(_query.value)
 			onCreated(id)
 		}
 	}
@@ -143,6 +140,9 @@ fun JobsScreen(
 	var showNew by rememberSaveable { mutableStateOf(false) }
 	val unnamedClient = stringResource(R.string.new_job_client_unnamed)
 	val untitled = stringResource(R.string.new_job_untitled)
+
+	// La fiecare intrare pe ecran, inclusiv la întoarcerea din detaliul unei lucrări.
+	LaunchedEffect(Unit) { vm.refresh() }
 
 	Scaffold(
 		floatingActionButton = {
