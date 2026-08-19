@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="ic_launcher_background">#9A3412</color>
+	<!-- Corpul calendarului din iconiță; umple stratul de fundal al iconiței adaptive. -->
+	<color name="ic_launcher_background">#CFE3F7</color>
 </resources>
