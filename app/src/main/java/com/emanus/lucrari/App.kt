@@ -34,10 +34,15 @@ class App : Application() {
 		super.onCreate()
 		ReminderNotifier.createChannel(this)
 		WorkScheduler.schedule(this)
-		// Datele demo intră o singură dată, la prima pornire după instalare. Odată
-		// șterse, nu mai revin: altfel aplicația nu poate fi niciodată goală.
+		// Datele demo se pun o singură dată, la prima pornire după instalare. Steagul se
+		// pune și când baza avea deja date (telefoanele cu versiuni mai vechi), ca demo-ul
+		// să nu reapară după ce utilizatorul îl șterge. Din a doua pornire nu se mai
+		// atinge baza deloc.
 		scope.launch {
-			if (Seed.ensure(db, prefs.demoSeeded)) prefs.demoSeeded = true
+			if (!prefs.demoSeeded) {
+				Seed.ensure(db, alreadySeeded = false)
+				prefs.demoSeeded = true
+			}
 		}
 	}
 }
