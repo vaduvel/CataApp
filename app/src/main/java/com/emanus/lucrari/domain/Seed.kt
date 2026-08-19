@@ -26,8 +26,18 @@ import java.time.LocalDate
  */
 object Seed {
 
-	suspend fun ensure(db: AppDb) {
-		if (db.clients().count() > 0) return
+	/**
+	 * Datele demo intră o singură dată, la prima pornire după instalare. Regula stă
+	 * separat de inserare ca să fie testabilă fără Android, iar `alreadySeeded` se
+	 * ține în afara bazei de date: altfel un import „Înlocuiește tot” cu arhivă goală
+	 * sau ștergerea manuală a demo-ului l-ar readuce pe Mario la următoarea pornire.
+	 */
+	fun shouldSeed(alreadySeeded: Boolean, clientCount: Int): Boolean =
+		!alreadySeeded && clientCount == 0
+
+	/** @return `true` dacă datele demo au fost inserate chiar acum. */
+	suspend fun ensure(db: AppDb, alreadySeeded: Boolean = false): Boolean {
+		if (!shouldSeed(alreadySeeded, db.clients().count())) return false
 
 		val client = Client(
 			name = "Mario",
@@ -124,5 +134,7 @@ object Seed {
 		db.payments().upsertAll(payments)
 		db.invoices().upsertAll(invoices)
 		db.todos().upsertAll(todos)
+
+		return true
 	}
 }

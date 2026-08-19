@@ -2,6 +2,7 @@ package com.emanus.lucrari
 
 import android.app.Application
 import com.emanus.lucrari.data.AppDb
+import com.emanus.lucrari.data.AppPrefs
 import com.emanus.lucrari.data.repo.BackupRepo
 import com.emanus.lucrari.data.repo.JobRepo
 import com.emanus.lucrari.data.repo.PhotoStore
@@ -25,6 +26,7 @@ class App : Application() {
 	val backupRepo: BackupRepo by lazy { BackupRepo(this, db) }
 	val photoStore: PhotoStore by lazy { PhotoStore(this, db) }
 	val reminderRepo: ReminderRepo by lazy { ReminderRepo(db) }
+	val prefs: AppPrefs by lazy { AppPrefs(this) }
 
 	private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -32,7 +34,10 @@ class App : Application() {
 		super.onCreate()
 		ReminderNotifier.createChannel(this)
 		WorkScheduler.schedule(this)
-		// La prima pornire baza e goală; punem lucrarea demo ca ecranele să nu fie albe.
-		scope.launch { Seed.ensure(db) }
+		// Datele demo intră o singură dată, la prima pornire după instalare. Odată
+		// șterse, nu mai revin: altfel aplicația nu poate fi niciodată goală.
+		scope.launch {
+			if (Seed.ensure(db, prefs.demoSeeded)) prefs.demoSeeded = true
+		}
 	}
 }
