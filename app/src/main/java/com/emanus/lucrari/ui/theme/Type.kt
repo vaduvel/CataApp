@@ -5,13 +5,26 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// Text mai mare decât implicit: se citește cu mâinile murdare, la lumină puternică,
-// fără ochelari de citit.
+// Scara din design system-ul aprobat. Roboto vine de la sistem: zero fonturi în APK.
+// Cifrele mari cer „tnum”, ca sumele să fie aliniate una sub alta în liste.
+// Totul în sp, deci scalarea de sistem îl ajută dacă vede greu.
 val LucrariTypography = Typography(
-	headlineMedium = TextStyle(fontSize = 30.sp, lineHeight = 38.sp, fontWeight = FontWeight.SemiBold),
-	titleLarge = TextStyle(fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold),
-	titleMedium = TextStyle(fontSize = 20.sp, lineHeight = 28.sp, fontWeight = FontWeight.Medium),
-	bodyLarge = TextStyle(fontSize = 18.sp, lineHeight = 26.sp),
-	bodyMedium = TextStyle(fontSize = 16.sp, lineHeight = 24.sp),
-	labelLarge = TextStyle(fontSize = 16.sp, lineHeight = 22.sp, fontWeight = FontWeight.Medium),
+	displayLarge = TextStyle(
+		fontSize = 34.sp,
+		lineHeight = 42.sp,
+		fontWeight = FontWeight.Bold,
+		fontFeatureSettings = "tnum",
+	),
+	headlineMedium = TextStyle(
+		fontSize = 28.sp,
+		lineHeight = 36.sp,
+		fontWeight = FontWeight.Bold,
+		fontFeatureSettings = "tnum",
+	),
+	titleLarge = TextStyle(fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.SemiBold),
+	titleMedium = TextStyle(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold),
+	bodyLarge = TextStyle(fontSize = 16.sp, lineHeight = 24.sp),
+	bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 20.sp),
+	labelLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium),
+	labelMedium = TextStyle(fontSize = 12.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
 )

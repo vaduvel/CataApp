@@ -12,6 +12,7 @@ fun LucrariTheme(
 	MaterialTheme(
 		colorScheme = if (darkTheme) DarkColors else LightColors,
 		typography = LucrariTypography,
+		shapes = LucrariShapes,
 		content = content,
 	)
 }
