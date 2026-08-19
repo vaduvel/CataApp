@@ -63,6 +63,14 @@ class JobRepo(private val db: AppDb) {
 	}
 
 	/**
+	 * Aceleași rânduri ca [board], dar citite o dată, la cerere. Lista de Lucrări se
+	 * reîmprospătează la fiecare intrare pe ecran: pe telefon s-a văzut că un abonament
+	 * lung la Room poate rămâne cu mulțimea veche, iar o lucrare abia salvată nu are voie
+	 * să lipsească din listă.
+	 */
+	suspend fun boardOnce(query: String): List<JobWithTotals> = db.jobs().boardOnce(query.trim())
+
+	/**
 	 * Lucrările la care se poate lucra azi, în ordinea în care le atinge: întâi cele în
 	 * lucru, apoi de finisat, apoi cele blocate în așteptare.
 	 */
