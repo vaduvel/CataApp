@@ -38,18 +38,34 @@ Verificări:
 bash tools/check-no-internet.sh
 ```
 
-Schemele Room sunt comise în `app/schemas/`. M7 adaugă numai DAO-uri/interogări peste entitățile existente; schema v1 trebuie să rămână byte-identică.
+Schemele Room sunt comise în `app/schemas/`. M7 a adăugat numai DAO-uri/interogări peste entitățile existente; schema v1 a rămas byte-identică.
 
 Păstrează `~/.android/debug.keystore` într-un loc sigur, în afara repo-ului. Dacă se pierde, aplicația instalată nu mai poate fi actualizată fără dezinstalare, iar dezinstalarea șterge datele.
 
-## M7 — verificări manuale importante
+## Unde stau datele
 
-- Poza se face prin aplicația cameră și `FileProvider`, apoi se vede offline în galerie.
-- Exportul folosește `ACTION_CREATE_DOCUMENT`; importul folosește `ACTION_OPEN_DOCUMENT`.
-- Testează ambele moduri de import: **Înlocuiește tot** și **Adaugă ce lipsește**.
-- În `files/backup/` rămân cel mult 7 arhive zilnice `lucrari-YYYY-MM-DD.zip`.
-- Pe Android 13+ notificările se activează din ecranul Mai mult.
-- Worker-ul de la 19:00 nu dublează un memento automat încă deschis pentru aceeași lucrare și regulă.
+Totul rămâne pe telefon:
+
+- baza de date Room, în spațiul privat al aplicației;
+- pozele, în `files/photos/<uuid>.jpg`;
+- backup-urile automate, în `files/backup/lucrari-YYYY-MM-DD.zip`, ultimele 7;
+- memento-urile, în baza de date, programate local cu WorkManager.
+
+Dezinstalarea sau „Șterge datele aplicației” șterge și backup-urile automate. De aceea exportul manual, salvat în afara aplicației, rămâne singura plasă de siguranță reală.
+
+## M7 — verificat pe emulator
+
+Verificat pe API 36, cu modul avion activ pe tot parcursul:
+
+- 61 teste unitare și 7 instrumentate verzi; `assembleDebug` și `lintDebug` OK;
+- `tools/check-no-internet.sh` OK pe 3 manifeste fuzionate;
+- poza făcută prin aplicația cameră și `FileProvider`, legată de lucrare și de un rest, vizibilă după repornirea aplicației;
+- export prin `ACTION_CREATE_DOCUMENT`, ștergerea datelor, apoi import **Înlocuiește tot**: starea a revenit identic, inclusiv pozele;
+- import **Adaugă ce lipsește** rulat de două ori, fără duplicate;
+- partajarea ultimei arhive prin `FileProvider`;
+- schema v1 neschimbată.
+
+De reverificat la orice modificare viitoare: rotația la 7 arhive, notificările pe Android 13+ și faptul că worker-ul de la 19:00 nu dublează un memento automat încă deschis pentru aceeași lucrare și regulă.
 
 ## Stadiu
 
@@ -60,5 +76,7 @@ Păstrează `~/.android/debug.keystore` într-un loc sigur, în afara repo-ului.
 - [x] M4 — măsurători și extra
 - [x] M5 — bani: încasări, evidență facturi
 - [x] M6 — „Descriere pentru factură” + copiere
-- [x] M7 — poze, backup automat/export/import SAF și memento-uri (implementat; necesită verificarea locală finală)
+- [x] M7 — poze, backup automat/export/import SAF și memento-uri
 - [ ] M8 — finisaje opționale
+
+Aplicația este gata de instalat pe telefon. M8 nu blochează livrarea.
