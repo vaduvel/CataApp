@@ -13,4 +13,22 @@
 	<string name="jobs_planned_period">Programat: %1$s → %2$s</string>
 	<string name="date_pick_ok">Alege</string>
 
+	<!-- M8: calendarul de lucru -->
+	<string name="calendar_title">Calendar de lucru</string>
+	<string name="calendar_open">Calendar</string>
+	<string name="calendar_prev">Luna trecută</string>
+	<string name="calendar_next">Luna viitoare</string>
+	<string name="calendar_hint">Atinge o zi ca să vezi ce e programat.</string>
+	<string name="calendar_day_empty">Nimic programat în ziua asta.</string>
+	<string name="calendar_month_count">Programate luna asta: %1$d</string>
+	<string-array name="weekday_initials">
+		<item>L</item>
+		<item>Ma</item>
+		<item>Mi</item>
+		<item>J</item>
+		<item>V</item>
+		<item>S</item>
+		<item>D</item>
+	</string-array>
+
 </resources>
