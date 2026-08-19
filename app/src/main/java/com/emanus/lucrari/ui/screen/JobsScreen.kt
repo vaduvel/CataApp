@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -74,11 +75,14 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 	val filter: StateFlow<JobStatus?> = _filter.asStateFlow()
 
 	/**
-	 * Rândurile citite ultima dată din bază. Nu stăm abonați la interogarea listei: pe
-	 * telefonul lui, o lucrare nouă nu ajungea niciodată în lista abonată, deși baza o avea
-	 * și detaliul ei, deschis imediat după salvare, o arăta corect. Citim scurt și la
-	 * momente clare — la intrarea pe ecran, la scris în căutare, după creare — și atunci
-	 * lista nu are de unde să rămână veche.
+	 * Rândurile citite ultima dată din bază, la momente clare: la intrarea pe ecran, la
+	 * scris în căutare și după creare.
+	 *
+	 * Am ajuns la citirea la cerere crezând că abonamentul lung la Room pierdea lucrarea
+	 * nouă. Nu o pierdea: rândul era în rezultat, dar lista îl desena deasupra marginii de
+	 * sus (vezi comentariul de la LazyColumn). Citirea scurtă rămâne fiindcă e simplă și
+	 * de ajuns pentru câteva zeci de rânduri; dacă vreodată lista trebuie să se miște
+	 * singură, se poate întoarce la Flow fără altă schimbare.
 	 */
 	private val _rows = MutableStateFlow<List<JobWithTotals>>(emptyList())
 
@@ -137,12 +141,23 @@ fun JobsScreen(
 	val jobs by vm.jobs.collectAsState()
 	val query by vm.query.collectAsState()
 	val filter by vm.filter.collectAsState()
+	val listState = rememberLazyListState()
 	var showNew by rememberSaveable { mutableStateOf(false) }
 	val unnamedClient = stringResource(R.string.new_job_client_unnamed)
 	val untitled = stringResource(R.string.new_job_untitled)
 
 	// La fiecare intrare pe ecran, inclusiv la întoarcerea din detaliul unei lucrări.
 	LaunchedEffect(Unit) { vm.refresh() }
+
+	// LazyColumn ține poziția după cheia primului rând vizibil, ca să nu-ți sară conținutul
+	// sub deget. Când o lucrare nouă intră în capul listei, poziția urmează cheia veche la
+	// noul ei index, iar rândul nou rămâne desenat deasupra marginii de sus: lista pare că
+	// nu l-a primit, deși îl are. Aici e invers decât vrea el: a salvat ceva și trebuie să
+	// vadă ce a salvat, deci ne întoarcem în cap când se schimbă primul rând.
+	val topRowId = jobs.firstOrNull()?.job?.id
+	LaunchedEffect(topRowId) {
+		if (topRowId != null) listState.scrollToItem(0)
+	}
 
 	Scaffold(
 		floatingActionButton = {
@@ -219,6 +234,7 @@ fun JobsScreen(
 				}
 			} else {
 				LazyColumn(
+					state = listState,
 					contentPadding = PaddingValues(16.dp),
 					verticalArrangement = Arrangement.spacedBy(12.dp),
 				) {
