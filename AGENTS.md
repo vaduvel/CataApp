@@ -14,6 +14,15 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Cerințe: JDK 17 sau 21, Android SDK 35. Wrapper-ul Gradle 8.9 este comis; folosește `./gradlew`, niciodată `gradle` direct. Bytecode-ul rămâne 17. Nu adăuga `jvmToolchain(17)`.
 
+Dacă `./gradlew` cade cu „Unable to locate a Java Runtime”, JDK-ul de sistem lipsește. Folosește JBR-ul din Android Studio, care este tot Java 21:
+
+```bash
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+"$JAVA_HOME/bin/java" -version   # confirmă Java 21 înainte de build
+```
+
+Calea are nevoie de `/Contents/Home` la final, altfel Gradle nu găsește `bin/java`. Nu o comite în `gradle.properties`: e specifică mașinii. Semnătura debug rămâne `~/.android/debug.keystore`, deci schimbarea JDK-ului nu împiedică `adb install -r` peste o versiune deja instalată.
+
 ## Reguli care nu se încalcă
 
 1. **Fără rețea.** Nu adăuga INTERNET, ACCESS_NETWORK_STATE sau ACCESS_WIFI_STATE. Nicio funcție nu depinde de semnal. WorkManager declară singur `ACCESS_NETWORK_STATE`; o scoatem din manifestul fuzionat cu `tools:node="remove"`. Orice bibliotecă nouă se verifică la fel, iar scriptul offline acceptă numai liniile marcate explicit cu `tools:node="remove"`.
@@ -55,6 +64,8 @@ Cerințe: JDK 17 sau 21, Android SDK 35. Wrapper-ul Gradle 8.9 este comis; folos
 - Textul pentru contabil se compune din datele curente și nu se salvează separat.
 - Cele cinci destinații din bara de jos sunt fixe: Azi, Lucrări, Rest, Bani, Mai mult. Calendarul și memento-urile nu intră în bara de jos.
 - Cele 7 statusuri se afișează cu etichetă text și pictogramă, nu numai prin culoare.
+- Culorile, mărimile de text, colțurile și distanțele vin din `ui/theme/` (`Color.kt`, `Type.kt`, `Shape.kt`, `Dimens.kt`). Nu scrie hex sau dp direct în ecrane.
+- Statusul se randează numai prin `StatusChip`; culoarea plină stă în `StatusColor`, iar perechea fundal/text în `StatusTones`.
 
 ## Definition of done
 
@@ -72,5 +83,7 @@ Pentru orice milestone: unit tests + assemble + lint + scriptul offline trec; cu
   - scriptul offline OK pe 3 manifeste fuzionate, după eliminarea `ACCESS_NETWORK_STATE` adusă de WorkManager;
   - schema Room v1 neschimbată față de `eaafada`;
   - scenariul export → ștergerea datelor → import verificat pe emulator API 36, cu modul avion activ.
-- **Următorul pas:** instalarea pe telefonul destinatarului.
-- **M8 — opțional:** finisaje vizuale pe baza noului design system, calendar lunar, statistici simple, widget, „spațiu folosit” în ecranul Mai mult și eventual câmpul `work` în rândul măsurătorii din descriere.
+- **Instalat pe telefon fizic:** `0.8.0-m7` (versionCode 8), instalare curată, pornire fără crash, date demo la prima pornire.
+- **Tema din design system-ul aprobat este aplicată:** paletă M3, scara de text, colțurile, tokenii de spațiere și chip-urile de status cu pictogramă.
+- **Următorul pas:** refactorizarea vizuală a ecranelor pe baza design system-ului — spațiu liber sub liste, cifrele mari pe `displayLarge`, cardul de backup din „Mai mult”, dialogul de import cu cele două opțiuni explicate.
+- **M8 — opțional:** calendar lunar, statistici simple, widget, „spațiu folosit” în ecranul Mai mult, stările „camera nu e disponibilă” și „backup eșuat”, zile lucrate per etapă (cere migrare de schemă) și eventual câmpul `work` în rândul măsurătorii din descriere.
