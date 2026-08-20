@@ -3,7 +3,6 @@ package com.emanus.lucrari.data.repo
 import com.emanus.lucrari.data.AppDb
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
-import com.emanus.lucrari.data.today
 import com.emanus.lucrari.domain.Schedule
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -27,7 +26,7 @@ class ScheduleRepo(private val db: AppDb) {
 			job.copy(
 				plannedStart = start,
 				status = if (open) {
-					Schedule.statusForNewJob(start, today(), job.status)
+					Schedule.statusForNewJob(start, job.status)
 				} else {
 					job.status
 				},

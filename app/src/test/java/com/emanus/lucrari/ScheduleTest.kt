@@ -45,20 +45,20 @@ class ScheduleTest {
 	fun o_data_din_viitor_face_lucrarea_programata() {
 		assertEquals(
 			JobStatus.PROGRAMAT,
-			Schedule.statusForNewJob(luni, LocalDate.of(2026, 8, 19), JobStatus.OFERTAT),
+			Schedule.statusForNewJob(luni, JobStatus.OFERTAT),
 		)
 	}
 
 	@Test
 	fun data_de_azi_este_tot_programat_pana_apasa_am_lucrat_azi_aici() {
-		assertEquals(JobStatus.PROGRAMAT, Schedule.statusForNewJob(luni, luni, JobStatus.OFERTAT))
+		assertEquals(JobStatus.PROGRAMAT, Schedule.statusForNewJob(luni, JobStatus.OFERTAT))
 	}
 
 	@Test
-	fun o_data_din_trecut_inseamna_lucrare_deja_inceputa() {
+	fun o_data_din_trecut_ramane_programat_pana_se_trece_prima_zi() {
 		assertEquals(
-			JobStatus.IN_LUCRU,
-			Schedule.statusForNewJob(luni, LocalDate.of(2026, 8, 25), JobStatus.OFERTAT),
+			JobStatus.PROGRAMAT,
+			Schedule.statusForNewJob(luni, JobStatus.OFERTAT),
 		)
 	}
 
@@ -66,7 +66,7 @@ class ScheduleTest {
 	fun fara_data_statusul_ramane_cel_implicit() {
 		assertEquals(
 			JobStatus.OFERTAT,
-			Schedule.statusForNewJob(null, luni, JobStatus.OFERTAT),
+			Schedule.statusForNewJob(null, JobStatus.OFERTAT),
 		)
 	}
 

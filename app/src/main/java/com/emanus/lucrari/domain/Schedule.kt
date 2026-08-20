@@ -34,16 +34,12 @@ object Schedule {
 	}
 
 	/**
-	 * Statusul unei lucrări nou create, după data aleasă: de azi înainte e Programat, o
-	 * dată din trecut înseamnă că a început deja, iar fără dată rămâne cum era (Ofertat).
-	 * Prima „Am lucrat azi aici” o mută oricum în lucru, deci nu se pierde nimic.
+	 * Statusul unei lucrări nou create, după data aleasă: orice dată o ține în Programat,
+	 * inclusiv dacă începutul a trecut, ca să rămână vizibilă drept restantă pe Azi. Fără
+	 * dată rămâne cum era (Ofertat). Prima „Am lucrat azi aici” o mută în lucru.
 	 */
-	fun statusForNewJob(start: LocalDate?, today: LocalDate, fallback: JobStatus): JobStatus =
-		when {
-			start == null -> fallback
-			start.isBefore(today) -> JobStatus.IN_LUCRU
-			else -> JobStatus.PROGRAMAT
-		}
+	fun statusForNewJob(start: LocalDate?, fallback: JobStatus): JobStatus =
+		if (start == null) fallback else JobStatus.PROGRAMAT
 
 	/** Câte zile mai sunt până la început. Negativ dacă data a trecut. */
 	fun daysUntilStart(start: LocalDate, today: LocalDate): Long =
