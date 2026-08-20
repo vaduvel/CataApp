@@ -1,6 +1,7 @@
 package com.emanus.lucrari.ui.nav
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
@@ -79,10 +80,16 @@ fun AppRoot() {
 			}
 		},
 	) { padding ->
+		// Fiecare ecran din NavHost are propriul Scaffold. Simpla adăugare de padding nu le
+		// spune și că marginile de sistem au fost deja acoperite aici, așa că ele le adaugă a
+		// doua oară: conținutul se scurta jos cu înălțimea barei de navigare (ultimul rând din
+		// „Mai mult" ieșea din ecran). consumeWindowInsets marchează marginile drept consumate.
 		NavHost(
 			navController = navController,
 			startDestination = Tab.TODAY.route,
-			modifier = Modifier.padding(padding),
+			modifier = Modifier
+				.padding(padding)
+				.consumeWindowInsets(padding),
 		) {
 			composable(Tab.TODAY.route) {
 				TodayScreen(onOpenJob = { id -> navController.navigate("job/" + id) })
