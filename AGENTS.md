@@ -99,11 +99,11 @@ Pentru orice milestone: unit tests + assemble + lint + scriptul offline trec; cu
 ## Stadiu
 
 - **M0–M8 — gata și verificate**, pe emulator Android API 36 și pe telefonul fizic (SM-A165F).
-- **88 de teste unitare** și **7 instrumentate** verzi; `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
+- **88 de teste unitare** și **8 instrumentate** verzi; `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
 - **M7:** poze locale prin `FileProvider`, backup ZIP zilnic cu rotație 7, export/import SAF cu „Înlocuiește tot” / „Adaugă ce lipsește”, memento-uri la 19:00 cu deduplicare. Scenariul export → ștergerea datelor → import verificat cu modul avion activ.
 - **M8:** dată de început și interval la creare, statusul `PROGRAMAT` pentru lucrările din viitor, calendarul lunar de lucru și memento-urile de început (19:00 pentru „peste 3 zile” și „mâine”, 07:30 pentru „azi”). Fără migrare de schemă.
 - **Runda de finisaj:** inseturile de sistem nu se mai aplică de două ori; memento-urile pleacă odată cu lucrarea ștearsă.
 - **Versiunea curentă:** `0.10.0-m8`, versionCode 10, instalată pe emulator și pe telefon.
 - **Tema din design system-ul aprobat este aplicată:** paletă M3, scara de text, colțurile, tokenii de spațiere și chip-urile de status cu pictogramă.
-- **Următorii pași:** iconița aplicației din PNG-ul primit; intervalul afișat în detaliul lucrării și eticheta `PROGRAMAT` pe ecranul Azi în ziua începerii; refactorizarea vizuală (spațiu liber sub liste, cifrele mari pe `displayLarge`, cardul de backup, dialogul de import); ștergerea datelor de test înainte de livrare.
+- **Următorii pași:** intervalul afișat în detaliul lucrării; confirmarea vizuală a iconiței în sertarul telefonului; refactorizarea vizuală (spațiu liber sub liste, cifrele mari pe `displayLarge`, cardul de backup, dialogul de import); ștergerea datelor de test înainte de livrare.
 - **M9 — opțional, nu blochează livrarea:** statistici simple, widget „Am lucrat azi la…”, „spațiu folosit”, stările „camera nu e disponibilă” și „backup eșuat”, zile lucrate per etapă (cere migrare de schemă) și câmpul `work` în rândul măsurătorii din descriere.

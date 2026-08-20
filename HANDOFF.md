@@ -86,9 +86,9 @@ veche și istoriile diverg — exact ce s-a întâmplat când commit-ul iconițe
 
 ## 3. Starea exactă la predare
 
-- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `de94e9bc69d3212e5cf7eeffc5841156068f48fe`
+- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `6bd2b8d605cfd8c5388e22f60ef9b4d8c55586bb`
 - **Versiune:** `versionName = "0.10.0-m8"`, `versionCode = 10`
-- **Teste:** **88 unitare** + **8 instrumentate** (al 8-lea e adăugat în `7d846ec` și **încă nu a rulat nicăieri**)
+- **Teste:** **88 unitare** + **8 instrumentate**, verzi pe emulator și pe telefonul fizic
 - **Schema Room:** v1, `app/schemas/com.emanus.lucrari.data.AppDb/1.json`, hash `9a2846d7ed22222385ac20bef74419e7` — **neschimbată din M1** și așa trebuie să rămână (§5)
 - **Instalat:** `0.10.0-m8` pe emulator (API 36) și pe telefonul fizic (`R5GL52XSGQP`, Samsung SM-A165F)
 
@@ -99,19 +99,19 @@ lucrări, etape și zile lucrate, rest de făcut, materiale, măsurători și ex
 descrierea pentru factură (test golden byte cu byte), poze, backup automat + export/import,
 memento-uri, programare cu dată de început și calendar lunar.
 
-### ⚠️ Ce NU e verificat încă (prima ta sarcină)
+### P0 verificat pe 20 august 2026
 
-Trei commit-uri au plecat spre `main` fără ca cineva să le fi rulat:
+Runda restantă, iconița și regresia găsită manual au fost verificate cap-coadă:
 
 | Commit | Ce face | Stare |
 |---|---|---|
-| `89f1dd4c32df75e9f6fafb2bbb642b79107b6aaf` | „Calendar de lucru” are rând propriu în ecranul „Mai mult” | build OK, **neverificat pe dispozitiv** |
-| `45a4df6f130d629ce30e93767733c3d36979b2db` | UI-ul pentru lucrarea programată pe „Azi” | **push incomplet** (2 fișiere din 4) — inert singur |
-| `7ed1f85c2e39fdac8730e10d0f41df63ed67d07f` | reparația: interogarea + ordinea | completează commit-ul de mai sus |
-| `7d846ec75fcff87792ef446ae2bd02e865819653` | testul instrumentat pentru regula de mai sus | **nerulat** |
+| `89f1dd4c32df75e9f6fafb2bbb642b79107b6aaf` | „Calendar de lucru” are rând propriu în ecranul „Mai mult” | verificat manual pe emulator |
+| `45a4df6` + `7ed1f85` | lucrarea programată apare pe „Azi” din ziua începerii | verificate împreună; primul commit rămâne inert luat separat |
+| `7d846ec75fcff87792ef446ae2bd02e865819653` | testul instrumentat pentru regula de mai sus | 8/8 verzi pe emulator și 8/8 pe telefon |
+| `de94e9bc69d3212e5cf7eeffc5841156068f48fe` | iconița aplicației | build + lint verzi; 5 densități și adaptive icon corecte; aspectul din sertarul Samsung rămâne de confirmat de utilizator |
+| `6bd2b8d605cfd8c5388e22f60ef9b4d8c55586bb` | păstrează lucrarea restantă în `PROGRAMAT` până la prima zi trecută | regresie găsită și reparată în P0; test unitar + scenariu manual verzi |
 
-**Nu construi nimic nou peste ele până nu vine raportul verde.** Dacă raportul zice că pică
-ceva, repară întâi.
+Următoarea schimbare de produs este P1.
 
 ### Regula implementată în ultima rundă (ca s-o poți verifica)
 
@@ -196,10 +196,11 @@ UI din M8 — toate au ieșit la mână, pe emulator.
 
 ## 6. Ce mai e de făcut (în ordinea asta)
 
-### P0 — Verifică runda în așteptare
+### P0 — Verificat pe emulator și telefon
 
-Vezi §3. Build + 88 unitare + 8 instrumentate + lint + offline + schemă + install, apoi
-scenariul manual pe emulator (ceasul emulatorului e pus pe 21/08/2026):
+Build + 88 unitare + 8 instrumentate pe fiecare dispozitiv + lint + offline + schemă + install
+au trecut. Scenariul de mai jos a fost verificat pe emulator la data de 20/08/2026 și rămâne
+checklist de regresie:
 
 1. Lucrare nouă cu început **azi** → apare **prima** pe „Azi”, cu chip `Programat` și „Începe azi”.
 2. Lucrare nouă cu început **mâine** → **nu** apare pe „Azi”, dar apare în calendar.
