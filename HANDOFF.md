@@ -78,11 +78,15 @@ trimit 2.
 4. Dacă ai schimbat o semnătură de funcție, caută **toți** apelanții înainte de push
    (căutarea de cod GitHub nu merge — vezi §7 — deci mergi pe căi exacte).
 
+**Regula simetrică pentru agentul local:** împinge imediat după fiecare commit și confirmă că
+`origin/main` indică același SHA ca `HEAD`. Altfel, agentul din chat construiește peste o bază
+veche și istoriile diverg — exact ce s-a întâmplat când commit-ul iconiței a rămas numai local.
+
 ---
 
 ## 3. Starea exactă la predare
 
-- **Branch:** `main`. **HEAD la scrierea acestui fișier:** `7d846ec75fcff87792ef446ae2bd02e865819653`
+- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `de94e9bc69d3212e5cf7eeffc5841156068f48fe`
 - **Versiune:** `versionName = "0.10.0-m8"`, `versionCode = 10`
 - **Teste:** **88 unitare** + **8 instrumentate** (al 8-lea e adăugat în `7d846ec` și **încă nu a rulat nicăieri**)
 - **Schema Room:** v1, `app/schemas/com.emanus.lucrari.data.AppDb/1.json`, hash `9a2846d7ed22222385ac20bef74419e7` — **neschimbată din M1** și așa trebuie să rămână (§5)
