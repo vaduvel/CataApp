@@ -22,7 +22,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -44,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -60,6 +58,8 @@ import com.emanus.lucrari.data.Photo
 import com.emanus.lucrari.data.Todo
 import com.emanus.lucrari.data.repo.PendingPhotoCapture
 import com.emanus.lucrari.ui.component.BrandTopAppBar
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.theme.Dimens
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -165,14 +165,14 @@ fun PhotosScreen(onBack: () -> Unit) {
 	) { padding ->
 		LazyColumn(
 			modifier = Modifier.fillMaxSize().padding(padding),
-			contentPadding = PaddingValues(16.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
+			contentPadding = PaddingValues(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 		) {
 			item {
 				Text(stringResource(R.string.photos_choose_job), style = MaterialTheme.typography.titleMedium)
 				Row(
 					modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-					horizontalArrangement = Arrangement.spacedBy(8.dp),
+					horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 				) {
 					jobs.forEach { job ->
 						FilterChip(
@@ -189,7 +189,7 @@ fun PhotosScreen(onBack: () -> Unit) {
 					Text(stringResource(R.string.photos_phase), style = MaterialTheme.typography.titleMedium)
 					Row(
 						modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 					) {
 						Phase.entries.forEach { item ->
 							val label = when (item) {
@@ -209,7 +209,7 @@ fun PhotosScreen(onBack: () -> Unit) {
 					Text(stringResource(R.string.photos_link_todo), style = MaterialTheme.typography.titleMedium)
 					Row(
 						modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 					) {
 						FilterChip(
 							selected = selectedTodoId == null,
@@ -242,10 +242,10 @@ fun PhotosScreen(onBack: () -> Unit) {
 								}
 							}
 						},
-						modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+						modifier = Modifier.fillMaxWidth().heightIn(min = Dimens.primaryButtonHeight),
 					) {
 						Icon(Icons.Outlined.PhotoCamera, contentDescription = null)
-						Spacer(Modifier.width(8.dp))
+						Spacer(Modifier.width(Dimens.space8))
 						Text(stringResource(R.string.photos_take))
 					}
 				}
@@ -253,16 +253,16 @@ fun PhotosScreen(onBack: () -> Unit) {
 					item { Text(stringResource(R.string.photos_empty)) }
 				} else {
 					items(photos, key = { it.id }) { photo ->
-						Card(modifier = Modifier.fillMaxWidth()) {
+						BrandCard(modifier = Modifier.fillMaxWidth()) {
 							Column {
 								AsyncImage(
 									model = File(photo.path),
 									contentDescription = stringResource(R.string.photo_content_description),
-									modifier = Modifier.fillMaxWidth().height(220.dp),
+									modifier = Modifier.fillMaxWidth().height(Dimens.photoPreviewHeight),
 									contentScale = ContentScale.Crop,
 								)
 								Row(
-									modifier = Modifier.fillMaxWidth().padding(12.dp),
+									modifier = Modifier.fillMaxWidth().padding(Dimens.space12),
 									horizontalArrangement = Arrangement.SpaceBetween,
 								) {
 									Column(modifier = Modifier.weight(1f)) {

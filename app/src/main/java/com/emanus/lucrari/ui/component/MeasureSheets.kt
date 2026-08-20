@@ -2,12 +2,9 @@ package com.emanus.lucrari.ui.component
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,11 +12,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,8 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.emanus.lucrari.R
+import com.emanus.lucrari.ui.theme.Dimens
 import com.emanus.lucrari.data.Extra
 import com.emanus.lucrari.data.Measure
 import com.emanus.lucrari.data.MeasureUnit
@@ -58,7 +53,7 @@ private fun DateChips(epochDay: Long, onPick: (Long) -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.horizontalScroll(rememberScrollState()),
-		horizontalArrangement = Arrangement.spacedBy(8.dp),
+		horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 	) {
 		FilterChip(
 			selected = picked == todayDate,
@@ -101,7 +96,6 @@ fun MeasureSheet(
 		date: LocalDate,
 	) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var place by rememberSaveable(measure?.id) { mutableStateOf(measure?.place.orEmpty()) }
 	var work by rememberSaveable(measure?.id) { mutableStateOf(measure?.work.orEmpty()) }
 	var qty by rememberSaveable(measure?.id) {
@@ -122,17 +116,7 @@ fun MeasureSheet(
 	val lineCents = if (parsedQty == null) null else Measures.lineCents(parsedQty, parsedPrice)
 	val ready = place.isNotBlank() && parsedQty != null && (price.isBlank() || parsedPrice != null)
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			OutlinedTextField(
 				value = place,
 				onValueChange = { place = it },
@@ -166,7 +150,7 @@ fun MeasureSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				MeasureUnit.entries.forEach { unit ->
 					FilterChip(
@@ -211,7 +195,7 @@ fun MeasureSheet(
 				enabled = ready,
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -224,7 +208,6 @@ fun MeasureSheet(
 					Text(stringResource(R.string.measure_delete))
 				}
 			}
-		}
 	}
 }
 
@@ -249,7 +232,6 @@ fun ExtraSheet(
 		date: LocalDate,
 	) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var what by rememberSaveable(extra?.id) { mutableStateOf(extra?.what.orEmpty()) }
 	var price by rememberSaveable(extra?.id) {
 		mutableStateOf(extra?.priceCents?.let { Money.plain(it) }.orEmpty())
@@ -264,17 +246,7 @@ fun ExtraSheet(
 	val parsedPrice = if (price.isBlank()) null else Money.parse(price)
 	val ready = what.isNotBlank() && (price.isBlank() || parsedPrice != null)
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			OutlinedTextField(
 				value = what,
 				onValueChange = { what = it },
@@ -296,7 +268,7 @@ fun ExtraSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				FilterChip(
 					selected = accepted,
@@ -334,7 +306,7 @@ fun ExtraSheet(
 				enabled = ready,
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -347,6 +319,5 @@ fun ExtraSheet(
 					Text(stringResource(R.string.extra_delete))
 				}
 			}
-		}
 	}
 }

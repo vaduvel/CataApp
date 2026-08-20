@@ -1,23 +1,16 @@
 package com.emanus.lucrari.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.emanus.lucrari.R
+import com.emanus.lucrari.ui.theme.Dimens
 import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.data.today
 import com.emanus.lucrari.domain.Dates
@@ -39,7 +32,6 @@ import java.time.LocalDate
  * schimbă cu o apăsare. Orele și blocajul sunt opționale și stau ascunse până le cere.
  * O zi cu blocaj trece lucrarea în Așteptare (SPEC §5.6).
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DaySheet(
 	day: WorkDay?,
@@ -48,7 +40,6 @@ fun DaySheet(
 	onDelete: () -> Unit,
 	onSave: (date: LocalDate, what: String, hours: Double?, blocked: String) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	val dayId = day?.id
 	var epochDay by rememberSaveable(dayId) { mutableStateOf((day?.date ?: today()).toEpochDay()) }
 	var what by rememberSaveable(dayId) { mutableStateOf(day?.what.orEmpty()) }
@@ -60,22 +51,11 @@ fun DaySheet(
 	var showBlocked by rememberSaveable(dayId) { mutableStateOf(day?.blocked != null) }
 	val date = LocalDate.ofEpochDay(epochDay)
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 24.dp)
-				.padding(bottom = 24.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(16.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			val todayDate = today()
 			val yesterday = todayDate.minusDays(1)
 			Row(
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				FilterChip(
@@ -140,7 +120,7 @@ fun DaySheet(
 				},
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -150,12 +130,10 @@ fun DaySheet(
 					Text(stringResource(R.string.day_delete))
 				}
 			}
-		}
 	}
 }
 
 /** Foaie cu un singur câmp, folosită la adăugarea unei etape. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextSheet(
 	title: String,
@@ -163,20 +141,9 @@ fun TextSheet(
 	onDismiss: () -> Unit,
 	onSave: (String) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var text by rememberSaveable { mutableStateOf("") }
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 24.dp)
-				.padding(bottom = 24.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(16.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			OutlinedTextField(
 				value = text,
 				onValueChange = { text = it },
@@ -189,10 +156,9 @@ fun TextSheet(
 				enabled = text.isNotBlank(),
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
-		}
 	}
 }

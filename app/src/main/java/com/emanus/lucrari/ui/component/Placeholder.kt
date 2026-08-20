@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import com.emanus.lucrari.ui.theme.Dimens
 
 /**
  * Ecran gol de M0. Se șterge pe măsură ce fiecare ecran primește conținut real.
@@ -26,12 +26,12 @@ fun Placeholder(
 	Column(
 		modifier = modifier
 			.fillMaxSize()
-			.padding(24.dp),
+			.padding(Dimens.space24),
 		verticalArrangement = Arrangement.Center,
 		horizontalAlignment = Alignment.CenterHorizontally,
 	) {
 		Text(text = title, style = MaterialTheme.typography.headlineMedium)
-		Spacer(modifier = Modifier.height(12.dp))
+		Spacer(modifier = Modifier.height(Dimens.space12))
 		Text(
 			text = subtitle,
 			style = MaterialTheme.typography.bodyMedium,

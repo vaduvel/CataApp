@@ -3,12 +3,9 @@ package com.emanus.lucrari.ui.component
 import androidx.annotation.StringRes
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,11 +13,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.emanus.lucrari.R
+import com.emanus.lucrari.ui.theme.Dimens
 import com.emanus.lucrari.data.Billing
 import com.emanus.lucrari.data.InvoiceKind
 import com.emanus.lucrari.data.InvoiceRef
@@ -82,7 +77,7 @@ private fun MoneyDateChips(epochDay: Long, onPick: (Long) -> Unit) {
 		modifier = Modifier
 			.fillMaxWidth()
 			.horizontalScroll(rememberScrollState()),
-		horizontalArrangement = Arrangement.spacedBy(8.dp),
+		horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 	) {
 		FilterChip(
 			selected = picked == todayDate,
@@ -117,7 +112,6 @@ fun PaymentSheet(
 	onDelete: () -> Unit,
 	onSave: (amountCents: Long, method: Method, date: LocalDate, note: String) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var amount by rememberSaveable(payment?.id) {
 		mutableStateOf(payment?.amountCents?.let { Money.plain(it) }.orEmpty())
 	}
@@ -132,17 +126,7 @@ fun PaymentSheet(
 	val parsedAmount = Money.parse(amount)
 	val ready = parsedAmount != null && parsedAmount != 0L
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			OutlinedTextField(
 				value = amount,
 				onValueChange = { amount = it },
@@ -160,7 +144,7 @@ fun PaymentSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				Method.entries.forEach { method ->
 					FilterChip(
@@ -195,7 +179,7 @@ fun PaymentSheet(
 				enabled = ready,
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -208,7 +192,6 @@ fun PaymentSheet(
 					Text(stringResource(R.string.payment_delete))
 				}
 			}
-		}
 	}
 }
 
@@ -231,7 +214,6 @@ fun InvoiceSheet(
 		paid: Boolean,
 	) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var number by rememberSaveable(invoice?.id) { mutableStateOf(invoice?.number.orEmpty()) }
 	var amount by rememberSaveable(invoice?.id) {
 		mutableStateOf(invoice?.amountCents?.let { Money.plain(it) }.orEmpty())
@@ -247,17 +229,7 @@ fun InvoiceSheet(
 	val parsedAmount = Money.parse(amount)
 	val ready = parsedAmount != null && parsedAmount != 0L
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			Text(
 				text = stringResource(R.string.invoice_note_app),
 				style = MaterialTheme.typography.bodySmall,
@@ -288,7 +260,7 @@ fun InvoiceSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				InvoiceKind.entries.forEach { kind ->
 					FilterChip(
@@ -322,7 +294,7 @@ fun InvoiceSheet(
 				enabled = ready,
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -335,6 +307,5 @@ fun InvoiceSheet(
 					Text(stringResource(R.string.invoice_delete))
 				}
 			}
-		}
 	}
 }

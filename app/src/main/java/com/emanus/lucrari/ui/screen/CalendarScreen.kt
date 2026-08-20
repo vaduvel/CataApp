@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,6 +54,7 @@ import com.emanus.lucrari.ui.component.StatusChip
 import com.emanus.lucrari.ui.component.BrandCard
 import com.emanus.lucrari.ui.component.BrandTopAppBar
 import com.emanus.lucrari.ui.component.color
+import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import java.time.YearMonth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -122,9 +122,9 @@ fun CalendarScreen(
 				.fillMaxSize()
 				.padding(padding)
 				.verticalScroll(scroll)
-				.padding(horizontal = 16.dp)
-				.padding(bottom = 24.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
+				.padding(horizontal = Dimens.space16)
+				.padding(bottom = Dimens.space24),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space8),
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
@@ -256,17 +256,17 @@ private fun DayCell(
 	}
 	Box(
 		modifier = modifier
-			.padding(2.dp)
-			.height(48.dp)
+			.padding(Dimens.space2)
+			.height(Dimens.touchTargetMin)
 			.clip(shape)
 			.background(background)
-			.border(width = 2.dp, color = outline, shape = shape)
+			.border(width = Dimens.space2, color = outline, shape = shape)
 			.clickable { onClick() },
 		contentAlignment = Alignment.Center,
 	) {
 		Column(
 			horizontalAlignment = Alignment.CenterHorizontally,
-			verticalArrangement = Arrangement.spacedBy(2.dp),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space2),
 		) {
 			Text(
 				text = date.dayOfMonth.toString(),
@@ -293,12 +293,12 @@ private fun DayJobRow(job: Job, onClick: () -> Unit) {
 		accent = job.status.color,
 	) {
 		Column(
-			modifier = Modifier.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(6.dp),
+			modifier = Modifier.padding(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space6),
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				Text(

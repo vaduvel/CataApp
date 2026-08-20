@@ -2,7 +2,6 @@ package com.emanus.lucrari.ui.component
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,12 +14,10 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,8 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.emanus.lucrari.R
+import com.emanus.lucrari.ui.theme.Dimens
 import com.emanus.lucrari.data.today
 import com.emanus.lucrari.domain.Dates
 import com.emanus.lucrari.domain.Schedule
@@ -61,7 +58,6 @@ fun NewJobSheet(
 		start: LocalDate?,
 	) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var client by rememberSaveable { mutableStateOf("") }
 	var address by rememberSaveable { mutableStateOf("") }
 	var what by rememberSaveable { mutableStateOf("") }
@@ -70,18 +66,10 @@ fun NewJobSheet(
 	var startEpoch by rememberSaveable { mutableStateOf<Long?>(null) }
 	var showPicker by rememberSaveable { mutableStateOf(false) }
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 20.dp)
-				.padding(bottom = 32.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(
-				text = stringResource(R.string.new_job_title),
-				style = MaterialTheme.typography.titleLarge,
-			)
+	BrandFormSheet(
+		title = stringResource(R.string.new_job_title),
+		onDismiss = onDismiss,
+	) {
 			OutlinedTextField(
 				value = client,
 				onValueChange = { client = it },
@@ -108,7 +96,7 @@ fun NewJobSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				templates.forEach { name ->
 					FilterChip(
@@ -143,7 +131,7 @@ fun NewJobSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				FilterChip(
 					selected = startEpoch == null,
@@ -192,11 +180,10 @@ fun NewJobSheet(
 				},
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
-		}
 	}
 
 	if (showPicker) {

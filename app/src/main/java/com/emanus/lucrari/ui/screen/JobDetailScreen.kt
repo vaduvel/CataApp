@@ -30,7 +30,6 @@ import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -55,7 +54,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -93,6 +91,7 @@ import com.emanus.lucrari.ui.component.BrandProgress
 import com.emanus.lucrari.ui.component.BrandTopAppBar
 import com.emanus.lucrari.ui.component.color
 import com.emanus.lucrari.ui.component.labelRes
+import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -403,8 +402,8 @@ fun JobDetailScreen(
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(padding),
-				contentPadding = PaddingValues(16.dp),
-				verticalArrangement = Arrangement.spacedBy(12.dp),
+				contentPadding = PaddingValues(Dimens.space16),
+				verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 			) {
 				item {
 					BrandCard(
@@ -412,8 +411,8 @@ fun JobDetailScreen(
 						accent = job.status.color,
 					) {
 						Column(
-							modifier = Modifier.padding(16.dp),
-							verticalArrangement = Arrangement.spacedBy(8.dp),
+							modifier = Modifier.padding(Dimens.space16),
+							verticalArrangement = Arrangement.spacedBy(Dimens.space8),
 						) {
 							Text(
 								text = client?.name.orEmpty(),
@@ -474,7 +473,7 @@ fun JobDetailScreen(
 									style = MaterialTheme.typography.bodyMedium,
 								)
 							}
-							Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+							Row(horizontalArrangement = Arrangement.spacedBy(Dimens.space8)) {
 								val phone = client?.phone
 								if (!phone.isNullOrBlank()) {
 									OutlinedButton(
@@ -484,7 +483,7 @@ fun JobDetailScreen(
 										},
 									) {
 										Icon(Icons.Outlined.Call, contentDescription = null)
-										Spacer(Modifier.width(8.dp))
+										Spacer(Modifier.width(Dimens.space8))
 										Text(stringResource(R.string.job_call))
 									}
 								}
@@ -496,7 +495,7 @@ fun JobDetailScreen(
 										},
 									) {
 										Icon(Icons.Outlined.Map, contentDescription = null)
-										Spacer(Modifier.width(8.dp))
+										Spacer(Modifier.width(Dimens.space8))
 										Text(stringResource(R.string.job_map))
 									}
 								}
@@ -507,20 +506,20 @@ fun JobDetailScreen(
 								onClick = { onOpenMoney(job.id) },
 								modifier = Modifier
 									.fillMaxWidth()
-									.height(56.dp),
+									.height(Dimens.primaryButtonHeight),
 							) {
 								Icon(Icons.Outlined.Payments, contentDescription = null)
-								Spacer(Modifier.width(8.dp))
+								Spacer(Modifier.width(Dimens.space8))
 								Text(stringResource(R.string.job_money_open))
 							}
 							OutlinedButton(
 								onClick = { onOpenDescrizione(job.id) },
 								modifier = Modifier
 									.fillMaxWidth()
-									.height(56.dp),
+									.height(Dimens.primaryButtonHeight),
 							) {
 								Icon(Icons.Outlined.Description, contentDescription = null)
-								Spacer(Modifier.width(8.dp))
+								Spacer(Modifier.width(Dimens.space8))
 								Text(stringResource(R.string.job_descrizione_open))
 							}
 						}
@@ -537,7 +536,7 @@ fun JobDetailScreen(
 						modifier = Modifier
 							.fillMaxWidth()
 							.horizontalScroll(rememberScrollState()),
-						horizontalArrangement = Arrangement.spacedBy(8.dp),
+						horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 					) {
 						JobStatus.entries.forEach { status ->
 							FilterChip(
@@ -562,8 +561,8 @@ fun JobDetailScreen(
 					item {
 						BrandCard(modifier = Modifier.fillMaxWidth()) {
 							Column(
-								modifier = Modifier.padding(16.dp),
-								verticalArrangement = Arrangement.spacedBy(8.dp),
+								modifier = Modifier.padding(Dimens.space16),
+								verticalArrangement = Arrangement.spacedBy(Dimens.space8),
 							) {
 								Text(
 									text = stringResource(R.string.definisat_suggest),
@@ -609,7 +608,7 @@ fun JobDetailScreen(
 							modifier = Modifier
 								.fillMaxWidth()
 								.horizontalScroll(rememberScrollState()),
-							horizontalArrangement = Arrangement.spacedBy(8.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 						) {
 							Templates.names.forEach { name ->
 								FilterChip(
@@ -626,7 +625,7 @@ fun JobDetailScreen(
 					items(stages, key = { it.id }) { stage ->
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space4),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							IconButton(onClick = { vm.toggleStage(stage) }) {
@@ -679,7 +678,7 @@ fun JobDetailScreen(
 						},
 						modifier = Modifier
 							.fillMaxWidth()
-							.height(56.dp),
+							.height(Dimens.primaryButtonHeight),
 					) {
 						Text(
 							text = stringResource(R.string.today_log),
@@ -700,7 +699,7 @@ fun JobDetailScreen(
 							modifier = Modifier
 								.fillMaxWidth()
 								.clickable { editingDayId = day.id },
-							horizontalArrangement = Arrangement.spacedBy(12.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space12),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							Text(
@@ -757,7 +756,7 @@ fun JobDetailScreen(
 					items(todos, key = { it.id }) { todo ->
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space4),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							IconButton(onClick = { vm.toggleTodo(todo) }) {
@@ -831,7 +830,7 @@ fun JobDetailScreen(
 					items(materials, key = { it.id }) { material ->
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space4),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							IconButton(onClick = { vm.toggleMaterial(material) }) {
@@ -895,7 +894,7 @@ fun JobDetailScreen(
 					items(measures, key = { it.id }) { measure ->
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space4),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							Column(
@@ -974,7 +973,7 @@ fun JobDetailScreen(
 					items(extras, key = { it.id }) { extra ->
 						Row(
 							modifier = Modifier.fillMaxWidth(),
-							horizontalArrangement = Arrangement.spacedBy(4.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space4),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							IconButton(onClick = { vm.toggleExtraAccepted(extra) }) {
@@ -1028,7 +1027,7 @@ fun JobDetailScreen(
 						}
 					}
 					item {
-						Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+						Column(verticalArrangement = Arrangement.spacedBy(Dimens.space4)) {
 							Text(
 								text = stringResource(
 									R.string.extras_total,

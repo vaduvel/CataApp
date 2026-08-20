@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Event
-import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.PauseCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,9 +24,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.emanus.lucrari.R
 import com.emanus.lucrari.data.JobStatus
+import com.emanus.lucrari.ui.theme.Dimens
 import com.emanus.lucrari.ui.theme.StatusColor
 import com.emanus.lucrari.ui.theme.StatusTone
 import com.emanus.lucrari.ui.theme.StatusTones
@@ -62,7 +62,7 @@ val JobStatus.icon: ImageVector
 		JobStatus.PROGRAMAT -> Icons.Outlined.Event
 		JobStatus.IN_LUCRU -> Icons.Outlined.Construction
 		JobStatus.ASTEPTARE -> Icons.Outlined.PauseCircle
-		JobStatus.DE_FINISAT -> Icons.Outlined.FormatListBulleted
+		JobStatus.DE_FINISAT -> Icons.AutoMirrored.Outlined.FormatListBulleted
 		JobStatus.TERMINAT -> Icons.Outlined.CheckCircle
 		JobStatus.ANULAT -> Icons.Outlined.Cancel
 	}
@@ -83,17 +83,17 @@ fun StatusChip(status: JobStatus, modifier: Modifier = Modifier) {
 	val tone = status.tone
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
-		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		horizontalArrangement = Arrangement.spacedBy(Dimens.space4),
 		modifier = modifier
 			.clip(RoundedCornerShape(50))
 			.background(tone.container)
-			.padding(start = 8.dp, end = 12.dp, top = 6.dp, bottom = 6.dp),
+			.padding(start = Dimens.space8, end = Dimens.space12, top = Dimens.space6, bottom = Dimens.space6),
 	) {
 		Icon(
 			imageVector = status.icon,
 			contentDescription = null,
 			tint = tone.content,
-			modifier = Modifier.size(16.dp),
+			modifier = Modifier.size(Dimens.space16),
 		)
 		Text(
 			text = stringResource(status.labelRes),

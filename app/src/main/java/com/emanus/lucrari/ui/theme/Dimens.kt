@@ -10,6 +10,7 @@ object Dimens {
 	val space0 = 0.dp
 	val space2 = 2.dp
 	val space4 = 4.dp
+	val space6 = 6.dp
 	val space8 = 8.dp
 	val space12 = 12.dp
 	val space16 = 16.dp
@@ -32,6 +33,7 @@ object Dimens {
 	val hairline = 1.dp
 	val navigationBrandMarkWidth = 22.dp
 	val navigationBrandMarkHeight = 3.dp
+	val photoPreviewHeight = 220.dp
 
 	/** Spațiu liber sub liste, ca butonul plutitor să nu acopere ultimul rând. */
 	val listBottomSpace = 96.dp

@@ -21,7 +21,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -43,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +60,10 @@ import com.emanus.lucrari.domain.Money
 import com.emanus.lucrari.ui.component.InvoiceSheet
 import com.emanus.lucrari.ui.component.PaymentSheet
 import com.emanus.lucrari.ui.component.BrandTopAppBar
+import com.emanus.lucrari.ui.component.BrandCard
 import com.emanus.lucrari.ui.component.labelRes
+import com.emanus.lucrari.ui.theme.AppColor
+import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -178,13 +179,13 @@ fun JobMoneyScreen(
 			modifier = Modifier
 				.fillMaxSize()
 				.padding(padding),
-			contentPadding = PaddingValues(16.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
+			contentPadding = PaddingValues(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 		) {
 			val loaded = header
 			if (loaded != null) {
 				item {
-					Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+					Column(verticalArrangement = Arrangement.spacedBy(Dimens.space2)) {
 						Text(
 							text = loaded.job.title,
 							style = MaterialTheme.typography.titleLarge,
@@ -355,10 +356,10 @@ private fun BillingCard(job: Job, onSave: (Billing, Long?, Long?) -> Unit) {
 	}
 	val billing = Billing.valueOf(billingName)
 
-	Card(modifier = Modifier.fillMaxWidth()) {
+	BrandCard(modifier = Modifier.fillMaxWidth()) {
 		Column(
-			modifier = Modifier.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
+			modifier = Modifier.padding(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 		) {
 			Text(
 				text = stringResource(R.string.money_billing),
@@ -368,7 +369,7 @@ private fun BillingCard(job: Job, onSave: (Billing, Long?, Long?) -> Unit) {
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				Billing.entries.forEach { option ->
 					FilterChip(
@@ -408,7 +409,7 @@ private fun BillingCard(job: Job, onSave: (Billing, Long?, Long?) -> Unit) {
 				onClick = { onSave(billing, Money.parse(agreed), Money.parse(dayRate)) },
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.money_billing_save))
 			}
@@ -429,10 +430,13 @@ private fun TotalsCard(job: Job, totals: JobTotals) {
 		)
 	}
 
-	Card(modifier = Modifier.fillMaxWidth()) {
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+	) {
 		Column(
-			modifier = Modifier.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier.padding(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space8),
 		) {
 			MoneyLine(label = baseLabel, value = Money.format(totals.baseCents))
 			MoneyLine(
@@ -508,14 +512,14 @@ private fun SectionHeader(titleRes: Int, actionRes: Int, onAction: () -> Unit) {
 
 @Composable
 private fun PaymentRow(payment: Payment, onOpen: () -> Unit) {
-	Card(
-		modifier = Modifier
-			.fillMaxWidth()
-			.clickable(onClick = onOpen),
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		onClick = onOpen,
+		accent = AppColor.Success,
 	) {
 		Column(
-			modifier = Modifier.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(2.dp),
+			modifier = Modifier.padding(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space2),
 		) {
 			Text(
 				text = Money.format(payment.amountCents) + " · " +
@@ -545,15 +549,22 @@ private fun InvoiceRow(
 	val date = invoice.date
 	val overdue = !invoice.paid && date != null && !date.isAfter(overdueBefore)
 
-	Card(modifier = Modifier.fillMaxWidth()) {
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		accent = when {
+			invoice.paid -> AppColor.Success
+			overdue -> MaterialTheme.colorScheme.error
+			else -> MaterialTheme.colorScheme.secondary
+		},
+	) {
 		Row(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(8.dp),
+				.padding(Dimens.space8),
 			verticalAlignment = Alignment.CenterVertically,
-			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 		) {
-			IconButton(onClick = onTogglePaid, modifier = Modifier.size(48.dp)) {
+			IconButton(onClick = onTogglePaid, modifier = Modifier.size(Dimens.touchTargetMin)) {
 				Icon(
 					imageVector = if (invoice.paid) {
 						Icons.Outlined.CheckCircle
@@ -567,8 +578,8 @@ private fun InvoiceRow(
 				modifier = Modifier
 					.weight(1f)
 					.clickable(onClick = onOpen)
-					.padding(vertical = 8.dp),
-				verticalArrangement = Arrangement.spacedBy(2.dp),
+					.padding(vertical = Dimens.space8),
+				verticalArrangement = Arrangement.spacedBy(Dimens.space2),
 			) {
 				val head = listOf(
 					Money.format(invoice.amountCents),

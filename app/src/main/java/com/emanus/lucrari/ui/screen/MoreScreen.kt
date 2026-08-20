@@ -48,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -235,7 +234,7 @@ fun MoreScreen(
 								}
 							},
 							enabled = !busy,
-							modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+							modifier = Modifier.fillMaxWidth().heightIn(min = Dimens.primaryButtonHeight),
 						) { Text(stringResource(R.string.demo_delete)) }
 					}
 				}
@@ -262,12 +261,12 @@ fun MoreScreen(
 								exportLauncher.launch("lucrari-${LocalDate.now()}.zip")
 							},
 							enabled = !busy,
-							modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+							modifier = Modifier.fillMaxWidth().heightIn(min = Dimens.primaryButtonHeight),
 						) { Text(stringResource(R.string.backup_export)) }
 						OutlinedButton(
 							onClick = { importLauncher.launch(arrayOf("application/zip", "application/octet-stream")) },
 							enabled = !busy,
-							modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+							modifier = Modifier.fillMaxWidth().heightIn(min = Dimens.primaryButtonHeight),
 						) { Text(stringResource(R.string.backup_import)) }
 						OutlinedButton(
 							onClick = {
@@ -288,7 +287,7 @@ fun MoreScreen(
 								}
 							},
 							enabled = !busy,
-							modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+							modifier = Modifier.fillMaxWidth().heightIn(min = Dimens.primaryButtonHeight),
 						) { Text(stringResource(R.string.backup_share)) }
 					}
 				}
@@ -297,7 +296,7 @@ fun MoreScreen(
 				item {
 					OutlinedButton(
 						onClick = { notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS) },
-						modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+						modifier = Modifier.fillMaxWidth().heightIn(min = Dimens.primaryButtonHeight),
 					) {
 						Icon(Icons.Outlined.Notifications, contentDescription = null)
 						Text(stringResource(R.string.reminders_enable_notifications))

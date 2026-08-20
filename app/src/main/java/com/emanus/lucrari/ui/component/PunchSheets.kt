@@ -3,23 +3,18 @@ package com.emanus.lucrari.ui.component
 import androidx.annotation.StringRes
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,8 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.emanus.lucrari.R
+import com.emanus.lucrari.ui.theme.Dimens
 import com.emanus.lucrari.data.Material
 import com.emanus.lucrari.data.Reason
 import com.emanus.lucrari.data.Todo
@@ -61,23 +56,12 @@ fun TodoSheet(
 	onDelete: () -> Unit,
 	onSave: (what: String, place: String, reason: Reason?, due: LocalDate?) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var what by rememberSaveable(todo?.id) { mutableStateOf(todo?.what.orEmpty()) }
 	var place by rememberSaveable(todo?.id) { mutableStateOf(todo?.place.orEmpty()) }
 	var reasonName by rememberSaveable(todo?.id) { mutableStateOf(todo?.reason?.name) }
 	var dueEpoch by rememberSaveable(todo?.id) { mutableStateOf(todo?.due?.toEpochDay()) }
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			OutlinedTextField(
 				value = what,
 				onValueChange = { what = it },
@@ -102,7 +86,7 @@ fun TodoSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				Reason.entries.forEach { reason ->
 					FilterChip(
@@ -124,7 +108,7 @@ fun TodoSheet(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState()),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				FilterChip(
 					selected = dueEpoch == null,
@@ -160,7 +144,7 @@ fun TodoSheet(
 				enabled = what.isNotBlank(),
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -173,7 +157,6 @@ fun TodoSheet(
 					Text(stringResource(R.string.todo_delete))
 				}
 			}
-		}
 	}
 }
 
@@ -187,22 +170,11 @@ fun MaterialSheet(
 	onDelete: () -> Unit,
 	onSave: (what: String, qty: String, shop: String) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 	var what by rememberSaveable(material?.id) { mutableStateOf(material?.what.orEmpty()) }
 	var qty by rememberSaveable(material?.id) { mutableStateOf(material?.qty.orEmpty()) }
 	var shop by rememberSaveable(material?.id) { mutableStateOf(material?.shop.orEmpty()) }
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 16.dp)
-				.imePadding()
-				.navigationBarsPadding(),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(text = title, style = MaterialTheme.typography.titleLarge)
-
+	BrandFormSheet(title = title, onDismiss = onDismiss) {
 			OutlinedTextField(
 				value = what,
 				onValueChange = { what = it },
@@ -232,7 +204,7 @@ fun MaterialSheet(
 				enabled = what.isNotBlank(),
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
@@ -245,6 +217,5 @@ fun MaterialSheet(
 					Text(stringResource(R.string.material_delete))
 				}
 			}
-		}
 	}
 }

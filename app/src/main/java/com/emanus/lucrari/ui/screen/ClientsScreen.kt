@@ -20,11 +20,9 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,6 +42,7 @@ import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.ui.component.BrandCard
 import com.emanus.lucrari.ui.component.BrandEmptyState
+import com.emanus.lucrari.ui.component.BrandFormSheet
 import com.emanus.lucrari.ui.component.BrandTopAppBar
 import com.emanus.lucrari.ui.theme.Dimens
 import kotlinx.coroutines.flow.SharingStarted
@@ -171,23 +169,14 @@ private fun NewClientSheet(
 	onDismiss: () -> Unit,
 	onSave: (name: String, phone: String, note: String) -> Unit,
 ) {
-	val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-	var name by remember { mutableStateOf("") }
-	var phone by remember { mutableStateOf("") }
-	var note by remember { mutableStateOf("") }
+	var name by rememberSaveable { mutableStateOf("") }
+	var phone by rememberSaveable { mutableStateOf("") }
+	var note by rememberSaveable { mutableStateOf("") }
 
-	ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-		Column(
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(horizontal = 20.dp)
-				.padding(bottom = 32.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
-		) {
-			Text(
-				text = stringResource(R.string.clients_new),
-				style = MaterialTheme.typography.titleLarge,
-			)
+	BrandFormSheet(
+		title = stringResource(R.string.clients_new),
+		onDismiss = onDismiss,
+	) {
 			OutlinedTextField(
 				value = name,
 				onValueChange = { name = it },
@@ -212,10 +201,9 @@ private fun NewClientSheet(
 				onClick = { onSave(name, phone, note) },
 				modifier = Modifier
 					.fillMaxWidth()
-					.height(56.dp),
+					.height(Dimens.primaryButtonHeight),
 			) {
 				Text(stringResource(R.string.save))
 			}
-		}
 	}
 }

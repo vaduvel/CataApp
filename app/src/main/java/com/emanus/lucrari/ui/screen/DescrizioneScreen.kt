@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.emanus.lucrari.App
@@ -48,6 +47,7 @@ import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.domain.descrizione
 import com.emanus.lucrari.ui.component.BrandCard
 import com.emanus.lucrari.ui.component.BrandTopAppBar
+import com.emanus.lucrari.ui.theme.Dimens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -143,8 +143,8 @@ fun DescrizioneScreen(
 				.fillMaxSize()
 				.padding(padding)
 				.verticalScroll(rememberScrollState())
-				.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
+				.padding(Dimens.space16),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 		) {
 			Text(
 				text = stringResource(R.string.descrizione_hint),
@@ -161,7 +161,7 @@ fun DescrizioneScreen(
 					SelectionContainer {
 						Text(
 							text = text,
-							modifier = Modifier.padding(16.dp),
+							modifier = Modifier.padding(Dimens.space16),
 							style = MaterialTheme.typography.bodyLarge,
 						)
 					}
@@ -174,7 +174,7 @@ fun DescrizioneScreen(
 					},
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(56.dp),
+						.height(Dimens.primaryButtonHeight),
 				) {
 					Text(stringResource(R.string.descrizione_copy))
 				}
@@ -189,7 +189,7 @@ fun DescrizioneScreen(
 					},
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(56.dp),
+						.height(Dimens.primaryButtonHeight),
 				) {
 					Text(stringResource(R.string.descrizione_send))
 				}
