@@ -69,12 +69,16 @@ class JobRepo(private val db: AppDb) {
 	suspend fun boardOnce(query: String): List<JobWithTotals> = db.jobs().boardOnce(query.trim())
 
 	/**
-	 * Lucrările la care se poate lucra azi, în ordinea în care le atinge: întâi cele în
-	 * lucru, apoi de finisat, apoi cele blocate în așteptare.
+	 * Lucrările la care se poate lucra azi, în ordinea în care le atinge: întâi cea care
+	 * ar trebui să înceapă, apoi cele în lucru, apoi de finisat, apoi cele blocate în
+	 * așteptare.
 	 */
 	fun todayBoard(date: LocalDate): Flow<List<JobToday>> =
-		db.jobs().observeToday(date, ACTIVE_STATUSES).map { list ->
-			list.sortedBy { row -> ACTIVE_STATUSES.indexOf(row.job.status) }
+		db.jobs().observeToday(date, ACTIVE_STATUSES, JobStatus.PROGRAMAT).map { list ->
+			list.sortedBy { row ->
+				val index = TODAY_ORDER.indexOf(row.job.status)
+				if (index < 0) TODAY_ORDER.size else index
+			}
 		}
 
 	fun job(id: String): Flow<Job?> = db.jobs().observe(id)
@@ -599,5 +603,11 @@ class JobRepo(private val db: AppDb) {
 			JobStatus.DE_FINISAT,
 			JobStatus.ASTEPTARE,
 		)
+
+		/**
+		 * Ordinea cardurilor pe ecranul Azi. Lucrarea programată stă prima: e singura la
+		 * care nu s-a atins nimeni încă, deci e singura care se poate uita.
+		 */
+		val TODAY_ORDER: List<JobStatus> = listOf(JobStatus.PROGRAMAT) + ACTIVE_STATUSES
 	}
 }

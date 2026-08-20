@@ -158,6 +158,10 @@ interface JobDao {
 	/**
 	 * Ecranul Azi (SPEC §6). Statusurile vin ca parametru, nu ca text în SQL, ca să nu
 	 * depindă de felul în care sunt scrise enum-urile în baza de date.
+	 *
+	 * Lucrarea programată intră în listă din ziua în care ar trebui să înceapă: mai
+	 * devreme n-are ce căuta pe ecranul de azi, iar dacă ziua a trecut și tot n-a început,
+	 * rămâne acolo până se atinge cineva de ea.
 	 */
 	@Query(
 		"""
@@ -170,10 +174,15 @@ interface JobDao {
 		FROM jobs j
 		JOIN clients c ON c.id = j.clientId
 		WHERE j.status IN (:statuses)
+			OR (j.status = :planned AND j.plannedStart IS NOT NULL AND j.plannedStart <= :date)
 		ORDER BY j.createdAt DESC
 		"""
 	)
-	fun observeToday(date: LocalDate, statuses: List<JobStatus>): Flow<List<JobToday>>
+	fun observeToday(
+		date: LocalDate,
+		statuses: List<JobStatus>,
+		planned: JobStatus,
+	): Flow<List<JobToday>>
 }
 
 @Dao
