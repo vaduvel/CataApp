@@ -43,6 +43,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.emanus.lucrari.App
 import com.emanus.lucrari.R
+import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.JobToday
 import com.emanus.lucrari.data.today
 import com.emanus.lucrari.domain.Dates
@@ -128,6 +129,7 @@ fun TodayScreen(onOpenJob: (String) -> Unit, vm: TodayViewModel = viewModel()) {
 					items(jobs, key = { row -> row.job.id }) { row ->
 						TodayCard(
 							row = row,
+							date = date,
 							onOpen = { onOpenJob(row.job.id) },
 							onLog = {
 								vm.logToday(row.job.id) { saved ->
@@ -147,7 +149,7 @@ fun TodayScreen(onOpenJob: (String) -> Unit, vm: TodayViewModel = viewModel()) {
 }
 
 @Composable
-private fun TodayCard(row: JobToday, onOpen: () -> Unit, onLog: () -> Unit) {
+private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog: () -> Unit) {
 	Card(modifier = Modifier.fillMaxWidth()) {
 		Column(
 			modifier = Modifier
@@ -174,6 +176,20 @@ private fun TodayCard(row: JobToday, onOpen: () -> Unit, onLog: () -> Unit) {
 			val where = listOfNotNull(row.clientName, row.job.street).joinToString(", ")
 			if (where.isNotEmpty()) {
 				Text(text = where, style = MaterialTheme.typography.bodyMedium)
+			}
+
+			// O lucrare programată ajunge aici în ziua în care ar trebui să înceapă, deci scrie
+			// din ce zi așteaptă: altfel se vede doar eticheta Programat, care nu spune când.
+			val start = row.job.plannedStart
+			if (row.job.status == JobStatus.PROGRAMAT && start != null) {
+				Text(
+					text = if (start == date) {
+						stringResource(R.string.today_starts)
+					} else {
+						stringResource(R.string.today_starts_late, Dates.dayMonth(start))
+					},
+					style = MaterialTheme.typography.bodyMedium,
+				)
 			}
 
 			if (row.stageCount > 0) {

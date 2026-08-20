@@ -12,6 +12,8 @@
 	<string name="jobs_planned">Programat: %1$s</string>
 	<string name="jobs_planned_period">Programat: %1$s → %2$s</string>
 	<string name="date_pick_ok">Alege</string>
+	<string name="today_starts">Începe azi</string>
+	<string name="today_starts_late">Trebuia să înceapă %1$s</string>
 
 	<!-- M8: calendarul de lucru -->
 	<string name="calendar_title">Calendar de lucru</string>
