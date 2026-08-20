@@ -110,11 +110,9 @@ interface JobDao {
 	 * Aceleași rânduri ca `observeBoard`, dar citite o singură dată, la cerere, și cu
 	 * căutarea în aceeași interogare (`:q` gol înseamnă toate lucrările).
 	 *
-	 * De ce există: pe telefonul lui, lucrarea nou creată nu apărea în listă, deși baza o
-	 * avea și celelalte ecrane o vedeau — detaliul lucrării, deschis imediat după salvare,
-	 * arăta rândul corect. Rămânea în urmă doar abonamentul lung la interogarea listei, care
-	 * nu mai livra mulțimea nouă nici după re-abonare forțată. O citire scurtă, la fiecare
-	 * intrare pe ecran, nu are cum să rămână în urmă.
+	 * Lista de Lucrări o folosește la fiecare intrare pe ecran. Citirea scurtă e simplă și
+	 * de ajuns pentru câteva zeci de rânduri; dacă vreodată lista trebuie să se miște
+	 * singură în timp ce e deschisă, se poate întoarce la `observeBoard`.
 	 */
 	@Query(
 		"""
@@ -385,6 +383,22 @@ interface ReminderDao {
 	@Query("SELECT * FROM reminders WHERE jobId = :jobId ORDER BY dueAt")
 	fun observeByJob(jobId: String): Flow<List<Reminder>>
 
-	@Query("SELECT * FROM reminders WHERE done = 0 ORDER BY dueAt")
+	/**
+	 * Memento-urile deschise. Cele rămase de la o lucrare ștearsă nu se arată: tabelul
+	 * `reminders` nu are cheie străină către `jobs`, fiindcă un memento poate fi legat de
+	 * un client sau de nimic, deci ștergerea lucrării nu le ia cu ea de la sine.
+	 */
+	@Query(
+		"""
+		SELECT * FROM reminders
+		WHERE done = 0
+			AND (jobId IS NULL OR jobId IN (SELECT id FROM jobs))
+		ORDER BY dueAt
+		"""
+	)
 	fun observeOpen(): Flow<List<Reminder>>
+
+	/** Șterge memento-urile unei lucrări care dispare (vezi [observeOpen]). */
+	@Query("DELETE FROM reminders WHERE jobId = :jobId")
+	suspend fun deleteByJob(jobId: String)
 }

@@ -64,9 +64,7 @@ class JobRepo(private val db: AppDb) {
 
 	/**
 	 * Aceleași rânduri ca [board], dar citite o dată, la cerere. Lista de Lucrări se
-	 * reîmprospătează la fiecare intrare pe ecran: pe telefon s-a văzut că un abonament
-	 * lung la Room poate rămâne cu mulțimea veche, iar o lucrare abia salvată nu are voie
-	 * să lipsească din listă.
+	 * reîmprospătează la fiecare intrare pe ecran.
 	 */
 	suspend fun boardOnce(query: String): List<JobWithTotals> = db.jobs().boardOnce(query.trim())
 
@@ -155,7 +153,14 @@ class JobRepo(private val db: AppDb) {
 		db.jobs().upsert(job.copy(status = status, closedAt = closedAt))
 	}
 
+	/**
+	 * Ștergerea lucrării ia cu ea etapele, zilele, resturile, măsurătorile, extra-urile,
+	 * banii și pozele, prin cheile străine cu ștergere în cascadă. Memento-urile nu au
+	 * cheie străină, așa că le ștergem noi: altfel rămân în bază legături către o lucrare
+	 * care nu mai există.
+	 */
 	suspend fun deleteJob(job: Job) {
+		db.reminders().deleteByJob(job.id)
 		db.jobs().delete(job)
 	}
 
