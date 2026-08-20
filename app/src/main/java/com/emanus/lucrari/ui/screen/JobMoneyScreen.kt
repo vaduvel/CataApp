@@ -32,7 +32,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -62,6 +61,7 @@ import com.emanus.lucrari.domain.JobTotals
 import com.emanus.lucrari.domain.Money
 import com.emanus.lucrari.ui.component.InvoiceSheet
 import com.emanus.lucrari.ui.component.PaymentSheet
+import com.emanus.lucrari.ui.component.BrandTopAppBar
 import com.emanus.lucrari.ui.component.labelRes
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
@@ -167,16 +167,10 @@ fun JobMoneyScreen(
 
 	Scaffold(
 		topBar = {
-			TopAppBar(
-				title = { Text(stringResource(R.string.job_money_title)) },
-				navigationIcon = {
-					IconButton(onClick = onBack) {
-						Icon(
-							Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = stringResource(R.string.back),
-						)
-					}
-				},
+			BrandTopAppBar(
+				title = stringResource(R.string.job_money_title),
+				onBack = onBack,
+				backContentDescription = stringResource(R.string.back),
 			)
 		},
 	) { padding ->

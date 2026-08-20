@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +23,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -48,6 +46,8 @@ import com.emanus.lucrari.data.Measure
 import com.emanus.lucrari.data.Stage
 import com.emanus.lucrari.data.WorkDay
 import com.emanus.lucrari.domain.descrizione
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandTopAppBar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -130,16 +130,10 @@ fun DescrizioneScreen(
 
 	Scaffold(
 		topBar = {
-			TopAppBar(
-				title = { Text(stringResource(R.string.descrizione_title)) },
-				navigationIcon = {
-					IconButton(onClick = onBack) {
-						Icon(
-							Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = stringResource(R.string.back),
-						)
-					}
-				},
+			BrandTopAppBar(
+				title = stringResource(R.string.descrizione_title),
+				onBack = onBack,
+				backContentDescription = stringResource(R.string.back),
 			)
 		},
 		snackbarHost = { SnackbarHost(snackbarState) },
@@ -163,7 +157,7 @@ fun DescrizioneScreen(
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			} else {
-				Card(modifier = Modifier.fillMaxWidth()) {
+				BrandCard(modifier = Modifier.fillMaxWidth()) {
 					SelectionContainer {
 						Text(
 							text = text,

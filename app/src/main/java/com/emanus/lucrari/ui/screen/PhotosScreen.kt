@@ -32,7 +32,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -60,6 +59,7 @@ import com.emanus.lucrari.data.Phase
 import com.emanus.lucrari.data.Photo
 import com.emanus.lucrari.data.Todo
 import com.emanus.lucrari.data.repo.PendingPhotoCapture
+import com.emanus.lucrari.ui.component.BrandTopAppBar
 import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -155,16 +155,10 @@ fun PhotosScreen(onBack: () -> Unit) {
 
 	Scaffold(
 		topBar = {
-			TopAppBar(
-				title = { Text(stringResource(R.string.photos_title)) },
-				navigationIcon = {
-					IconButton(onClick = onBack) {
-						Icon(
-							Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = stringResource(R.string.back),
-						)
-					}
-				},
+			BrandTopAppBar(
+				title = stringResource(R.string.photos_title),
+				onBack = onBack,
+				backContentDescription = stringResource(R.string.back),
 			)
 		},
 		snackbarHost = { SnackbarHost(snackbar) },

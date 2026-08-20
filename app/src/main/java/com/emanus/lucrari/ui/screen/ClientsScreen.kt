@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -25,7 +24,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,6 +43,10 @@ import com.emanus.lucrari.App
 import com.emanus.lucrari.R
 import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandEmptyState
+import com.emanus.lucrari.ui.component.BrandTopAppBar
+import com.emanus.lucrari.ui.theme.Dimens
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -84,16 +86,10 @@ fun ClientsScreen(onBack: () -> Unit, vm: ClientsViewModel = viewModel()) {
 
 	Scaffold(
 		topBar = {
-			TopAppBar(
-				title = { Text(stringResource(R.string.clients_title)) },
-				navigationIcon = {
-					IconButton(onClick = onBack) {
-						Icon(
-							Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = stringResource(R.string.back),
-						)
-					}
-				},
+			BrandTopAppBar(
+				title = stringResource(R.string.clients_title),
+				onBack = onBack,
+				backContentDescription = stringResource(R.string.back),
 			)
 		},
 		floatingActionButton = {
@@ -109,27 +105,27 @@ fun ClientsScreen(onBack: () -> Unit, vm: ClientsViewModel = viewModel()) {
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(padding)
-					.padding(32.dp),
-				contentAlignment = Alignment.Center,
-			) {
-				Text(
-					text = stringResource(R.string.clients_empty),
-					style = MaterialTheme.typography.bodyLarge,
-				)
+					.padding(Dimens.space32),
+			contentAlignment = Alignment.Center,
+		) {
+			BrandEmptyState(
+				icon = Icons.Outlined.Add,
+				title = stringResource(R.string.clients_empty),
+			)
 			}
 		} else {
 			LazyColumn(
 				modifier = Modifier
 					.fillMaxSize()
 					.padding(padding),
-				contentPadding = PaddingValues(16.dp),
-				verticalArrangement = Arrangement.spacedBy(12.dp),
+				contentPadding = PaddingValues(Dimens.screenPadding),
+				verticalArrangement = Arrangement.spacedBy(Dimens.cardSpacing),
 			) {
 				items(clients, key = { it.client.id }) { row ->
-					Card(modifier = Modifier.fillMaxWidth()) {
+					BrandCard(modifier = Modifier.fillMaxWidth()) {
 						Column(
-							modifier = Modifier.padding(16.dp),
-							verticalArrangement = Arrangement.spacedBy(4.dp),
+							modifier = Modifier.padding(Dimens.cardPadding),
+							verticalArrangement = Arrangement.spacedBy(Dimens.space4),
 						) {
 							Text(
 								text = row.client.name,

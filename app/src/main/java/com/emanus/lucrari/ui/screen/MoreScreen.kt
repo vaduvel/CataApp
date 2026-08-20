@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,6 +45,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -63,6 +62,11 @@ import com.emanus.lucrari.data.Reminder
 import com.emanus.lucrari.data.repo.ImportMode
 import com.emanus.lucrari.data.repo.ImportResult
 import com.emanus.lucrari.domain.Seed
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandIconTile
+import com.emanus.lucrari.ui.component.BrandPageHeader
+import com.emanus.lucrari.ui.component.BrandSectionHeader
+import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -173,13 +177,17 @@ fun MoreScreen(
 		SnackbarHost(snackbar)
 		LazyColumn(
 			modifier = Modifier.fillMaxSize(),
-			contentPadding = PaddingValues(16.dp),
-			verticalArrangement = Arrangement.spacedBy(12.dp),
+			contentPadding = PaddingValues(
+				start = Dimens.screenPadding,
+				end = Dimens.screenPadding,
+				bottom = Dimens.listBottomSpace,
+			),
+			verticalArrangement = Arrangement.spacedBy(Dimens.cardSpacing),
 		) {
 			item {
-				Text(
-					text = stringResource(R.string.screen_more_title),
-					style = MaterialTheme.typography.headlineSmall,
+				BrandPageHeader(
+					title = stringResource(R.string.screen_more_title),
+					horizontalPadding = Dimens.space0,
 				)
 			}
 			// Calendarul are si o iconita pe ecranul Lucrari, dar acolo e usor de ratat.
@@ -189,7 +197,7 @@ fun MoreScreen(
 					title = stringResource(R.string.calendar_title),
 					hint = stringResource(R.string.more_calendar_hint),
 					onClick = onOpenCalendar,
-					icon = { Icon(Icons.Outlined.CalendarMonth, contentDescription = null) },
+					icon = Icons.Outlined.CalendarMonth,
 				)
 			}
 			item {
@@ -197,7 +205,7 @@ fun MoreScreen(
 					title = stringResource(R.string.more_clients),
 					hint = stringResource(R.string.more_clients_hint),
 					onClick = onOpenClients,
-					icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+					icon = Icons.Outlined.Person,
 				)
 			}
 			item {
@@ -205,14 +213,14 @@ fun MoreScreen(
 					title = stringResource(R.string.more_photos),
 					hint = stringResource(R.string.more_photos_hint),
 					onClick = onOpenPhotos,
-					icon = { Icon(Icons.Outlined.PhotoCamera, contentDescription = null) },
+					icon = Icons.Outlined.PhotoCamera,
 				)
 			}
 			item {
-				Card(modifier = Modifier.fillMaxWidth()) {
+				BrandCard(modifier = Modifier.fillMaxWidth()) {
 					Column(
-						modifier = Modifier.padding(16.dp),
-						verticalArrangement = Arrangement.spacedBy(10.dp),
+						modifier = Modifier.padding(Dimens.cardPadding),
+						verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 					) {
 						Text(stringResource(R.string.demo_title), style = MaterialTheme.typography.titleMedium)
 						Text(stringResource(R.string.demo_hint))
@@ -233,16 +241,19 @@ fun MoreScreen(
 				}
 			}
 			item {
-				Card(modifier = Modifier.fillMaxWidth()) {
+				BrandCard(
+					modifier = Modifier.fillMaxWidth(),
+					containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+				) {
 					Column(
-						modifier = Modifier.padding(16.dp),
-						verticalArrangement = Arrangement.spacedBy(10.dp),
+						modifier = Modifier.padding(Dimens.cardPadding),
+						verticalArrangement = Arrangement.spacedBy(Dimens.space12),
 					) {
 						Row(
-							horizontalArrangement = Arrangement.spacedBy(12.dp),
+							horizontalArrangement = Arrangement.spacedBy(Dimens.space12),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
-							Icon(Icons.Outlined.Backup, contentDescription = null)
+							BrandIconTile(Icons.Outlined.Backup, contentDescription = null)
 							Text(stringResource(R.string.backup_title), style = MaterialTheme.typography.titleMedium)
 						}
 						Text(stringResource(R.string.backup_hint))
@@ -294,15 +305,15 @@ fun MoreScreen(
 				}
 			}
 			item {
-				Text(stringResource(R.string.reminders_title), style = MaterialTheme.typography.titleLarge)
+				BrandSectionHeader(title = stringResource(R.string.reminders_title))
 			}
 			if (reminders.isEmpty()) {
 				item { Text(stringResource(R.string.reminders_empty)) }
 			} else {
 				items(reminders, key = { it.id }) { reminder ->
-					Card(modifier = Modifier.fillMaxWidth()) {
+					BrandCard(modifier = Modifier.fillMaxWidth()) {
 						Row(
-							modifier = Modifier.fillMaxWidth().padding(12.dp),
+							modifier = Modifier.fillMaxWidth().padding(Dimens.space12),
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							Text(reminder.text, modifier = Modifier.weight(1f))
@@ -380,15 +391,18 @@ private fun MoreLinkCard(
 	title: String,
 	hint: String,
 	onClick: () -> Unit,
-	icon: @Composable () -> Unit,
+	icon: ImageVector,
 ) {
-	Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		onClick = onClick,
+	) {
 		Row(
-			modifier = Modifier.padding(16.dp),
-			horizontalArrangement = Arrangement.spacedBy(16.dp),
+			modifier = Modifier.padding(Dimens.cardPadding),
+			horizontalArrangement = Arrangement.spacedBy(Dimens.space12),
 			verticalAlignment = Alignment.CenterVertically,
 		) {
-			icon()
+			BrandIconTile(icon = icon, contentDescription = null)
 			Column {
 				Text(title, style = MaterialTheme.typography.titleMedium)
 				Text(hint, style = MaterialTheme.typography.bodyMedium)

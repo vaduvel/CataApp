@@ -19,14 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,6 +52,9 @@ import com.emanus.lucrari.domain.Dates
 import com.emanus.lucrari.domain.MonthGrid
 import com.emanus.lucrari.domain.Schedule
 import com.emanus.lucrari.ui.component.StatusChip
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandTopAppBar
+import com.emanus.lucrari.ui.component.color
 import java.time.LocalDate
 import java.time.YearMonth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -110,16 +111,9 @@ fun CalendarScreen(
 
 	Scaffold(
 		topBar = {
-			TopAppBar(
-				title = { Text(stringResource(R.string.calendar_title)) },
-				navigationIcon = {
-					IconButton(onClick = onBack) {
-						Icon(
-							Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = null,
-						)
-					}
-				},
+			BrandTopAppBar(
+				title = stringResource(R.string.calendar_title),
+				onBack = onBack,
 			)
 		},
 	) { padding ->
@@ -293,10 +287,10 @@ private fun DayCell(
 /** O lucrare din ziua atinsă: titlu, status, unde și intervalul ei. */
 @Composable
 private fun DayJobRow(job: Job, onClick: () -> Unit) {
-	Card(
-		modifier = Modifier
-			.fillMaxWidth()
-			.clickable { onClick() },
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		onClick = onClick,
+		accent = job.status.color,
 	) {
 		Column(
 			modifier = Modifier.padding(16.dp),

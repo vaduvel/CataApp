@@ -1,8 +1,15 @@
 package com.emanus.lucrari.ui.nav
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Construction
@@ -12,11 +19,16 @@ import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavType
@@ -37,6 +49,7 @@ import com.emanus.lucrari.ui.screen.MoreScreen
 import com.emanus.lucrari.ui.screen.PhotosScreen
 import com.emanus.lucrari.ui.screen.PunchScreen
 import com.emanus.lucrari.ui.screen.TodayScreen
+import com.emanus.lucrari.ui.theme.Dimens
 
 /** Cele 5 destinații din bara de jos (SPEC §6). */
 enum class Tab(val route: String, @StringRes val labelRes: Int, val icon: ImageVector) {
@@ -61,11 +74,16 @@ fun AppRoot() {
 	val route = backStackEntry?.destination?.route
 
 	Scaffold(
+		containerColor = MaterialTheme.colorScheme.background,
 		bottomBar = {
-			NavigationBar {
+			NavigationBar(
+				containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+				contentColor = MaterialTheme.colorScheme.onSurface,
+			) {
 				Tab.entries.forEach { tab ->
+					val selected = isSelected(tab, route)
 					NavigationBarItem(
-						selected = isSelected(tab, route),
+						selected = selected,
 						onClick = {
 							navController.navigate(tab.route) {
 								popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -73,8 +91,29 @@ fun AppRoot() {
 								restoreState = true
 							}
 						},
-						icon = { Icon(tab.icon, contentDescription = null) },
+						icon = {
+							Column(horizontalAlignment = Alignment.CenterHorizontally) {
+								Box(
+									modifier = Modifier
+										.width(Dimens.navigationBrandMarkWidth)
+										.height(Dimens.navigationBrandMarkHeight)
+										.clip(RoundedCornerShape(50))
+										.background(
+											if (selected) MaterialTheme.colorScheme.tertiary else Color.Transparent,
+										),
+								)
+								Spacer(Modifier.height(Dimens.space4))
+								Icon(tab.icon, contentDescription = null)
+							}
+						},
 						label = { Text(stringResource(tab.labelRes)) },
+						colors = NavigationBarItemDefaults.colors(
+							selectedIconColor = MaterialTheme.colorScheme.secondary,
+							selectedTextColor = MaterialTheme.colorScheme.onSurface,
+							indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+							unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+							unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+						),
 					)
 				}
 			}

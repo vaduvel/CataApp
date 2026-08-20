@@ -19,13 +19,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -52,8 +50,15 @@ import com.emanus.lucrari.domain.Dates
 import com.emanus.lucrari.domain.Schedule
 import com.emanus.lucrari.domain.Templates
 import com.emanus.lucrari.ui.component.NewJobSheet
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandEmptyState
+import com.emanus.lucrari.ui.component.BrandIconButton
+import com.emanus.lucrari.ui.component.BrandPageHeader
+import com.emanus.lucrari.ui.component.BrandProgress
 import com.emanus.lucrari.ui.component.StatusChip
+import com.emanus.lucrari.ui.component.color
 import com.emanus.lucrari.ui.component.labelRes
+import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -167,6 +172,7 @@ fun JobsScreen(
 	}
 
 	Scaffold(
+		containerColor = MaterialTheme.colorScheme.background,
 		floatingActionButton = {
 			ExtendedFloatingActionButton(
 				onClick = { showNew = true },
@@ -180,11 +186,12 @@ fun JobsScreen(
 				.fillMaxSize()
 				.padding(padding),
 		) {
+			BrandPageHeader(title = stringResource(R.string.tab_jobs))
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
-					.padding(horizontal = 16.dp, vertical = 8.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+					.padding(horizontal = Dimens.screenPadding, vertical = Dimens.space4),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				OutlinedTextField(
@@ -195,22 +202,18 @@ fun JobsScreen(
 					singleLine = true,
 					modifier = Modifier.weight(1f),
 				)
-				IconButton(
+				BrandIconButton(
 					onClick = onOpenCalendar,
-					modifier = Modifier.size(56.dp),
-				) {
-					Icon(
-						Icons.Outlined.CalendarMonth,
-						contentDescription = stringResource(R.string.calendar_open),
-					)
-				}
+					icon = Icons.Outlined.CalendarMonth,
+					contentDescription = stringResource(R.string.calendar_open),
+				)
 			}
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
 					.horizontalScroll(rememberScrollState())
-					.padding(horizontal = 16.dp),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+					.padding(horizontal = Dimens.screenPadding),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 			) {
 				FilterChip(
 					selected = filter == null,
@@ -229,7 +232,7 @@ fun JobsScreen(
 				Box(
 					modifier = Modifier
 						.fillMaxSize()
-						.padding(32.dp),
+						.padding(Dimens.space32),
 					contentAlignment = Alignment.Center,
 				) {
 					val empty = if (query.isBlank() && filter == null) {
@@ -237,13 +240,21 @@ fun JobsScreen(
 					} else {
 						R.string.jobs_empty_search
 					}
-					Text(text = stringResource(empty), style = MaterialTheme.typography.bodyLarge)
+					BrandEmptyState(
+						icon = Icons.Outlined.Construction,
+						title = stringResource(empty),
+					)
 				}
 			} else {
 				LazyColumn(
 					state = listState,
-					contentPadding = PaddingValues(16.dp),
-					verticalArrangement = Arrangement.spacedBy(12.dp),
+					contentPadding = PaddingValues(
+						start = Dimens.screenPadding,
+						top = Dimens.space12,
+						end = Dimens.screenPadding,
+						bottom = Dimens.listBottomSpace,
+					),
+					verticalArrangement = Arrangement.spacedBy(Dimens.cardSpacing),
 				) {
 					items(jobs, key = { it.job.id }) { row ->
 						JobCard(row = row, onClick = { onOpenJob(row.job.id) })
@@ -276,18 +287,19 @@ fun JobsScreen(
 
 @Composable
 private fun JobCard(row: JobWithTotals, onClick: () -> Unit) {
-	Card(
+	BrandCard(
 		modifier = Modifier
-			.fillMaxWidth()
-			.clickable { onClick() },
+			.fillMaxWidth(),
+		onClick = onClick,
+		accent = row.job.status.color,
 	) {
 		Column(
-			modifier = Modifier.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(6.dp),
+			modifier = Modifier.padding(Dimens.cardPadding),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space8),
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				Text(
@@ -298,7 +310,11 @@ private fun JobCard(row: JobWithTotals, onClick: () -> Unit) {
 				StatusChip(status = row.job.status)
 			}
 			val where = listOfNotNull(row.clientName, row.job.street, row.job.city)
-			Text(text = where.joinToString(", "), style = MaterialTheme.typography.bodyMedium)
+			Text(
+				text = where.joinToString(", "),
+				style = MaterialTheme.typography.bodyMedium,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+			)
 			val planned = row.job.plannedStart
 			if (planned != null && row.job.status == JobStatus.PROGRAMAT) {
 				val end = Schedule.endDate(planned, row.job.estDays)
@@ -317,9 +333,8 @@ private fun JobCard(row: JobWithTotals, onClick: () -> Unit) {
 				)
 			}
 			if (row.stageCount > 0) {
-				LinearProgressIndicator(
+				BrandProgress(
 					progress = { row.stagesDone.toFloat() / row.stageCount },
-					modifier = Modifier.fillMaxWidth(),
 				)
 				Text(
 					text = stringResource(R.string.jobs_stages, row.stagesDone, row.stageCount),

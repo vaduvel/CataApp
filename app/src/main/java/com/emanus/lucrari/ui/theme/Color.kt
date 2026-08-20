@@ -5,19 +5,23 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// Paletă cu contrast mare: telefonul se folosește pe șantier, adesea în plin soare.
-// Valorile vin din design system-ul aprobat. Nu folosim culori dinamice (Material You),
-// ca aspectul să fie mereu previzibil.
+// Paleta vine direct din iconiță: calendar albastru, cască portocalie și bară coral.
+// Nuanțele mai închise păstrează contrastul în soare, iar cele deschise construiesc
+// suprafețele. Culorile dinamice rămân dezactivate ca identitatea să fie constantă.
 
 private val BurntOrange = Color(0xFFB94708)
-private val SafetyOrange = Color(0xFFF47A20)
+private val HelmetOrange = Color(0xFFF47A20)
+private val CalendarCoral = Color(0xFFFF4F2C)
+private val CalendarSky = Color(0xFFCFE3F7)
+private val CalendarSkySoft = Color(0xFFEAF4FC)
 private val Peach = Color(0xFFFFDBCA)
 private val Charcoal = Color(0xFF1F2529)
 private val SteelBlue = Color(0xFF305F73)
 private val IndustrialPurple = Color(0xFF6A4C93)
-private val Concrete = Color(0xFFF5F2EC)
-private val Cement = Color(0xFFE5E1D8)
-private val DividerGray = Color(0xFFE0E0E0)
+private val Concrete = Color(0xFFF7F3EC)
+private val WarmWhite = Color(0xFFFFFDF9)
+private val Cement = Color(0xFFE8E2D9)
+private val DividerGray = Color(0xFFD9D3CA)
 private val OutlineGray = Color(0xFF74736E)
 
 val LightColors: ColorScheme = lightColorScheme(
@@ -27,18 +31,28 @@ val LightColors: ColorScheme = lightColorScheme(
 	onPrimaryContainer = Color(0xFF3B0D02),
 	secondary = SteelBlue,
 	onSecondary = Color.White,
-	secondaryContainer = Color(0xFFD8E5EC),
+	secondaryContainer = CalendarSky,
 	onSecondaryContainer = Color(0xFF10323F),
-	tertiary = IndustrialPurple,
+	tertiary = CalendarCoral,
 	onTertiary = Color.White,
-	tertiaryContainer = Color(0xFFEBE3F5),
-	onTertiaryContainer = Color(0xFF31214A),
+	tertiaryContainer = Color(0xFFFFDDD4),
+	onTertiaryContainer = Color(0xFF511306),
 	background = Concrete,
 	onBackground = Charcoal,
-	surface = Color.White,
+	surface = WarmWhite,
 	onSurface = Charcoal,
-	surfaceVariant = Cement,
+	surfaceVariant = CalendarSkySoft,
 	onSurfaceVariant = Color(0xFF4B5157),
+	surfaceTint = BurntOrange,
+	surfaceDim = Color(0xFFE5DED4),
+	surfaceBright = WarmWhite,
+	surfaceContainerLowest = Color.White,
+	surfaceContainerLow = Color(0xFFFCF8F2),
+	surfaceContainer = Color(0xFFF2ECE4),
+	surfaceContainerHigh = Color(0xFFEBE5DD),
+	// Card-urile Material care nu au fost încă specializate folosesc implicit acest token.
+	// Îl ținem alb ca toate ecranele, inclusiv cele secundare, să aparțină aceluiași sistem.
+	surfaceContainerHighest = Color.White,
 	outline = OutlineGray,
 	outlineVariant = DividerGray,
 	error = Color(0xFFC62828),
@@ -54,14 +68,26 @@ val DarkColors: ColorScheme = darkColorScheme(
 	onPrimaryContainer = Peach,
 	secondary = Color(0xFF9CC9DC),
 	onSecondary = Color(0xFF0B2C38),
-	tertiary = Color(0xFFC9B2E8),
-	onTertiary = Color(0xFF35234F),
+	secondaryContainer = Color(0xFF244B5D),
+	onSecondaryContainer = CalendarSky,
+	tertiary = Color(0xFFFFB4A0),
+	onTertiary = Color(0xFF611D0C),
+	tertiaryContainer = Color(0xFF7C2C18),
+	onTertiaryContainer = Color(0xFFFFDBD1),
 	background = Color(0xFF141312),
 	onBackground = Color(0xFFECE7E1),
 	surface = Color(0xFF1F1E1D),
 	onSurface = Color(0xFFECE7E1),
-	surfaceVariant = Color(0xFF4A4842),
+	surfaceVariant = Color(0xFF263740),
 	onSurfaceVariant = Color(0xFFD5CFC6),
+	surfaceTint = Color(0xFFFFB59B),
+	surfaceDim = Color(0xFF141312),
+	surfaceBright = Color(0xFF3B3936),
+	surfaceContainerLowest = Color(0xFF0F0E0D),
+	surfaceContainerLow = Color(0xFF1B1A18),
+	surfaceContainer = Color(0xFF211F1D),
+	surfaceContainerHigh = Color(0xFF2B2926),
+	surfaceContainerHighest = Color(0xFF36332F),
 	outline = Color(0xFF9A958C),
 	outlineVariant = Color(0xFF3A3936),
 	error = Color(0xFFF2B8B5),
@@ -103,5 +129,9 @@ object AppColor {
 	val Warning = Color(0xFFF9A825)
 	val WarningContainer = Color(0xFFFFF0CC)
 	val OnWarningContainer = Color(0xFF6E4900)
-	val Safety = SafetyOrange
+	val Safety = HelmetOrange
+	val BrandCoral = CalendarCoral
+	val BrandSky = CalendarSky
+	val BrandSkySoft = CalendarSkySoft
+	val BrandCharcoal = Charcoal
 }

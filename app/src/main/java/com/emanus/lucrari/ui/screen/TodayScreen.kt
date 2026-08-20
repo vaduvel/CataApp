@@ -1,7 +1,6 @@
 package com.emanus.lucrari.ui.screen
 
 import android.app.Application
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,10 +16,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Construction
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -49,6 +47,12 @@ import com.emanus.lucrari.data.today
 import com.emanus.lucrari.domain.Dates
 import com.emanus.lucrari.domain.Progress
 import com.emanus.lucrari.ui.component.StatusChip
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandEmptyState
+import com.emanus.lucrari.ui.component.BrandPageHeader
+import com.emanus.lucrari.ui.component.BrandProgress
+import com.emanus.lucrari.ui.component.color
+import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -103,28 +107,28 @@ fun TodayScreen(onOpenJob: (String) -> Unit, vm: TodayViewModel = viewModel()) {
 				.fillMaxSize()
 				.padding(padding),
 		) {
-			Text(
-				text = Dates.longDay(date),
-				style = MaterialTheme.typography.titleLarge,
-				modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-			)
+			BrandPageHeader(title = Dates.longDay(date))
 
 			if (jobs.isEmpty()) {
 				Box(
 					modifier = Modifier
 						.fillMaxSize()
-						.padding(32.dp),
+						.padding(Dimens.space32),
 					contentAlignment = Alignment.Center,
 				) {
-					Text(
-						text = stringResource(R.string.today_empty),
-						style = MaterialTheme.typography.bodyLarge,
+					BrandEmptyState(
+						icon = Icons.Outlined.Construction,
+						title = stringResource(R.string.today_empty),
 					)
 				}
 			} else {
 				LazyColumn(
-					contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
-					verticalArrangement = Arrangement.spacedBy(12.dp),
+					contentPadding = PaddingValues(
+						start = Dimens.screenPadding,
+						end = Dimens.screenPadding,
+						bottom = Dimens.listBottomSpace,
+					),
+					verticalArrangement = Arrangement.spacedBy(Dimens.cardSpacing),
 				) {
 					items(jobs, key = { row -> row.job.id }) { row ->
 						TodayCard(
@@ -150,17 +154,20 @@ fun TodayScreen(onOpenJob: (String) -> Unit, vm: TodayViewModel = viewModel()) {
 
 @Composable
 private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog: () -> Unit) {
-	Card(modifier = Modifier.fillMaxWidth()) {
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		onClick = onOpen,
+		accent = row.job.status.color,
+	) {
 		Column(
 			modifier = Modifier
 				.fillMaxWidth()
-				.clickable { onOpen() }
-				.padding(16.dp),
-			verticalArrangement = Arrangement.spacedBy(8.dp),
+				.padding(Dimens.cardPadding),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space8),
 		) {
 			Row(
 				modifier = Modifier.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
 				verticalAlignment = Alignment.CenterVertically,
 			) {
 				Text(
@@ -175,7 +182,11 @@ private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog:
 
 			val where = listOfNotNull(row.clientName, row.job.street).joinToString(", ")
 			if (where.isNotEmpty()) {
-				Text(text = where, style = MaterialTheme.typography.bodyMedium)
+				Text(
+					text = where,
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+				)
 			}
 
 			// O lucrare programată ajunge aici în ziua în care ar trebui să înceapă, deci scrie
@@ -193,9 +204,8 @@ private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog:
 			}
 
 			if (row.stageCount > 0) {
-				LinearProgressIndicator(
+				BrandProgress(
 					progress = { Progress.ofStages(row.stagesDone, row.stageCount) },
-					modifier = Modifier.fillMaxWidth(),
 				)
 				Text(
 					text = stringResource(R.string.jobs_stages, row.stagesDone, row.stageCount),
@@ -216,17 +226,21 @@ private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog:
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
-				.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+				.padding(
+					start = Dimens.cardPadding,
+					end = Dimens.cardPadding,
+					bottom = Dimens.cardPadding,
+				),
 		) {
 			if (row.loggedToday > 0) {
 				OutlinedButton(
 					onClick = onOpen,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(56.dp),
+						.height(Dimens.primaryButtonHeight),
 				) {
 					Icon(imageVector = Icons.Outlined.Check, contentDescription = null)
-					Spacer(modifier = Modifier.width(8.dp))
+					Spacer(modifier = Modifier.width(Dimens.space8))
 					Text(stringResource(R.string.today_logged_button))
 				}
 			} else {
@@ -234,7 +248,7 @@ private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog:
 					onClick = onLog,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(56.dp),
+						.height(Dimens.primaryButtonHeight),
 				) {
 					Text(
 						text = stringResource(R.string.today_log),

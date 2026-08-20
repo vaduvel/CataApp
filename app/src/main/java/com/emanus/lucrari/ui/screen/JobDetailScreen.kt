@@ -36,7 +36,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -44,7 +43,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -90,6 +88,10 @@ import com.emanus.lucrari.ui.component.MaterialSheet
 import com.emanus.lucrari.ui.component.MeasureSheet
 import com.emanus.lucrari.ui.component.TextSheet
 import com.emanus.lucrari.ui.component.TodoSheet
+import com.emanus.lucrari.ui.component.BrandCard
+import com.emanus.lucrari.ui.component.BrandProgress
+import com.emanus.lucrari.ui.component.BrandTopAppBar
+import com.emanus.lucrari.ui.component.color
 import com.emanus.lucrari.ui.component.labelRes
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -370,16 +372,10 @@ fun JobDetailScreen(
 
 	Scaffold(
 		topBar = {
-			TopAppBar(
-				title = { Text(text = job?.title.orEmpty(), maxLines = 1) },
-				navigationIcon = {
-					IconButton(onClick = onBack) {
-						Icon(
-							Icons.AutoMirrored.Outlined.ArrowBack,
-							contentDescription = stringResource(R.string.back),
-						)
-					}
-				},
+			BrandTopAppBar(
+				title = job?.title.orEmpty(),
+				onBack = onBack,
+				backContentDescription = stringResource(R.string.back),
 				actions = {
 					IconButton(onClick = { confirmDelete = true }) {
 						Icon(
@@ -411,7 +407,10 @@ fun JobDetailScreen(
 				verticalArrangement = Arrangement.spacedBy(12.dp),
 			) {
 				item {
-					Card(modifier = Modifier.fillMaxWidth()) {
+					BrandCard(
+						modifier = Modifier.fillMaxWidth(),
+						accent = job.status.color,
+					) {
 						Column(
 							modifier = Modifier.padding(16.dp),
 							verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -441,9 +440,8 @@ fun JobDetailScreen(
 								)
 							}
 							if (stages.isNotEmpty()) {
-								LinearProgressIndicator(
+								BrandProgress(
 									progress = { Progress.ofStages(stagesDone, stages.size) },
-									modifier = Modifier.fillMaxWidth(),
 								)
 								Text(
 									text = stringResource(R.string.jobs_stages, stagesDone, stages.size),
@@ -562,7 +560,7 @@ fun JobDetailScreen(
 				)
 				if (suggestDeFinisat) {
 					item {
-						Card(modifier = Modifier.fillMaxWidth()) {
+						BrandCard(modifier = Modifier.fillMaxWidth()) {
 							Column(
 								modifier = Modifier.padding(16.dp),
 								verticalArrangement = Arrangement.spacedBy(8.dp),
