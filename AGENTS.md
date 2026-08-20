@@ -43,7 +43,7 @@ Calea are nevoie de `/Contents/Home` la final, altfel Gradle nu găsește `bin/j
 - DAO-urile și interogările adăugate după M6 nu schimbă schema: `app/schemas/com.emanus.lucrari.data.AppDb/1.json` trebuie să rămână neschimbat față de `eaafada`.
 - Enum-ul `Unit` din spec se numește `MeasureUnit` ca să nu umbrească `kotlin.Unit`.
 - **`Reminder` nu are cheie străină spre `jobs`**, pentru că un memento poate fi legat de un client sau de nimic. Ștergerea unei lucrări trece prin `JobRepo.deleteJob`, care șterge întâi memento-urile ei (`ReminderDao.deleteByJob`); în plus, `observeOpen()` ignoră rândurile rămase de la lucrări care nu mai există. Orice tabel nou fără cheie străină spre `jobs` se tratează la fel.
-- **Datele demo intră o singură dată.** `Seed.ensure` se uită la steagul `demoSeeded`, nu la numărul de clienți: după „șterge datele demo” sau după `pm clear`, demo-ul nu are voie să reapară.
+- **Datele demo intră o singură dată.** După o instalare curată sau `pm clear`, seed-ul apare la prima pornire. Butonul „Șterge datele demo” păstrează steagul `demoSeeded`, deci demo-ul nu mai reapare la repornirile următoare.
 - Importul verifică `schemaVersion` înainte să șteargă ceva.
 - Modul „Adaugă ce lipsește” folosește `INSERT IGNORE` pe UUID și trebuie să fie idempotent.
 - Arhiva este ZIP cu `data.json` și `photos/<photoId>.jpg`; backup-urile automate sunt `files/backup/lucrari-YYYY-MM-DD.zip`, ultimele 7.
@@ -99,11 +99,11 @@ Pentru orice milestone: unit tests + assemble + lint + scriptul offline trec; cu
 ## Stadiu
 
 - **M0–M8 — gata și verificate**, pe emulator Android API 36 și pe telefonul fizic (SM-A165F).
-- **88 de teste unitare** și **8 instrumentate** verzi; `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
+- **88 de teste unitare** și **9 instrumentate** verzi pe fiecare dispozitiv; `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
 - **M7:** poze locale prin `FileProvider`, backup ZIP zilnic cu rotație 7, export/import SAF cu „Înlocuiește tot” / „Adaugă ce lipsește”, memento-uri la 19:00 cu deduplicare. Scenariul export → ștergerea datelor → import verificat cu modul avion activ.
 - **M8:** dată de început și interval la creare, statusul `PROGRAMAT` pentru lucrările din viitor, calendarul lunar de lucru și memento-urile de început (19:00 pentru „peste 3 zile” și „mâine”, 07:30 pentru „azi”). Fără migrare de schemă.
 - **Runda de finisaj:** inseturile de sistem nu se mai aplică de două ori; memento-urile pleacă odată cu lucrarea ștearsă.
-- **Versiunea curentă:** `0.10.0-m8`, versionCode 10, instalată pe emulator și pe telefon.
+- **Versiunea curentă:** `1.0.0`, versionCode 11, instalată pentru livrare pe telefon.
 - **Tema din design system-ul aprobat este aplicată:** paletă M3, scara de text, colțurile, tokenii de spațiere și chip-urile de status cu pictogramă.
-- **Următorii pași:** intervalul afișat în detaliul lucrării; confirmarea vizuală a iconiței în sertarul telefonului; refactorizarea vizuală (spațiu liber sub liste, cifrele mari pe `displayLarge`, cardul de backup, dialogul de import); ștergerea datelor de test înainte de livrare.
+- **Livrare:** intervalul este afișat în detaliul lucrării; telefonul nu mai conține date de test sau demo; butonul de ștergere demo și versiunea sunt în „Mai mult”; iconița a fost verificată în sertarul Samsung. Au rămas doar refactorizarea vizuală și M9, ambele opționale.
 - **M9 — opțional, nu blochează livrarea:** statistici simple, widget „Am lucrat azi la…”, „spațiu folosit”, stările „camera nu e disponibilă” și „backup eșuat”, zile lucrate per etapă (cere migrare de schemă) și câmpul `work` în rândul măsurătorii din descriere.

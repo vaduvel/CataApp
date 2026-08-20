@@ -40,8 +40,9 @@ Ce înseamnă asta concret:
   șantier. Un ciclu „am lucrat azi aici” trebuie să se facă în **2 apăsări**. Butoanele mari
   (56 dp) și cifrele mari nu sunt decor, sunt cerință.
 
-**Nu adăuga funcții noi din proprie inițiativă.** Aplicația e la ~95%. Cel mai mare risc de
-aici încolo nu e o funcție lipsă, ci o regresie într-o funcție care merge deja.
+**Nu adăuga funcții noi din proprie inițiativă.** Versiunea 1.0.0 este livrată. Ce a rămas în
+P3 și P4 este opțional; cel mai mare risc de aici încolo este o regresie într-o funcție care
+merge deja.
 
 ---
 
@@ -86,11 +87,12 @@ veche și istoriile diverg — exact ce s-a întâmplat când commit-ul iconițe
 
 ## 3. Starea exactă la predare
 
-- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `6bd2b8d605cfd8c5388e22f60ef9b4d8c55586bb`
-- **Versiune:** `versionName = "0.10.0-m8"`, `versionCode = 10`
-- **Teste:** **88 unitare** + **8 instrumentate**, verzi pe emulator și pe telefonul fizic
+- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `b31a71d`
+- **Versiune:** `versionName = "1.0.0"`, `versionCode = 11`
+- **Teste:** **88 unitare** + **9 instrumentate**, verzi pe emulator și pe telefonul fizic
 - **Schema Room:** v1, `app/schemas/com.emanus.lucrari.data.AppDb/1.json`, hash `9a2846d7ed22222385ac20bef74419e7` — **neschimbată din M1** și așa trebuie să rămână (§5)
-- **Instalat:** `0.10.0-m8` pe emulator (API 36) și pe telefonul fizic (`R5GL52XSGQP`, Samsung SM-A165F)
+- **Instalat pentru livrare:** `1.0.0` pe telefonul fizic (`R5GL52XSGQP`, Samsung SM-A165F),
+  cu toate datele de test și demo șterse
 
 ### Ce e verificat pe dispozitiv real
 
@@ -108,10 +110,24 @@ Runda restantă, iconița și regresia găsită manual au fost verificate cap-co
 | `89f1dd4c32df75e9f6fafb2bbb642b79107b6aaf` | „Calendar de lucru” are rând propriu în ecranul „Mai mult” | verificat manual pe emulator |
 | `45a4df6` + `7ed1f85` | lucrarea programată apare pe „Azi” din ziua începerii | verificate împreună; primul commit rămâne inert luat separat |
 | `7d846ec75fcff87792ef446ae2bd02e865819653` | testul instrumentat pentru regula de mai sus | 8/8 verzi pe emulator și 8/8 pe telefon |
-| `de94e9bc69d3212e5cf7eeffc5841156068f48fe` | iconița aplicației | build + lint verzi; 5 densități și adaptive icon corecte; aspectul din sertarul Samsung rămâne de confirmat de utilizator |
+| `de94e9bc69d3212e5cf7eeffc5841156068f48fe` | iconița aplicației | build + lint verzi; 5 densități și adaptive icon corecte; verificată vizual în sertarul Samsung |
 | `6bd2b8d605cfd8c5388e22f60ef9b4d8c55586bb` | păstrează lucrarea restantă în `PROGRAMAT` până la prima zi trecută | regresie găsită și reparată în P0; test unitar + scenariu manual verzi |
 
-Următoarea schimbare de produs este P1.
+P1 și P2 sunt finalizate. Au rămas numai actualizarea paginii Notion și finisajele opționale
+din P3/P4.
+
+### Livrarea 1.0.0 din 20 august 2026
+
+| Commit | Ce face | Stare |
+|---|---|---|
+| `0b9038e` | afișează intervalul programat în detaliul lucrării | build + test manual pe emulator verzi |
+| `1148f7e` | ridică versiunea la 1.0.0 / code 11 | confirmată prin `dumpsys package` pe Samsung |
+| `b31a71d` | șterge datele demo dintr-o apăsare și afișează versiunea | test manual pe emulator și Samsung; 9/9 instrumentate pe fiecare |
+
+După instalarea finală pe Samsung s-a rulat `pm clear`, demo-ul a fost șters din butonul din
+„Mai mult”, iar aplicația a fost omorâtă și redeschisă. Interogarea copiei SQLite a confirmat:
+`clients=0`, `jobs=0`, `reminders=0`, `children=0`; preferința `demo_seeded=true`, deci demo-ul
+nu revine.
 
 ### Regula implementată în ultima rundă (ca s-o poți verifica)
 
@@ -164,7 +180,7 @@ Compose BOM 2024.10.01 (`material-icons-extended`), Room + KSP, `work-runtime-kt
 
 > `git pull` (HEAD trebuie să fie `<sha>`) → `export JAVA_HOME=...` →
 > `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:lintDebug` (88 unitare) →
-> `./gradlew :app:connectedDebugAndroidTest` (8 instrumentate) →
+> `./gradlew :app:connectedDebugAndroidTest` (9 instrumentate) →
 > `bash tools/check-no-internet.sh` → `git diff --exit-code eaafada9... -- app/schemas/...1.json` →
 > `adb install -r ...` pe ambele dispozitive → apoi scenariul manual: *(pașii concreți, numerotați,
 > cu ce trebuie să apară pe ecran la fiecare pas)*.
@@ -208,47 +224,16 @@ checklist de regresie:
 4. Lucrare cu început 18/08 → „Trebuia să înceapă 18/08”.
 5. „Mai mult” → există rândul **„Calendar de lucru”** și deschide calendarul (`89f1dd4`).
 
-### P1 — Intervalul programat în ecranul de detaliu al lucrării
+### P1 — Finalizat: intervalul programat în detaliul lucrării
 
-**Singura funcție care mai lipsește.** În lista de lucrări intervalul se vede deja
-(`jobs_planned_period`), în detaliu nu.
+Commit `0b9038e`. Sub adresă se afișează o singură zi sau intervalul calculat cu
+`Schedule.endDate`; scenariul „10/08 → 12/08” a fost verificat pe emulator.
 
-- Fișier: `app/src/main/java/com/emanus/lucrari/ui/screen/JobDetailScreen.kt`.
-  **Atenție: fișierul e mare și s-a trunchiat la citire de două ori.** Citește-l integral
-  înainte de orice modificare; dacă se trunchiază iar, **nu ghici** — deleagă modificarea
-  agentului local cu instrucțiuni exacte (el are fișierul pe disc).
-- Ce se afișează: sub adresă, dacă `job.plannedStart != null`, un rând cu intervalul.
-  Sfârșitul se calculează cu **`Schedule.endDate(start, estDays)`** din `domain/Schedule.kt`
-  (o lucrare de o zi începe și se termină în aceeași zi; fără `estDays` se presupune o zi).
-  Formatarea zilelor: `Dates.dayMonth` („dd/MM”) sau `Dates.full` („dd/MM/yyyy”) din `domain/Dates.kt`.
-- Refolosește string-ul existent `jobs_planned_period` dacă se potrivește; altfel adaugă unul
-  nou în `app/src/main/res/values/strings_m8.xml`. **Nu inventa formate noi de dată.**
-- Test unitar pentru `Schedule.endDate` există deja; dacă adaugi logică nouă, adaugă și test.
+### P2 — Finalizat: curățenia și versiunea de livrare
 
-### P2 — Curățenia de dinaintea livrării (obligatoriu, altfel primește un telefon plin de gunoi)
-
-Pe telefon au rămas lucrări și clienți de test din toate rundele de depanare. **Nu dispar cu
-butonul „șterge datele demo”** — acela șterge doar seed-ul.
-
-Nume de șters (cel puțin): `Test3`–`Test7`, `FixTest`, `RotTest`, `ListaTest1`–`ListaTest3`,
-`AnchorTest1`–`AnchorTest3`, `Lnc1`, `Lnc2`, `OrfanTest` (posibil scris greșit `OrfannT` —
-emulatorul pierdea caractere la tastare), plus orice apare din rundele următoare.
-
-Procedura recomandată, în ordine:
-
-1. Rulează scenariile de verificare **pe emulator**, nu pe telefon, ca să nu mai adaugi gunoi.
-2. La final: `adb -s R5GL52XSGQP shell pm clear com.emanus.lucrari` — șterge tot curat.
-3. Repornește aplicația o dată (seed-ul demo reapare doar dacă nu a fost șters explicit —
-   vezi `Seed.ensure` + flag-ul `demoSeeded`), apoi apasă „șterge datele demo”.
-4. Confirmă cu `sqlite3` că tabelele `clients`, `jobs`, `reminders` sunt goale.
-5. Abia apoi instalarea finală.
-
-Tot aici: ridică versiunea la ceva de livrare (`versionName = "1.0.0"`, `versionCode = 11`) și
-instalează varianta finală pe telefon.
-
-*(Pe emulator au rămas 4 rânduri orfane în tabelul `reminders`, din vremea când `Reminder` nu
-avea filtrare. Nu se mai văd în interfață și nu afectează telefonul. Curăță-le doar dacă vrei
-emulatorul curat.)*
+Commiturile `1148f7e` și `b31a71d`. Telefonul are versiunea 1.0.0 / code 11, toate datele sunt
+goale, iar demo-ul nu reapare după repornire. Butonul „Șterge datele demo” șterge numai seed-ul,
+recunoaște și seed-ul vechi cu UUID aleator și păstrează datele reale ale utilizatorului.
 
 ### P3 — Finisaje de cod și vizual (nu blochează livrarea)
 
@@ -347,17 +332,17 @@ success `#2E7D32`, warning `#F9A825`, error `#C62828`. Iconița: fundal `#CFE3F7
 
 Aplicația se predă când **toate** rândurile de mai jos sunt bifate:
 
-- [ ] `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:lintDebug` — verde
-- [ ] `./gradlew :app:connectedDebugAndroidTest` — verde
-- [ ] `bash tools/check-no-internet.sh` — „OK: nicio permisiune de rețea”
-- [ ] `git diff --exit-code eaafada9... -- app/schemas/...1.json` — fără ieșire
-- [ ] Intervalul programat se vede în detaliul lucrării (P1)
-- [ ] Ciclul „am lucrat azi aici” se face în 2 apăsări, pe telefonul fizic
-- [ ] Rotire, background/foreground, kill și redeschidere — nu se pierde nimic
-- [ ] Export → `pm clear` → import — starea revine identic, inclusiv pozele
-- [ ] Datele de test șterse de pe telefon și confirmate cu `sqlite3` (P2)
-- [ ] Versiunea de livrare instalată pe telefon și confirmată cu `dumpsys package`
-- [ ] Iconița verificată **vizual de utilizator** în sertarul telefonului
+- [x] `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:lintDebug` — verde
+- [x] `./gradlew :app:connectedDebugAndroidTest` — 9/9 pe emulator și 9/9 pe Samsung
+- [x] `bash tools/check-no-internet.sh` — „OK: nicio permisiune de rețea”
+- [x] `git diff --exit-code eaafada9... -- app/schemas/...1.json` — fără ieșire
+- [x] Intervalul programat se vede în detaliul lucrării (P1)
+- [x] Ciclul „am lucrat azi aici” se face în 2 apăsări, pe telefonul fizic
+- [x] Rotire, background/foreground, kill și redeschidere — nu se pierde nimic
+- [x] Export → `pm clear` → import — starea revine identic, inclusiv pozele
+- [x] Datele de test șterse de pe telefon și confirmate cu `sqlite3` (P2)
+- [x] Versiunea de livrare instalată pe telefon și confirmată cu `dumpsys package`
+- [x] Iconița verificată vizual în sertarul telefonului Samsung
 - [ ] Pagina de spec din Notion actualizată la starea finală
 
 ---
