@@ -21,7 +21,7 @@ Dacă ceva din acest fișier contrazice realitatea din repo, **realitatea din re
 
 ## 1. Pentru cine e aplicația (contextul care schimbă deciziile)
 
-Aplicația se numește **„Lucrări”** (`com.emanus.lucrari`) și e un **cadou surpriză** pentru
+Aplicația se numește **„CataLucrari”** (`com.emanus.lucrari`) și e un **cadou surpriză** pentru
 fratele proprietarului repo-ului: constructor în Italia, lucrează singur — e și muncitor, și
 administrator. Nu e om de calculatoare. Nu poate fi întrebat nimic despre cum vrea aplicația,
 pentru că nu trebuie să afle până nu e gata.
@@ -34,13 +34,14 @@ Ce înseamnă asta concret:
 - **Nu procesează facturi și nu ține date personale de facturare.** Facturile există în
   aplicație doar ca *evidență* („am facturat / am încasat”), pentru că omul chiar emite
   facturi și are nevoie să știe ce a rămas neîncasat. Aplicația nu emite nimic oficial.
-- **Interfața e în română.** Textul pentru descrierea de factură se generează în italiană
-  (dicționar RO→IT în `domain/Dictionary.kt` + `domain/Descrizione.kt`), pentru clienții lui.
+- **Interfața este completă în italiană și română.** Italiana este implicită, iar alegerea
+  persistentă RO/IT se face din „Altro” / „Mai mult”. Textul pentru descrierea de factură
+  rămâne mereu în italiană (`domain/Dictionary.kt` + `domain/Descrizione.kt`).
 - **Ergonomia bate frumusețea.** Omul deschide telefonul cu mâinile murdare, în picioare, pe
   șantier. Un ciclu „am lucrat azi aici” trebuie să se facă în **2 apăsări**. Butoanele mari
   (56 dp) și cifrele mari nu sunt decor, sunt cerință.
 
-**Nu adăuga funcții noi din proprie inițiativă.** Versiunea 1.0.0 este livrată. Ce a rămas în
+**Nu adăuga funcții noi din proprie inițiativă.** Versiunea 1.1.0 este livrată. Ce a rămas în
 P3 și P4 este opțional; cel mai mare risc de aici încolo este o regresie într-o funcție care
 merge deja.
 
@@ -87,12 +88,12 @@ veche și istoriile diverg — exact ce s-a întâmplat când commit-ul iconițe
 
 ## 3. Starea exactă la predare
 
-- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `b03f9cd`
-- **Versiune:** `versionName = "1.0.0"`, `versionCode = 11`
-- **Teste:** **88 unitare** + **9 instrumentate**, verzi pe emulator și pe telefonul fizic
+- **Branch:** `main`. HEAD este commit-ul care conține această actualizare 1.1.
+- **Versiune:** `versionName = "1.1.0"`, `versionCode = 12`
+- **Teste:** **90 unitare** + **12 instrumentate**; suita curentă este verde pe telefonul fizic
 - **Schema Room:** v1, `app/schemas/com.emanus.lucrari.data.AppDb/1.json`, hash `9a2846d7ed22222385ac20bef74419e7` — **neschimbată din M1** și așa trebuie să rămână (§5)
-- **Instalat pentru livrare:** `1.0.0` pe telefonul fizic (`R5GL52XSGQP`, Samsung SM-A165F),
-  cu toate datele de test și demo șterse
+- **Instalat pentru livrare:** `1.1.0` pe telefonul fizic (`R5GL52XSGQP`, Samsung SM-A165F),
+  prin actualizare care păstrează datele existente
 
 ### Ce e verificat pe dispozitiv real
 
@@ -114,6 +115,25 @@ Runda restantă, iconița și regresia găsită manual au fost verificate cap-co
 | `6bd2b8d605cfd8c5388e22f60ef9b4d8c55586bb` | păstrează lucrarea restantă în `PROGRAMAT` până la prima zi trecută | regresie găsită și reparată în P0; test unitar + scenariu manual verzi |
 
 P1–P3 sunt finalizate. Au rămas numai actualizarea paginii Notion și M9, opțional.
+
+### Actualizarea 1.1.0 din 20 august 2026
+
+- Interfața are toate cele 350 de chei de text în română și italiană; italiana este implicită,
+  schimbarea din „Altro” / „Mai mult” se aplică imediat și persistă după repornire.
+- Formularul de lucrare nouă permite mai multe șabloane. Cheile canonice se păstrează în
+  `Job.type`, unite cu ` + `, iar etapele lor se combină fără duplicate; schema Room rămâne v1.
+- Numele introduse de utilizator (client, adresă, titlul lucrării) nu se traduc. Etichetele
+  șabloanelor și etapelor sistemului se traduc numai la afișare.
+- Pozele nu sunt o grămadă globală: fiecare `Photo` are obligatoriu `jobId`, poate avea
+  opțional `todoId` și este clasificată `BEFORE` / `DURING` / `AFTER`; fișierul fizic rămâne
+  în `files/photos/<uuid>.jpg` și backupul păstrează legătura.
+- Verificare pe Samsung: schimbare IT→RO→IT și persistență după relansare; creare temporară
+  „Baie completă + Tencuială” cu 12 etape, apoi ștergere; ecranul Foto cere alegerea lucrării.
+- Capcană nouă dovedită: `connectedDebugAndroidTest` a recreat pachetul de pe Samsung și a
+  șters baza/preferințele. După suită s-a reinstalat APK-ul final, s-a eliminat demo-ul și
+  s-a refăcut singura lucrare vizibilă anterior (`Baie completă`, client `dani`, `sagului`,
+  programată 28/08–04/09, 8 zile, 7 etape). Înainte de orice suită viitoare pe telefonul de
+  livrare, exportă datele sau rulează pe emulator.
 
 ### Livrarea 1.0.0 din 20 august 2026
 

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">CataLucrari</string>
+
+	<!-- Barra inferiore -->
+	<string name="tab_today">Oggi</string>
+	<string name="tab_jobs">Lavori</string>
+	<string name="tab_punch">Da fare</string>
+	<string name="tab_money">Soldi</string>
+	<string name="tab_more">Altro</string>
+
+	<string name="screen_jobs_title">Lavori</string>
+	<string name="screen_jobs_subtitle">Tutti i lavori, con filtri e ricerca.</string>
+	<string name="screen_punch_title">Da completare</string>
+	<string name="screen_money_title">Soldi</string>
+	<string name="screen_more_title">Altro</string>
+	<string name="screen_more_subtitle">Modelli delle fasi, backup, esportazione e importazione.</string>
+	<string name="demo_title">Dati demo</string>
+	<string name="demo_hint">Elimina l’esempio di Mario e il lavoro Rifacimento bagno. I tuoi dati restano.</string>
+	<string name="demo_delete">Elimina i dati demo</string>
+	<string name="demo_deleted">I dati demo sono stati eliminati.</string>
+	<string name="demo_already_deleted">I dati demo non sono più presenti.</string>
+	<string name="app_version">Versione %1$s</string>
+
+	<!-- Stati -->
+	<string name="status_ofertat">Preventivo</string>
+	<string name="status_programat">Programmato</string>
+	<string name="status_in_lucru">In corso</string>
+	<string name="status_asteptare">In attesa</string>
+	<string name="status_de_finisat">Da rifinire</string>
+	<string name="status_terminat">Terminato</string>
+	<string name="status_anulat">Annullato</string>
+	<string name="filter_all">Tutti</string>
+
+	<!-- Oggi -->
+	<string name="today_empty">Nessun lavoro attivo adesso. Apri un lavoro da Lavori e impostalo su In corso.</string>
+	<string name="today_log">Ho lavorato qui oggi</string>
+	<string name="today_logged_button">Registrato oggi</string>
+	<string name="today_logged_snack">La giornata di oggi è stata registrata.</string>
+	<string name="today_already_snack">La giornata di oggi era già registrata.</string>
+	<string name="today_next">Prossima fase: %1$s</string>
+
+	<!-- Elenco lavori -->
+	<string name="jobs_search_hint">Cerca per via o cliente</string>
+	<string name="jobs_new">Nuovo lavoro</string>
+	<string name="jobs_empty">Nessun lavoro. Tocca Nuovo lavoro.</string>
+	<string name="jobs_empty_search">Nessun lavoro per questa ricerca.</string>
+	<string name="jobs_stages">Fasi: %1$d di %2$d</string>
+	<string name="jobs_days">Giornate lavorate: %1$d</string>
+	<string name="jobs_open_todos">%1$d da fare</string>
+
+	<!-- Nuovo lavoro -->
+	<string name="new_job_title">Nuovo lavoro</string>
+	<string name="new_job_client">Cliente</string>
+	<string name="new_job_address">Via</string>
+	<string name="new_job_address_hint">Es.: Via 23, Milano</string>
+	<string name="new_job_what">Che lavoro</string>
+	<string name="new_job_days">Quanti giorni</string>
+	<string name="new_job_client_unnamed">Cliente senza nome</string>
+	<string name="new_job_untitled">Lavoro</string>
+
+	<!-- Dettaglio lavoro -->
+	<string name="job_status">Stato</string>
+	<string name="job_stages_title">Fasi</string>
+	<string name="job_no_stages">Nessuna fase.</string>
+	<string name="job_stages_add">Aggiungi fase</string>
+	<string name="job_template_title">Scegli un modello di fasi</string>
+	<string name="stage_new_title">Nuova fase</string>
+	<string name="stage_name">Nome della fase</string>
+	<string name="stage_delete">Elimina fase</string>
+	<string name="job_call">Chiama</string>
+	<string name="job_map">Mappa</string>
+	<string name="job_delete">Elimina lavoro</string>
+	<string name="job_delete_confirm">Il lavoro e tutti i dati collegati verranno eliminati: fasi, giornate, cose da fare, misure e soldi.</string>
+	<string name="job_money_open">Contabilità del lavoro</string>
+	<string name="job_descrizione_open">Descrizione per fattura</string>
+
+	<!-- Giornate lavorate -->
+	<string name="job_days_title">Giornate lavorate</string>
+	<string name="job_days_empty">Nessuna giornata registrata.</string>
+	<string name="job_days_estimate">Stimate: %1$d · Lavorate: %2$d</string>
+	<string name="job_days_over">Oltre la stima: +%1$d</string>
+	<string name="job_day_add">Aggiungi giornata</string>
+	<string name="job_day_hours">%1$s ore</string>
+	<string name="day_new_title">Giornata lavorata</string>
+	<string name="day_edit_title">Giornata del %1$s</string>
+	<string name="day_today">Oggi</string>
+	<string name="day_yesterday">Ieri</string>
+	<string name="day_what">Cosa è stato fatto</string>
+	<string name="day_hours">Ore</string>
+	<string name="day_hours_add">Aggiungi ore</string>
+	<string name="day_delete">Elimina giornata</string>
+	<string name="day_blocked_add">Giornata non lavorata</string>
+	<string name="day_blocked">Perché non si è potuto lavorare</string>
+	<string name="day_blocked_note">Una giornata bloccata imposta il lavoro su In attesa.</string>
+
+	<!-- Da completare -->
+	<string name="punch_empty">Niente da completare. Tutto è stato spuntato.</string>
+	<string name="punch_due">Scadenza: %1$s</string>
+	<string name="punch_overdue">Scaduto: %1$s</string>
+	<string name="job_todos_title">Da completare</string>
+	<string name="job_todos_empty">Niente da completare qui.</string>
+	<string name="job_todo_add">Aggiungi</string>
+	<string name="todo_new_title">Cosa resta</string>
+	<string name="todo_edit_title">Modifica attività</string>
+	<string name="todo_what">Cosa resta da fare</string>
+	<string name="todo_place">Dove: stanza, scala</string>
+	<string name="todo_reason">Perché è rimasto</string>
+	<string name="todo_due">Scadenza</string>
+	<string name="todo_due_none">Senza scadenza</string>
+	<string name="todo_due_today">Oggi</string>
+	<string name="todo_due_tomorrow">Domani</string>
+	<string name="todo_due_week">Tra una settimana</string>
+	<string name="todo_delete">Elimina attività</string>
+	<string name="reason_material">Materiale mancante</string>
+	<string name="reason_decizie_client">In attesa del cliente</string>
+	<string name="reason_alt_meserias">Altro artigiano</string>
+	<string name="reason_vremea">Meteo</string>
+	<string name="reason_lipsa_timp">Tempo insufficiente</string>
+	<string name="reason_altul">Altro</string>
+
+	<!-- Materiali -->
+	<string name="job_materials_title">Materiali</string>
+	<string name="job_materials_empty">Nessun materiale registrato.</string>
+	<string name="job_material_add">Aggiungi</string>
+	<string name="material_new_title">Materiale</string>
+	<string name="material_edit_title">Modifica materiale</string>
+	<string name="material_what">Quale materiale</string>
+	<string name="material_qty">Quantità</string>
+	<string name="material_shop">Dove acquistarlo</string>
+	<string name="material_delete">Elimina materiale</string>
+
+	<!-- Misure -->
+	<string name="job_measures_title">Misure</string>
+	<string name="job_measures_empty">Nessuna misura registrata.</string>
+	<string name="job_measure_add">Aggiungi</string>
+	<string name="measures_total">Totale misure: %1$s</string>
+	<string name="measure_new_title">Misura</string>
+	<string name="measure_edit_title">Modifica misura</string>
+	<string name="measure_place">Dove: stanza, parete, piano</string>
+	<string name="measure_work">Lavorazione, se vuoi</string>
+	<string name="measure_qty">Quantità</string>
+	<string name="measure_unit">Unità</string>
+	<string name="measure_price">Prezzo unitario, se si paga a misura</string>
+	<string name="measure_line">%1$s per unità = %2$s</string>
+	<string name="measure_total_line">Totale %1$s</string>
+	<string name="measure_delete">Elimina misura</string>
+
+	<!-- Extra -->
+	<string name="job_extras_title">Extra</string>
+	<string name="job_extras_empty">Nessun extra richiesto.</string>
+	<string name="job_extra_add">Aggiungi</string>
+	<string name="extras_total">Extra accettati: %1$s</string>
+	<string name="extras_not_accepted">%1$d senza accordo</string>
+	<string name="extra_new_title">Extra richiesto dal cliente</string>
+	<string name="extra_edit_title">Modifica extra</string>
+	<string name="extra_what">Cosa è stato richiesto in più</string>
+	<string name="extra_price">Quanto costa</string>
+	<string name="extra_accepted">Concordato con il cliente</string>
+	<string name="extra_proof">Come è stato concordato: vocale, messaggio, di persona</string>
+	<string name="extra_billable">Da mettere in fattura</string>
+	<string name="extra_not_billable">Da non mettere in fattura</string>
+	<string name="extra_no_deal">Senza accordo</string>
+	<string name="extra_delete">Elimina extra</string>
+
+	<!-- Soldi -->
+	<string name="money_outstanding">Da incassare</string>
+	<string name="money_overdue">Scaduti da oltre 30 giorni</string>
+	<string name="money_this_month">Incassato questo mese</string>
+	<string name="money_to_invoice_title">Da fatturare</string>
+	<string name="money_to_invoice_empty">Niente da fatturare adesso.</string>
+	<string name="money_other_jobs">Altri lavori</string>
+	<string name="money_empty">Nessun lavoro.</string>
+	<string name="money_row_invoiced">Fatturato %1$s · Incassato %2$s</string>
+	<string name="money_row_rest">Da incassare: %1$s</string>
+	<string name="money_row_settled">Tutto incassato</string>
+
+	<!-- Contabilità del lavoro -->
+	<string name="job_money_title">Soldi</string>
+	<string name="money_billing">Come viene pagato</string>
+	<string name="billing_corp">A corpo</string>
+	<string name="billing_masura">A misura</string>
+	<string name="billing_zile">A giornata</string>
+	<string name="money_agreed_price">Prezzo concordato</string>
+	<string name="money_day_rate">Prezzo al giorno</string>
+	<string name="money_billing_save">Salva prezzo</string>
+	<string name="money_base">Lavoro</string>
+	<string name="money_base_masura">Dalle misure</string>
+	<string name="money_base_zile">%1$s al giorno × %2$d giorni</string>
+	<string name="money_extras">Extra accettati</string>
+	<string name="money_total">Totale</string>
+	<string name="money_invoiced">Fatturato</string>
+	<string name="money_to_invoice">Da fatturare</string>
+	<string name="money_collected">Incassato</string>
+	<string name="money_rest">Da incassare</string>
+	<string name="money_note_split">Fatturato e incassato sono due importi separati: uno indica quanto hai richiesto, l’altro quanto hai ricevuto.</string>
+	<string name="money_over_invoiced">Hai fatturato più del valore del lavoro.</string>
+
+	<!-- Incassi -->
+	<string name="payments_title">Incassi</string>
+	<string name="payments_empty">Nessun incasso registrato.</string>
+	<string name="payment_add">Aggiungi</string>
+	<string name="payment_new_title">Nuovo incasso</string>
+	<string name="payment_edit_title">Modifica incasso</string>
+	<string name="payment_amount">Importo ricevuto</string>
+	<string name="payment_method">Metodo</string>
+	<string name="payment_note">Nota, se vuoi</string>
+	<string name="payment_delete">Elimina incasso</string>
+	<string name="method_cash">Contanti</string>
+	<string name="method_bonifico">Bonifico</string>
+	<string name="method_altul">Altro</string>
+
+	<!-- Fatture -->
+	<string name="invoices_title">Fatture inviate</string>
+	<string name="invoices_empty">Nessuna fattura registrata.</string>
+	<string name="invoice_add">Aggiungi</string>
+	<string name="invoice_new_title">Fattura inviata</string>
+	<string name="invoice_edit_title">Modifica fattura</string>
+	<string name="invoice_number">Numero fattura</string>
+	<string name="invoice_amount">Importo della fattura</string>
+	<string name="invoice_kind">Tipo</string>
+	<string name="invoice_paid">Incassata</string>
+	<string name="invoice_not_paid">Non incassata</string>
+	<string name="invoice_overdue">Non incassata da oltre 30 giorni</string>
+	<string name="invoice_no_number">Senza numero</string>
+	<string name="invoice_delete">Elimina fattura</string>
+	<string name="invoice_note_app">L’app non emette fatture. Qui registri solo ciò che hai già inviato, per sapere a che punto sei.</string>
+	<string name="kind_aconto">Acconto</string>
+	<string name="kind_saldo">Saldo</string>
+	<string name="kind_unica">Unica</string>
+
+	<!-- Descrizione per fattura -->
+	<string name="descrizione_title">Descrizione per fattura</string>
+	<string name="descrizione_hint">Il testo è già in italiano, pronto per il commercialista. L’app non emette fatture: riassume solo lavori, misure e accordi.</string>
+	<string name="descrizione_copy">Copia testo</string>
+	<string name="descrizione_send">Invia</string>
+	<string name="descrizione_copied">Testo copiato.</string>
+	<string name="descrizione_empty">Non c’è ancora nulla da scrivere. Registra le giornate, completa le fasi o aggiungi misure.</string>
+
+	<!-- Regole di stato -->
+	<string name="done_confirm_title">Terminare con attività aperte?</string>
+	<string name="done_confirm_text">Ci sono ancora %1$d cose da fare in questo lavoro.</string>
+	<string name="done_confirm_yes">Imposta Terminato</string>
+	<string name="definisat_suggest">Tutte le fasi sono completate, ma restano attività aperte.</string>
+	<string name="definisat_apply">Imposta Da rifinire</string>
+
+	<!-- Clienti -->
+	<string name="more_clients">Clienti</string>
+	<string name="more_clients_hint">Elenco dei clienti e dei loro lavori</string>
+	<string name="clients_title">Clienti</string>
+	<string name="clients_new">Nuovo cliente</string>
+	<string name="clients_empty">Nessun cliente.</string>
+	<string name="client_name">Nome</string>
+	<string name="client_phone">Telefono</string>
+	<string name="client_note">Nota</string>
+	<string name="client_jobs">%1$d lavori</string>
+
+	<!-- Comuni -->
+	<string name="save">Salva</string>
+	<string name="cancel">Annulla</string>
+	<string name="delete">Elimina</string>
+	<string name="back">Indietro</string>
+	<string name="date_when">Quando</string>
+</resources>

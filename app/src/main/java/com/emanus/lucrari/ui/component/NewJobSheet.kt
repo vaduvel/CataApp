@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.emanus.lucrari.R
@@ -35,6 +36,7 @@ import java.time.LocalDate
 
 /** `DatePicker` lucrează în milisecunde UTC, iar o zi are exact atâtea. */
 private const val MILLIS_PER_DAY = 86_400_000L
+private const val TEMPLATE_SEPARATOR = "\u001F"
 
 /**
  * Lucrare nouă (SPEC §7): client, adresă, ce lucrare, câte zile și când începe. Butonul de
@@ -53,7 +55,7 @@ fun NewJobSheet(
 		client: String,
 		address: String,
 		what: String,
-		template: String?,
+		templates: List<String>,
 		days: Int?,
 		start: LocalDate?,
 	) -> Unit,
@@ -61,10 +63,15 @@ fun NewJobSheet(
 	var client by rememberSaveable { mutableStateOf("") }
 	var address by rememberSaveable { mutableStateOf("") }
 	var what by rememberSaveable { mutableStateOf("") }
-	var template by rememberSaveable { mutableStateOf<String?>(null) }
+	var templateKeys by rememberSaveable { mutableStateOf("") }
 	var days by rememberSaveable { mutableStateOf("") }
 	var startEpoch by rememberSaveable { mutableStateOf<Long?>(null) }
 	var showPicker by rememberSaveable { mutableStateOf(false) }
+	val selectedTemplates = templateKeys.split(TEMPLATE_SEPARATOR).filter { it.isNotEmpty() }
+	val context = LocalContext.current
+	val templateLabels = templates.associateWith { name ->
+		templateLabelRes(name)?.let(context::getString) ?: name
+	}
 
 	BrandFormSheet(
 		title = stringResource(R.string.new_job_title),
@@ -92,6 +99,11 @@ fun NewJobSheet(
 				singleLine = true,
 				modifier = Modifier.fillMaxWidth(),
 			)
+			Text(
+				text = stringResource(R.string.new_job_templates_hint),
+				style = MaterialTheme.typography.bodySmall,
+				color = MaterialTheme.colorScheme.onSurfaceVariant,
+			)
 			Row(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -100,16 +112,23 @@ fun NewJobSheet(
 			) {
 				templates.forEach { name ->
 					FilterChip(
-						selected = template == name,
+						selected = name in selectedTemplates,
 						onClick = {
-							val picked = if (template == name) null else name
-							template = picked
-							// Titlul urmează șablonul cât timp nu a scris el altceva.
-							if (what.isBlank() || templates.contains(what)) {
-								what = picked.orEmpty()
+							val previousTitle = selectedTemplates.joinToString(" + ") {
+								templateLabels.getValue(it)
+							}
+							val picked = if (name in selectedTemplates) {
+								selectedTemplates - name
+							} else {
+								selectedTemplates + name
+							}
+							templateKeys = picked.joinToString(TEMPLATE_SEPARATOR)
+							// Titlul urmează selecția doar cât timp nu l-a personalizat.
+							if (what.isBlank() || what == previousTitle || templates.contains(what)) {
+								what = picked.joinToString(" + ") { templateLabels.getValue(it) }
 							}
 						},
-						label = { Text(name) },
+						label = { Text(templateLabels.getValue(name)) },
 					)
 				}
 			}
@@ -176,7 +195,7 @@ fun NewJobSheet(
 
 			Button(
 				onClick = {
-					onSave(client, address, what, template, days.toIntOrNull(), start)
+					onSave(client, address, what, selectedTemplates, days.toIntOrNull(), start)
 				},
 				modifier = Modifier
 					.fillMaxWidth()

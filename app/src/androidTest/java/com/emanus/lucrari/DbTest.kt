@@ -9,6 +9,7 @@ import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.data.Reminder
+import com.emanus.lucrari.data.repo.JobRepo
 import com.emanus.lucrari.domain.Seed
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
@@ -184,5 +185,26 @@ class DbTest {
 		assertTrue(titluri.contains("In lucru"))
 		assertFalse(titluri.contains("Abia peste doua zile"))
 		assertFalse(titluri.contains("Fara data"))
+	}
+
+	@Test
+	fun lucrarea_noua_combina_etapele_din_mai_multe_sabloane() = runBlocking {
+		val repo = JobRepo(db)
+		val jobId = repo.createJob(
+			clientName = "Luigi",
+			address = "Via Roma, Milano",
+			title = "Bagno e intonaco",
+			type = "Baie completă",
+			additionalTypes = listOf("Tencuială"),
+			estDays = 8,
+		)
+
+		val job = db.jobs().byId(jobId)
+		val stages = db.stages().observeByJob(jobId).first()
+		assertEquals("Baie completă + Tencuială", job?.type)
+		assertEquals(12, stages.size)
+		assertEquals(stages.size, stages.map { stage -> stage.name }.distinct().size)
+		assertTrue(stages.any { stage -> stage.name == "Demolare" })
+		assertTrue(stages.any { stage -> stage.name == "Glet" })
 	}
 }

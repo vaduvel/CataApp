@@ -15,6 +15,8 @@ import androidx.room.withTransaction
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.emanus.lucrari.App
+import com.emanus.lucrari.AppLanguage
+import com.emanus.lucrari.AppLocale
 import com.emanus.lucrari.MainActivity
 import com.emanus.lucrari.R
 import com.emanus.lucrari.data.Extra
@@ -59,7 +61,8 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
 					dao.todos(), dao.reminders(),
 				)
 			}
-			val text = ReminderText(applicationContext)
+			val localizedContext = AppLocale.wrap(applicationContext)
+			val text = ReminderText(localizedContext)
 			val existing = data.reminders.filter { it.auto && !it.done }.mapNotNull { reminder ->
 				val jobId = reminder.jobId ?: return@mapNotNull null
 				val kind = text.kindOf(reminder.text) ?: return@mapNotNull null
@@ -87,31 +90,28 @@ class ReminderWorker(context: Context, params: WorkerParameters) : CoroutineWork
 						auto = true,
 					),
 				)
-				ReminderNotifier.show(applicationContext, candidate, message)
+				ReminderNotifier.show(localizedContext, candidate, message)
 			}
 		}.fold(onSuccess = { Result.success() }, onFailure = { Result.retry() })
 	}
 }
 
 private class ReminderText(private val context: Context) {
-	private val toInvoicePrefix = context.getString(R.string.reminder_prefix_to_invoice)
-	private val overduePrefix = context.getString(R.string.reminder_prefix_overdue)
-	private val offerPrefix = context.getString(R.string.reminder_prefix_offer)
-	private val todoPrefix = context.getString(R.string.reminder_prefix_todo)
-	private val startSoonPrefix = context.getString(R.string.reminder_prefix_start_soon)
-	private val startTomorrowPrefix = context.getString(R.string.reminder_prefix_start_tomorrow)
-	private val startTodayPrefix = context.getString(R.string.reminder_prefix_start_today)
+	private val allPrefixes = AppLanguage.entries.flatMap { language ->
+		val localized = AppLocale.contextFor(context, language)
+		listOf(
+			localized.getString(R.string.reminder_prefix_to_invoice) to ReminderKind.TO_INVOICE,
+			localized.getString(R.string.reminder_prefix_overdue) to ReminderKind.OVERDUE_INVOICE,
+			localized.getString(R.string.reminder_prefix_offer) to ReminderKind.OFFER_FOLLOW_UP,
+			localized.getString(R.string.reminder_prefix_todo) to ReminderKind.TODO_DUE,
+			localized.getString(R.string.reminder_prefix_start_soon) to ReminderKind.START_SOON,
+			localized.getString(R.string.reminder_prefix_start_tomorrow) to ReminderKind.START_TOMORROW,
+			localized.getString(R.string.reminder_prefix_start_today) to ReminderKind.START_TODAY,
+		)
+	}.distinct()
 
-	fun kindOf(text: String): ReminderKind? = when {
-		text.startsWith(toInvoicePrefix) -> ReminderKind.TO_INVOICE
-		text.startsWith(overduePrefix) -> ReminderKind.OVERDUE_INVOICE
-		text.startsWith(offerPrefix) -> ReminderKind.OFFER_FOLLOW_UP
-		text.startsWith(todoPrefix) -> ReminderKind.TODO_DUE
-		text.startsWith(startSoonPrefix) -> ReminderKind.START_SOON
-		text.startsWith(startTomorrowPrefix) -> ReminderKind.START_TOMORROW
-		text.startsWith(startTodayPrefix) -> ReminderKind.START_TODAY
-		else -> null
-	}
+	fun kindOf(text: String): ReminderKind? =
+		allPrefixes.firstOrNull { (prefix, _) -> text.startsWith(prefix) }?.second
 
 	fun format(candidate: ReminderCandidate): String = when (candidate.kind) {
 		ReminderKind.TO_INVOICE -> context.getString(R.string.reminder_to_invoice, candidate.jobTitle)

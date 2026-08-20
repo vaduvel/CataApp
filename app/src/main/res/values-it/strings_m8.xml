@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Programmazione lavori -->
+	<string name="new_job_start">Quando inizia</string>
+	<string name="new_job_start_none">Senza data</string>
+	<string name="new_job_start_today">Oggi</string>
+	<string name="new_job_start_tomorrow">Domani</string>
+	<string name="new_job_start_pick">Altra data</string>
+	<string name="new_job_start_chosen">Inizia il %1$s</string>
+	<string name="new_job_period">Inizia il %1$s, termina il %2$s</string>
+	<string name="jobs_planned">Programmato: %1$s</string>
+	<string name="jobs_planned_period">Programmato: %1$s → %2$s</string>
+	<string name="date_pick_ok">Scegli</string>
+	<string name="today_starts">Inizia oggi</string>
+	<string name="today_starts_late">Doveva iniziare il %1$s</string>
+
+	<!-- Calendario -->
+	<string name="calendar_title">Calendario lavori</string>
+	<string name="calendar_open">Calendario</string>
+	<string name="calendar_prev">Mese precedente</string>
+	<string name="calendar_next">Mese successivo</string>
+	<string name="calendar_hint">Tocca un giorno per vedere cosa è programmato.</string>
+	<string name="calendar_day_empty">Nessun lavoro programmato per questo giorno.</string>
+	<string name="calendar_month_count">Programmati questo mese: %1$d</string>
+	<string name="more_calendar_hint">Quale lavoro è programmato e in quale giorno</string>
+	<string-array name="weekday_initials">
+		<item>L</item>
+		<item>Ma</item>
+		<item>Me</item>
+		<item>G</item>
+		<item>V</item>
+		<item>S</item>
+		<item>D</item>
+	</string-array>
+
+	<!-- Promemoria di inizio -->
+	<string name="reminder_prefix_start_soon">Tra 3 giorni inizia</string>
+	<string name="reminder_prefix_start_tomorrow">Domani inizia</string>
+	<string name="reminder_prefix_start_today">Oggi inizia</string>
+	<string name="reminder_start_soon">Tra 3 giorni inizia %1$s. Hai i materiali?</string>
+	<string name="reminder_start_tomorrow">Domani inizia %1$s.</string>
+	<string name="reminder_start_today">Oggi inizia %1$s.</string>
+</resources>

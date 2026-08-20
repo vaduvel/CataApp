@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="language_title">Lingua</string>
+	<string name="language_hint">Scegli la lingua dell’app</string>
+	<string name="language_ro">Română</string>
+	<string name="language_it">Italiano</string>
+	<string name="new_job_templates_hint">Puoi sceglierne più di uno. Le fasi vengono unite.</string>
+
+	<string name="template_baie_completa">Bagno completo</string>
+	<string name="template_tencuiala">Intonacatura</string>
+	<string name="template_gresie_pavaj">Piastrelle / pavimentazione</string>
+	<string name="template_rigips">Cartongesso</string>
+	<string name="template_zugraveala">Tinteggiatura</string>
+	<string name="template_sapa">Massetto</string>
+	<string name="template_termosistem">Cappotto termico</string>
+	<string name="template_gard_zid">Recinzione / muro</string>
+	<string name="template_mansarda">Mansarda</string>
+	<string name="template_reparatii_diverse">Riparazioni varie</string>
+
+	<string name="stage_demolare">Demolizione</string>
+	<string name="stage_trasee_instalatii">Tracce impianti</string>
+	<string name="stage_impermeabilizare">Impermeabilizzazione</string>
+	<string name="stage_gresie_faianta">Pavimento / rivestimento</string>
+	<string name="stage_sanitare">Sanitari</string>
+	<string name="stage_silicon_finisaje">Silicone / finiture</string>
+	<string name="stage_curatenie">Pulizia</string>
+	<string name="stage_pregatire_pereti">Preparazione pareti</string>
+	<string name="stage_coltare_plase">Paraspigoli / reti</string>
+	<string name="stage_tencuiala">Intonacatura</string>
+	<string name="stage_glet">Rasatura</string>
+	<string name="stage_slefuit">Carteggiatura</string>
+	<string name="stage_pregatire_suport">Preparazione supporto</string>
+	<string name="stage_trasare">Tracciatura</string>
+	<string name="stage_montaj">Posa</string>
+	<string name="stage_chituit">Stuccatura fughe</string>
+	<string name="stage_plinte">Battiscopa</string>
+	<string name="stage_structura">Struttura</string>
+	<string name="stage_placare">Rivestimento</string>
+	<string name="stage_banda_masa">Nastro / stucco</string>
+	<string name="stage_protejare">Protezione</string>
+	<string name="stage_amorsa">Primer</string>
+	<string name="stage_strat_1">Prima mano</string>
+	<string name="stage_strat_2">Seconda mano</string>
+	<string name="stage_retusuri">Ritocchi</string>
+	<string name="stage_curatare_suport">Pulizia supporto</string>
+	<string name="stage_nivele">Livelli</string>
+	<string name="stage_turnare">Getto</string>
+	<string name="stage_uscare_verificare">Asciugatura / verifica</string>
+	<string name="stage_schela">Ponteggio</string>
+	<string name="stage_lipit_placi">Incollaggio pannelli</string>
+	<string name="stage_dibluit">Tassellatura</string>
+	<string name="stage_plasa_masa">Rete / rasatura</string>
+	<string name="stage_decorativ">Finitura decorativa</string>
+	<string name="stage_fundatie">Fondazione</string>
+	<string name="stage_zidarie">Muratura</string>
+	<string name="stage_rostuit_finisaj">Stuccatura / finitura</string>
+	<string name="stage_izolatie">Isolamento</string>
+	<string name="stage_bariera_vapori">Barriera al vapore</string>
+	<string name="stage_finisaje">Finiture</string>
+	<string name="stage_de_vazut">Da controllare</string>
+	<string name="stage_de_reparat">Da riparare</string>
+	<string name="stage_verificare_finala">Verifica finale</string>
+</resources>

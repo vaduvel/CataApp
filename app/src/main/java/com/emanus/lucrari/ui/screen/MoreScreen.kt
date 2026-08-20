@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
@@ -56,6 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.emanus.lucrari.App
+import com.emanus.lucrari.AppLanguage
 import com.emanus.lucrari.R
 import com.emanus.lucrari.data.Reminder
 import com.emanus.lucrari.data.repo.ImportMode
@@ -133,6 +135,8 @@ class MoreViewModel(app: App) : ViewModel() {
 
 @Composable
 fun MoreScreen(
+	language: AppLanguage,
+	onLanguageChange: (AppLanguage) -> Unit,
 	onOpenCalendar: () -> Unit,
 	onOpenClients: () -> Unit,
 	onOpenPhotos: () -> Unit,
@@ -188,6 +192,9 @@ fun MoreScreen(
 					title = stringResource(R.string.screen_more_title),
 					horizontalPadding = Dimens.space0,
 				)
+			}
+			item {
+				LanguageCard(language = language, onLanguageChange = onLanguageChange)
 			}
 			// Calendarul are si o iconita pe ecranul Lucrari, dar acolo e usor de ratat.
 			// Randul de aici e singurul loc in care se vede scris ce face.
@@ -369,6 +376,60 @@ fun MoreScreen(
 				}
 			},
 		)
+	}
+}
+
+@Composable
+private fun LanguageCard(
+	language: AppLanguage,
+	onLanguageChange: (AppLanguage) -> Unit,
+) {
+	BrandCard(
+		modifier = Modifier.fillMaxWidth(),
+		containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+	) {
+		Column(
+			modifier = Modifier.padding(Dimens.cardPadding),
+			verticalArrangement = Arrangement.spacedBy(Dimens.space12),
+		) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space12),
+				verticalAlignment = Alignment.CenterVertically,
+			) {
+				BrandIconTile(Icons.Outlined.Language, contentDescription = null)
+				Column {
+					Text(stringResource(R.string.language_title), style = MaterialTheme.typography.titleMedium)
+					Text(stringResource(R.string.language_hint), style = MaterialTheme.typography.bodyMedium)
+				}
+			}
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.spacedBy(Dimens.space8),
+			) {
+				if (language == AppLanguage.ROMANIAN) {
+					Button(
+						onClick = {},
+						modifier = Modifier.weight(1f).heightIn(min = Dimens.primaryButtonHeight),
+					) { Text(stringResource(R.string.language_ro)) }
+				} else {
+					OutlinedButton(
+						onClick = { onLanguageChange(AppLanguage.ROMANIAN) },
+						modifier = Modifier.weight(1f).heightIn(min = Dimens.primaryButtonHeight),
+					) { Text(stringResource(R.string.language_ro)) }
+				}
+				if (language == AppLanguage.ITALIAN) {
+					Button(
+						onClick = {},
+						modifier = Modifier.weight(1f).heightIn(min = Dimens.primaryButtonHeight),
+					) { Text(stringResource(R.string.language_it)) }
+				} else {
+					OutlinedButton(
+						onClick = { onLanguageChange(AppLanguage.ITALIAN) },
+						modifier = Modifier.weight(1f).heightIn(min = Dimens.primaryButtonHeight),
+					) { Text(stringResource(R.string.language_it)) }
+				}
+			}
+		}
 	}
 }
 

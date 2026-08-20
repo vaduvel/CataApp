@@ -91,6 +91,8 @@ import com.emanus.lucrari.ui.component.BrandProgress
 import com.emanus.lucrari.ui.component.BrandTopAppBar
 import com.emanus.lucrari.ui.component.color
 import com.emanus.lucrari.ui.component.labelRes
+import com.emanus.lucrari.ui.component.localizedStageLabel
+import com.emanus.lucrari.ui.component.localizedTemplateLabel
 import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -614,7 +616,7 @@ fun JobDetailScreen(
 								FilterChip(
 									selected = false,
 									onClick = { vm.applyTemplate(name) },
-									label = { Text(name) },
+									label = { Text(localizedTemplateLabel(name)) },
 								)
 							}
 						}
@@ -637,7 +639,7 @@ fun JobDetailScreen(
 								Icon(icon, contentDescription = null)
 							}
 							Text(
-								text = stage.name,
+								text = localizedStageLabel(stage.name),
 								style = MaterialTheme.typography.bodyLarge,
 								modifier = Modifier.weight(1f),
 							)

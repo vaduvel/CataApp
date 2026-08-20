@@ -9,7 +9,7 @@
 
 ## 0. TL;DR
 
-- **Ce construim:** aplicație Android nativă, un singur utilizator, **100% offline**, fără cont, fără cloud, instalată prin cablu. Interfață în română, textele generate pentru client/contabil în italiană.
+- **Ce construim:** aplicație Android nativă, un singur utilizator, **100% offline**, fără cont, fără cloud, instalată prin cablu. Interfață în italiană și română, cu italiana implicită și selector persistent în aplicație; textele generate pentru client/contabil rămân în italiană.
 - **Stack:** Kotlin + Jetpack Compose + Room. Build: `./gradlew assembleDebug` → `app/build/outputs/apk/debug/app-debug.apk` → `adb install -r`.
 - **Regula de aur:** **nu se adaugă permisiunea `android.permission.INTERNET`.** Dacă o funcție are nevoie de rețea, nu intră în v1. Există un check automat pentru asta (§9).
 - **Aplicația nu emite facturi.** Produce evidența și **textul** care ajunge pe factură. Zero XML, zero SdI, zero TVA, zero date fiscale.
@@ -115,7 +115,7 @@ data class Job(
   val street: String? = null,       // „Via 23" — el caută după stradă, nu după client
   val city: String? = null,
   val addrNote: String? = null,     // scară, apartament, interfon
-  val type: String? = null,         // cheia șablonului din Templates
+  val type: String? = null,         // una sau mai multe chei Templates, unite stabil cu " + "
   val status: JobStatus = JobStatus.OFERTAT,
   val plannedStart: LocalDate? = null,
   val estDays: Int? = null,         // zile estimate
@@ -320,14 +320,14 @@ Toate formularele sunt bottom sheet-uri (`BottomSheetForm`) cu același comporta
 ## 7. Reguli de UX (se verifică la review)
 
 - Ținte minime **56 dp**; distanță între ținte 8 dp.
-- Formular „Lucrare nouă" = **4 câmpuri**: client, stradă, ce lucrare (șablon), câte zile. Restul se completează mai târziu.
-- Alegerea șablonului precompletează etapele din `Templates` (§14) — editabile.
+- Formular „Lucrare nouă" = **4 câmpuri**: client, stradă, ce lucrare (unul sau mai multe șabloane), câte zile. Restul se completează mai târziu.
+- Alegerea unuia sau mai multor șabloane precompletează și combină etapele distincte din `Templates` (§14) — editabile.
 - Durata se exprimă în **zile**, nu ore. Orele sunt opționale și ascunse implicit.
 - Data se completează automat cu „azi", editabilă cu un tap.
 - Toate câmpurile de text acceptă dictare (tastatura Android o oferă; nu se implementează nimic custom).
 - Culorile statusurilor sunt cele din §5.1 și se folosesc consecvent în liste, chip-uri și calendar.
 - Zero dialoguri de tip „ești sigur?" în afară de: ștergere lucrare, `TERMINAT` cu resturi deschise, import backup.
-- Text în română în `strings.xml`. Textele generate pentru client/contabil rămân în italiană (§5.5), niciodată traduse.
+- Text UI în română în `values/strings*.xml` și în italiană în `values-it/strings*.xml`. Italiana este implicită; selectorul RO/IT este în „Mai mult” / „Altro” și alegerea persistă local. Textele generate pentru client/contabil rămân în italiană (§5.5), indiferent de limba interfeței.
 
 ## 8. Backup, export, share
 
@@ -398,7 +398,7 @@ Ordinea e obligatorie: M0→M6 formează aplicația utilă. M7 înainte de a i-o
 ## 12. Convenții
 
 - Commit-uri Conventional Commits: `feat(money): rest de incasat pe lucrare`. Un PR per milestone, cu descrierea criteriilor bifate.
-- Cod și identificatori în engleză; texte UI în română, exclusiv în `strings.xml`; textele generate în italiană, exclusiv în `Descrizione.kt` și `Dictionary.kt`.
+- Cod și identificatori în engleză; textele UI sunt resurse XML complete în română și italiană, cu aceleași chei; textele generate pentru contabil sunt în italiană, exclusiv în `Descrizione.kt` și `Dictionary.kt`.
 - Compose: state hoisting, `ViewModel` + `StateFlow`, zero logică de business în composable-uri. Logica de bani și de text stă în `domain/`, pură și testabilă fără Android.
 - Fără `!!`, fără `GlobalScope`, fără operații de DB pe main thread.
 - Nicio dependență nouă fără justificare în PR. Niciun apel de rețea, niciodată.

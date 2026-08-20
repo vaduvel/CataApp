@@ -31,7 +31,7 @@ Calea are nevoie de `/Contents/Home` la final, altfel Gradle nu găsește `bin/j
 4. **Facturat și încasat sunt independente.** Bifa unei facturi nu creează o încasare.
 5. Un extra intră în bani numai cu `accepted && billable`.
 6. Aceeași lucrare/sumă nu se repetă pe același ecran.
-7. Codul și identificatorii sunt în engleză; textele UI sunt în română și stau în resurse XML; textul pentru contabil este în italiană și stă în `domain/Descrizione.kt`/`Dictionary.kt`. Nu folosi ghilimele tipografice amestecate cu ghilimele ASCII în literale Kotlin.
+7. Codul și identificatorii sunt în engleză; textele UI au seturi complete și cu aceleași chei în română (`values/`) și italiană (`values-it/`), iar italiana este implicită. Textul pentru contabil este mereu în italiană și stă în `domain/Descrizione.kt`/`Dictionary.kt`. Nu folosi ghilimele tipografice amestecate cu ghilimele ASCII în literale Kotlin.
 8. Logica de business este pură în `domain/`, nu în composable-uri.
 9. Fără `!!`, `GlobalScope` sau operații Room pe main thread.
 10. Dependențele se declară numai în `gradle/libs.versions.toml` și se adaugă doar cu justificare.
@@ -71,6 +71,7 @@ Calea are nevoie de `/Contents/Home` la final, altfel Gradle nu găsește `bin/j
 - Statusul se randează numai prin `StatusChip`; culoarea plină stă în `StatusColor`, iar perechea fundal/text în `StatusTones`.
 - **Inseturile de sistem se aplică o singură dată.** `Scaffold`-ul din `AppRoot` dă padding-ul lui `NavHost`, care îl consumă cu `consumeWindowInsets`, pentru că ecranele interioare au propriul `Scaffold`. Fără asta, ultimul rând al listelor lungi intră sub bara de navigare.
 - **Starea formularelor și ancorele de listă folosesc `rememberSaveable`**, nu `remember`: rotația și revenirea din background nu au voie să piardă nimic.
+- Limba se schimbă numai din cardul „Limbă” / „Lingua” din „Mai mult” / „Altro”, se aplică imediat și persistă în `AppPrefs`; nu urma automat limba telefonului.
 - **Listele care primesc rânduri noi în cap se derulează la cap numai când chiar se schimbă capul.** Se ține minte id-ul primului rând într-un `rememberSaveable` și se compară înainte de `scrollToItem(0)`. Un `LaunchedEffect(cheie)` rulează și la prima compoziție, deci fără comparație lista sare în cap la fiecare revenire din detaliu, iar poziția utilizatorului se pierde.
 
 ## Verificare pe emulator și pe telefon
@@ -86,6 +87,7 @@ git diff --exit-code eaafada -- app/schemas/com.emanus.lucrari.data.AppDb/1.json
 ```
 
 - **`uiautomator` e blocat pe telefonul Samsung** (SIGKILL în `UiAutomationManager`). Verificările care au nevoie de dump se fac pe emulator; pe telefon se verifică vizual și prin `dumpsys`.
+- **Nu rula `connectedDebugAndroidTest` pe telefonul de livrare fără export sau inventar al datelor.** În runda 1.1, instalarea de test a recreat pachetul și a șters preferințele/baza locală. După teste, reinstalează APK-ul final, restaurează datele necesare și verifică explicit conținutul, limba și versiunea.
 - **Atinge mijlocul zonei clickabile din dump, nu coordonate fixe.** `ExtendedFloatingActionButton` nu apare ca nod text, ci numai ca zonă clickabilă.
 - **Închide tastatura (BACK) înainte de orice atingere pe listă.** Cu tastatura deschisă, atingerile de jos lovesc taste reale.
 - **Forțarea unui worker:** `cmd jobscheduler run -f` nu îl expediază. Rescrie `last_enqueue_time` în baza de date a WorkManager-ului; la următoarea verificare, workerul se reprogramează cu întârziere 0. Merge pe API 36 și e singurul mod de a testa un memento fără să aștepți ora reală.
@@ -99,11 +101,12 @@ Pentru orice milestone: unit tests + assemble + lint + scriptul offline trec; cu
 ## Stadiu
 
 - **M0–M8 — gata și verificate**, pe emulator Android API 36 și pe telefonul fizic (SM-A165F).
-- **88 de teste unitare** și **9 instrumentate** verzi pe fiecare dispozitiv; `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
+- **90 de teste unitare** și **12 instrumentate** verzi; suita instrumentată curentă este verificată pe telefonul fizic, iar `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
 - **M7:** poze locale prin `FileProvider`, backup ZIP zilnic cu rotație 7, export/import SAF cu „Înlocuiește tot” / „Adaugă ce lipsește”, memento-uri la 19:00 cu deduplicare. Scenariul export → ștergerea datelor → import verificat cu modul avion activ.
 - **M8:** dată de început și interval la creare, statusul `PROGRAMAT` pentru lucrările din viitor, calendarul lunar de lucru și memento-urile de început (19:00 pentru „peste 3 zile” și „mâine”, 07:30 pentru „azi”). Fără migrare de schemă.
 - **Runda de finisaj:** inseturile de sistem nu se mai aplică de două ori; memento-urile pleacă odată cu lucrarea ștearsă; toate cele 10 formulare folosesc `BrandFormSheet`, iar ecranele nu mai conțin carduri generice sau dimensiuni `dp` scrise direct.
-- **Versiunea curentă:** `1.0.0`, versionCode 11, instalată pentru livrare pe telefon.
+- **Versiunea curentă:** `1.1.0`, versionCode 12, instalată pentru livrare pe telefon.
+- **Actualizarea 1.1:** interfață completă RO/IT cu italiana implicită și alegere persistentă; la crearea unei lucrări se pot selecta mai multe șabloane, ale căror etape se combină fără duplicate și se păstrează în câmpul existent, fără migrare Room.
 - **Tema din design system-ul aprobat este aplicată:** paletă M3, scara de text, colțurile, tokenii de spațiere și chip-urile de status cu pictogramă.
 - **Livrare:** intervalul este afișat în detaliul lucrării; telefonul nu mai conține date de test sau demo; butonul de ștergere demo și versiunea sunt în „Mai mult”; iconița a fost verificată în sertarul Samsung; refactorizarea vizuală este finalizată. A rămas doar M9, opțional.
 - **M9 — opțional, nu blochează livrarea:** statistici simple, widget „Am lucrat azi la…”, „spațiu folosit”, stările „camera nu e disponibilă” și „backup eșuat”, zile lucrate per etapă (cere migrare de schemă) și câmpul `work` în rândul măsurătorii din descriere.

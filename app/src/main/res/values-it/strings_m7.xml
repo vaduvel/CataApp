@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Promemoria -->
+	<string name="reminder_channel_name">Promemoria lavori</string>
+	<string name="reminder_channel_description">Attività, fatture e preventivi che richiedono attenzione</string>
+	<string name="reminder_notification_title">Lavori</string>
+	<string name="reminder_prefix_to_invoice">Da inviare per la fatturazione:</string>
+	<string name="reminder_prefix_overdue">Non incassato da </string>
+	<string name="reminder_prefix_offer">Chiama per il preventivo:</string>
+	<string name="reminder_prefix_todo">Da completare oggi:</string>
+	<string name="reminder_to_invoice">Da inviare per la fatturazione: %1$s</string>
+	<string name="reminder_overdue">Non incassato da %1$d giorni: %2$s</string>
+	<string name="reminder_offer">Chiama per il preventivo: %1$s</string>
+	<string name="reminder_todo">Da completare oggi: %1$s</string>
+	<string name="reminders_title">Promemoria</string>
+	<string name="reminders_empty">Nessun promemoria adesso.</string>
+	<string name="reminders_enable_notifications">Attiva notifiche</string>
+	<string name="reminder_done">Risolto</string>
+
+	<!-- Foto -->
+	<string name="more_photos">Foto</string>
+	<string name="more_photos_hint">Foto prima, durante e dopo il lavoro</string>
+	<string name="photos_title">Foto dei lavori</string>
+	<string name="photos_choose_job">Scegli il lavoro</string>
+	<string name="photos_no_jobs">Non ci sono lavori per le foto.</string>
+	<string name="photos_phase">Momento della foto</string>
+	<string name="photo_before">Prima</string>
+	<string name="photo_during">Durante il lavoro</string>
+	<string name="photo_after">Dopo</string>
+	<string name="photos_link_todo">Collega la foto a un’attività, se vuoi</string>
+	<string name="photos_job_only">Solo il lavoro</string>
+	<string name="photos_take">Scatta una foto</string>
+	<string name="photos_empty">Nessuna foto per questo lavoro.</string>
+	<string name="photo_saved">Foto salvata.</string>
+	<string name="photo_failed">Impossibile salvare la foto.</string>
+	<string name="photo_delete">Elimina foto</string>
+	<string name="photo_content_description">Foto del lavoro</string>
+
+	<!-- Backup -->
+	<string name="backup_title">Backup</string>
+	<string name="backup_hint">L’app conserva automaticamente gli ultimi 7 backup giornalieri. Esportazione e importazione usano il selettore Android, senza permessi di archiviazione.</string>
+	<string name="backup_export">Esporta backup</string>
+	<string name="backup_import">Importa backup</string>
+	<string name="backup_share">Invia ultimo backup</string>
+	<string name="backup_export_done">Backup esportato.</string>
+	<string name="backup_import_done">Dati importati.</string>
+	<string name="backup_failed">Operazione di backup non riuscita. I dati esistenti non sono stati eliminati.</string>
+	<string name="backup_import_mode_title">Come importare i dati?</string>
+	<string name="backup_import_mode_text">Sostituisci tutto elimina i dati attuali solo dopo la verifica dell’archivio. Aggiungi ciò che manca mantiene i dati esistenti e usa gli UUID per evitare duplicati.</string>
+	<string name="backup_replace">Sostituisci tutto</string>
+	<string name="backup_merge">Aggiungi ciò che manca</string>
+</resources>

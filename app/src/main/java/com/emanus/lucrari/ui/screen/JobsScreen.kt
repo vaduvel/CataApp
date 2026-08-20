@@ -114,7 +114,7 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 		client: String,
 		address: String,
 		what: String,
-		template: String?,
+		templates: List<String>,
 		days: Int?,
 		start: LocalDate?,
 		onCreated: (String) -> Unit,
@@ -124,7 +124,8 @@ class JobsViewModel(app: Application) : AndroidViewModel(app) {
 				clientName = client,
 				address = address,
 				title = what,
-				type = template,
+				type = templates.firstOrNull(),
+				additionalTypes = templates.drop(1),
 				estDays = days,
 			)
 			// Data vine după creare: pune și statusul potrivit (Programat pentru viitor).
@@ -267,12 +268,12 @@ fun JobsScreen(
 		NewJobSheet(
 			templates = Templates.names,
 			onDismiss = { showNew = false },
-			onSave = { client, address, what, template, days, start ->
+			onSave = { client, address, what, templates, days, start ->
 				vm.create(
 					client = client.ifBlank { unnamedClient },
 					address = address,
-					what = what.ifBlank { template ?: untitled },
-					template = template,
+					what = what.ifBlank { untitled },
+					templates = templates,
 					days = days,
 					start = start,
 				) { id ->

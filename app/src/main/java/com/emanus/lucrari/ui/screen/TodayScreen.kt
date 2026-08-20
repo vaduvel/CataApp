@@ -51,6 +51,7 @@ import com.emanus.lucrari.ui.component.BrandEmptyState
 import com.emanus.lucrari.ui.component.BrandPageHeader
 import com.emanus.lucrari.ui.component.BrandProgress
 import com.emanus.lucrari.ui.component.color
+import com.emanus.lucrari.ui.component.localizedStageLabel
 import com.emanus.lucrari.ui.theme.Dimens
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -215,7 +216,7 @@ private fun TodayCard(row: JobToday, date: LocalDate, onOpen: () -> Unit, onLog:
 			val next = row.nextStage
 			if (!next.isNullOrBlank()) {
 				Text(
-					text = stringResource(R.string.today_next, next),
+					text = stringResource(R.string.today_next, localizedStageLabel(next)),
 					style = MaterialTheme.typography.bodySmall,
 				)
 			}

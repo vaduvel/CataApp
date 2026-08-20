@@ -1,6 +1,7 @@
 package com.emanus.lucrari
 
 import android.app.Application
+import android.content.Context
 import com.emanus.lucrari.data.AppDb
 import com.emanus.lucrari.data.AppPrefs
 import com.emanus.lucrari.data.repo.BackupRepo
@@ -21,6 +22,9 @@ import kotlinx.coroutines.launch
  * cât aplicația. Fără injecție de dependențe, nu merită la dimensiunea asta.
  */
 class App : Application() {
+	override fun attachBaseContext(base: Context) {
+		super.attachBaseContext(AppLocale.wrap(base))
+	}
 
 	val db: AppDb by lazy { AppDb.build(this) }
 	val repo: JobRepo by lazy { JobRepo(db) }

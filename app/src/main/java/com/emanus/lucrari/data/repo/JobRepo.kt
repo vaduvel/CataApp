@@ -118,6 +118,7 @@ class JobRepo(private val db: AppDb) {
 		address: String,
 		title: String,
 		type: String?,
+		additionalTypes: List<String> = emptyList(),
 		estDays: Int?,
 	): String {
 		val name = clientName.trim()
@@ -126,18 +127,19 @@ class JobRepo(private val db: AppDb) {
 		val parts = address.split(",", limit = 2)
 		val street = parts.getOrNull(0)?.trim()?.takeIf { it.isNotEmpty() }
 		val city = parts.getOrNull(1)?.trim()?.takeIf { it.isNotEmpty() }
+		val selectedTypes = listOfNotNull(type) + additionalTypes
 
 		val job = Job(
 			clientId = client.id,
 			title = title.trim(),
 			street = street,
 			city = city,
-			type = type,
+			type = Templates.combineTypes(selectedTypes),
 			estDays = estDays,
 		)
 		db.jobs().upsert(job)
 
-		val stageNames = Templates.stagesFor(type)
+		val stageNames = selectedTypes.flatMap(Templates::stagesFor).distinct()
 		if (stageNames.isNotEmpty()) {
 			db.stages().upsertAll(
 				stageNames.mapIndexed { index, stageName ->

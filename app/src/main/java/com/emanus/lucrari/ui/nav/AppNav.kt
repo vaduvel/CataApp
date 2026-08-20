@@ -38,6 +38,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.emanus.lucrari.R
+import com.emanus.lucrari.AppLanguage
 import com.emanus.lucrari.ui.screen.CalendarScreen
 import com.emanus.lucrari.ui.screen.ClientsScreen
 import com.emanus.lucrari.ui.screen.DescrizioneScreen
@@ -68,7 +69,10 @@ const val ROUTE_PHOTOS = "photos"
 const val ROUTE_CALENDAR = "calendar"
 
 @Composable
-fun AppRoot() {
+fun AppRoot(
+	language: AppLanguage,
+	onLanguageChange: (AppLanguage) -> Unit,
+) {
 	val navController = rememberNavController()
 	val backStackEntry by navController.currentBackStackEntryAsState()
 	val route = backStackEntry?.destination?.route
@@ -147,6 +151,8 @@ fun AppRoot() {
 			}
 			composable(Tab.MORE.route) {
 				MoreScreen(
+					language = language,
+					onLanguageChange = onLanguageChange,
 					onOpenCalendar = { navController.navigate(ROUTE_CALENDAR) },
 					onOpenClients = { navController.navigate(ROUTE_CLIENTS) },
 					onOpenPhotos = { navController.navigate(ROUTE_PHOTOS) },

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!-- Limba aplicației -->
+	<string name="language_title">Limbă</string>
+	<string name="language_hint">Alege limba aplicației</string>
+	<string name="language_ro">Română</string>
+	<string name="language_it">Italiano</string>
+	<string name="new_job_templates_hint">Poți alege mai multe. Etapele lor se combină.</string>
+
+	<!-- Șabloane de lucrări; valorile canonice rămân stabile în baza de date. -->
+	<string name="template_baie_completa">Baie completă</string>
+	<string name="template_tencuiala">Tencuială</string>
+	<string name="template_gresie_pavaj">Gresie / pavaj</string>
+	<string name="template_rigips">Rigips</string>
+	<string name="template_zugraveala">Zugrăveală</string>
+	<string name="template_sapa">Șapă</string>
+	<string name="template_termosistem">Termosistem</string>
+	<string name="template_gard_zid">Gard / zid</string>
+	<string name="template_mansarda">Mansardă</string>
+	<string name="template_reparatii_diverse">Reparații diverse</string>
+
+	<!-- Etapele generate de șabloane. -->
+	<string name="stage_demolare">Demolare</string>
+	<string name="stage_trasee_instalatii">Trasee instalații</string>
+	<string name="stage_impermeabilizare">Impermeabilizare</string>
+	<string name="stage_gresie_faianta">Gresie / faianță</string>
+	<string name="stage_sanitare">Sanitare</string>
+	<string name="stage_silicon_finisaje">Silicon / finisaje</string>
+	<string name="stage_curatenie">Curățenie</string>
+	<string name="stage_pregatire_pereti">Pregătire pereți</string>
+	<string name="stage_coltare_plase">Colțare / plase</string>
+	<string name="stage_tencuiala">Tencuială</string>
+	<string name="stage_glet">Glet</string>
+	<string name="stage_slefuit">Șlefuit</string>
+	<string name="stage_pregatire_suport">Pregătire suport</string>
+	<string name="stage_trasare">Trasare</string>
+	<string name="stage_montaj">Montaj</string>
+	<string name="stage_chituit">Chituit</string>
+	<string name="stage_plinte">Plinte</string>
+	<string name="stage_structura">Structură</string>
+	<string name="stage_placare">Placare</string>
+	<string name="stage_banda_masa">Bandă / masă</string>
+	<string name="stage_protejare">Protejare</string>
+	<string name="stage_amorsa">Amorsă</string>
+	<string name="stage_strat_1">Strat 1</string>
+	<string name="stage_strat_2">Strat 2</string>
+	<string name="stage_retusuri">Retușuri</string>
+	<string name="stage_curatare_suport">Curățare suport</string>
+	<string name="stage_nivele">Nivele</string>
+	<string name="stage_turnare">Turnare</string>
+	<string name="stage_uscare_verificare">Uscare / verificare</string>
+	<string name="stage_schela">Schelă</string>
+	<string name="stage_lipit_placi">Lipit plăci</string>
+	<string name="stage_dibluit">Dibluit</string>
+	<string name="stage_plasa_masa">Plasă / masă</string>
+	<string name="stage_decorativ">Decorativ</string>
+	<string name="stage_fundatie">Fundație</string>
+	<string name="stage_zidarie">Zidărie</string>
+	<string name="stage_rostuit_finisaj">Rostuit / finisaj</string>
+	<string name="stage_izolatie">Izolație</string>
+	<string name="stage_bariera_vapori">Barieră vapori</string>
+	<string name="stage_finisaje">Finisaje</string>
+	<string name="stage_de_vazut">De văzut</string>
+	<string name="stage_de_reparat">De reparat</string>
+	<string name="stage_verificare_finala">Verificare finală</string>
+</resources>

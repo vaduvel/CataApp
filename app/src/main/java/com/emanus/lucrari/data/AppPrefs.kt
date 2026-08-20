@@ -20,8 +20,18 @@ class AppPrefs(context: Context) {
 			prefs.edit().putBoolean(KEY_DEMO_SEEDED, value).apply()
 		}
 
+	/** Limba aleasă în aplicație, independentă de limba telefonului. */
+	var languageCode: String
+		get() = prefs.getString(KEY_LANGUAGE, DEFAULT_LANGUAGE).orEmpty()
+		set(value) {
+			// Schimbarea recreează activitatea imediat; commit garantează că noul context o vede.
+			prefs.edit().putString(KEY_LANGUAGE, value).commit()
+		}
+
 	private companion object {
 		const val NAME = "lucrari"
 		const val KEY_DEMO_SEEDED = "demo_seeded"
+		const val KEY_LANGUAGE = "language"
+		const val DEFAULT_LANGUAGE = "it"
 	}
 }

@@ -6,6 +6,7 @@ package com.emanus.lucrari.domain
  * fără să se actualizeze și dicționarul.
  */
 object Templates {
+	private const val TYPE_SEPARATOR = " + "
 
 	val all: Map<String, List<String>> = linkedMapOf(
 		"Baie completă" to listOf(
@@ -80,5 +81,20 @@ object Templates {
 
 	val names: List<String> = all.keys.toList()
 
-	fun stagesFor(type: String?): List<String> = all[type].orEmpty()
+	/** Un singur câmp Room păstrează toate șabloanele alese, fără schimbarea schemei. */
+	fun combineTypes(types: List<String>): String? = types
+		.filter(all::containsKey)
+		.distinct()
+		.joinToString(TYPE_SEPARATOR)
+		.ifBlank { null }
+
+	fun typesFor(value: String?): List<String> = value
+		?.split(TYPE_SEPARATOR)
+		.orEmpty()
+		.filter(all::containsKey)
+		.distinct()
+
+	fun stagesFor(type: String?): List<String> = typesFor(type)
+		.flatMap { name -> all.getValue(name) }
+		.distinct()
 }

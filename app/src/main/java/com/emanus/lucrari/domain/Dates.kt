@@ -10,11 +10,8 @@ import java.util.Locale
  */
 object Dates {
 
-	private val romanian: Locale = Locale.forLanguageTag("ro")
 	private val dayMonthFormat = DateTimeFormatter.ofPattern("dd/MM", Locale.ITALY)
 	private val fullFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ITALY)
-	private val longDayFormat = DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", romanian)
-	private val monthYearFormat = DateTimeFormatter.ofPattern("MMMM yyyy", romanian)
 
 	fun dayMonth(date: LocalDate): String = date.format(dayMonthFormat)
 
@@ -22,11 +19,13 @@ object Dates {
 
 	/** Titlul ecranului Azi: Marti, 18 august 2026, cu majusculă la început. */
 	fun longDay(date: LocalDate): String =
-		date.format(longDayFormat).replaceFirstChar { it.uppercase() }
+		date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.getDefault()))
+			.replaceFirstChar { it.uppercase() }
 
 	/** Capul calendarului lunar: August 2026. */
 	fun monthYear(date: LocalDate): String =
-		date.format(monthYearFormat).replaceFirstChar { it.uppercase() }
+		date.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault()))
+			.replaceFirstChar { it.uppercase() }
 
 	/** Orele sunt opționale și se scriu scurt: 7, 7,5. */
 	fun hours(value: Double): String {
