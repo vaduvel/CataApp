@@ -7,11 +7,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.emanus.lucrari.data.AppDb
 import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
+import com.emanus.lucrari.data.JobStatus
 import com.emanus.lucrari.domain.Seed
+import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -88,5 +91,60 @@ class DbTest {
 
 		assertTrue(db.jobs().observeAll().first().isEmpty())
 		assertTrue(db.stages().observeByJob(job.id).first().isEmpty())
+	}
+
+	/**
+	 * M8: lucrarea programată ajunge pe ecranul Azi în ziua în care ar trebui să înceapă.
+	 * Nu mai devreme, ca să nu încarce ziua de azi cu ce e săptămâna viitoare, dar nici nu
+	 * dispare dacă ziua a trecut și tot n-a început-o.
+	 */
+	@Test
+	fun ecranul_azi_ia_lucrarea_programata_din_ziua_de_inceput() = runBlocking {
+		val client = Client(name = "Test")
+		db.clients().upsert(client)
+		val azi = LocalDate.of(2026, 8, 21)
+
+		db.jobs().upsert(
+			Job(
+				clientId = client.id,
+				title = "Incepe azi",
+				status = JobStatus.PROGRAMAT,
+				plannedStart = azi,
+			),
+		)
+		db.jobs().upsert(
+			Job(
+				clientId = client.id,
+				title = "A ramas in urma",
+				status = JobStatus.PROGRAMAT,
+				plannedStart = azi.minusDays(3),
+			),
+		)
+		db.jobs().upsert(
+			Job(
+				clientId = client.id,
+				title = "Abia peste doua zile",
+				status = JobStatus.PROGRAMAT,
+				plannedStart = azi.plusDays(2),
+			),
+		)
+		db.jobs().upsert(
+			Job(clientId = client.id, title = "Fara data", status = JobStatus.PROGRAMAT),
+		)
+		db.jobs().upsert(
+			Job(clientId = client.id, title = "In lucru", status = JobStatus.IN_LUCRU),
+		)
+
+		val titluri = db.jobs()
+			.observeToday(azi, listOf(JobStatus.IN_LUCRU), JobStatus.PROGRAMAT)
+			.first()
+			.map { row -> row.job.title }
+
+		assertEquals(3, titluri.size)
+		assertTrue(titluri.contains("Incepe azi"))
+		assertTrue(titluri.contains("A ramas in urma"))
+		assertTrue(titluri.contains("In lucru"))
+		assertFalse(titluri.contains("Abia peste doua zile"))
+		assertFalse(titluri.contains("Fara data"))
 	}
 }
