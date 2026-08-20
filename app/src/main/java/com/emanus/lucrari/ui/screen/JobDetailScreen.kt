@@ -82,6 +82,7 @@ import com.emanus.lucrari.domain.Measures
 import com.emanus.lucrari.domain.Money
 import com.emanus.lucrari.domain.Progress
 import com.emanus.lucrari.domain.Rules
+import com.emanus.lucrari.domain.Schedule
 import com.emanus.lucrari.domain.Templates
 import com.emanus.lucrari.ui.component.DaySheet
 import com.emanus.lucrari.ui.component.ExtraSheet
@@ -421,6 +422,23 @@ fun JobDetailScreen(
 							)
 							if (where.isNotEmpty()) {
 								Text(text = where, style = MaterialTheme.typography.bodyLarge)
+							}
+							val plannedStart = job.plannedStart
+							if (plannedStart != null) {
+								val plannedEnd = Schedule.endDate(plannedStart, job.estDays)
+								Text(
+									text = if (plannedEnd == plannedStart) {
+										stringResource(R.string.jobs_planned, Dates.dayMonth(plannedStart))
+									} else {
+										stringResource(
+											R.string.jobs_planned_period,
+											Dates.dayMonth(plannedStart),
+											Dates.dayMonth(plannedEnd),
+										)
+									},
+									style = MaterialTheme.typography.bodyMedium,
+									color = MaterialTheme.colorScheme.onSurfaceVariant,
+								)
 							}
 							if (stages.isNotEmpty()) {
 								LinearProgressIndicator(
