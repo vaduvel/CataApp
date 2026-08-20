@@ -87,7 +87,7 @@ veche și istoriile diverg — exact ce s-a întâmplat când commit-ul iconițe
 
 ## 3. Starea exactă la predare
 
-- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `b31a71d`
+- **Branch:** `main`. **HEAD de cod la actualizarea acestui fișier:** `b03f9cd`
 - **Versiune:** `versionName = "1.0.0"`, `versionCode = 11`
 - **Teste:** **88 unitare** + **9 instrumentate**, verzi pe emulator și pe telefonul fizic
 - **Schema Room:** v1, `app/schemas/com.emanus.lucrari.data.AppDb/1.json`, hash `9a2846d7ed22222385ac20bef74419e7` — **neschimbată din M1** și așa trebuie să rămână (§5)
@@ -113,8 +113,7 @@ Runda restantă, iconița și regresia găsită manual au fost verificate cap-co
 | `de94e9bc69d3212e5cf7eeffc5841156068f48fe` | iconița aplicației | build + lint verzi; 5 densități și adaptive icon corecte; verificată vizual în sertarul Samsung |
 | `6bd2b8d605cfd8c5388e22f60ef9b4d8c55586bb` | păstrează lucrarea restantă în `PROGRAMAT` până la prima zi trecută | regresie găsită și reparată în P0; test unitar + scenariu manual verzi |
 
-P1 și P2 sunt finalizate. Au rămas numai actualizarea paginii Notion și finisajele opționale
-din P3/P4.
+P1–P3 sunt finalizate. Au rămas numai actualizarea paginii Notion și M9, opțional.
 
 ### Livrarea 1.0.0 din 20 august 2026
 
@@ -123,6 +122,8 @@ din P3/P4.
 | `0b9038e` | afișează intervalul programat în detaliul lucrării | build + test manual pe emulator verzi |
 | `1148f7e` | ridică versiunea la 1.0.0 / code 11 | confirmată prin `dumpsys package` pe Samsung |
 | `b31a71d` | șterge datele demo dintr-o apăsare și afișează versiunea | test manual pe emulator și Samsung; 9/9 instrumentate pe fiecare |
+| `12f06e4` | aplică design system-ul derivat din iconiță | paletă M3, tipografie, forme și statusuri verificate pe emulator și Samsung |
+| `b03f9cd` | unifică cele 10 formulare și elimină valorile `dp`/cardurile generice din ecrane | 88 unitare + 9 instrumentate pe fiecare dispozitiv; lint, offline și schema v1 verzi |
 
 După instalarea finală pe Samsung s-a rulat `pm clear`, demo-ul a fost șters din butonul din
 „Mai mult”, iar aplicația a fost omorâtă și redeschisă. Interogarea copiei SQLite a confirmat:

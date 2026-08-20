@@ -102,8 +102,8 @@ Pentru orice milestone: unit tests + assemble + lint + scriptul offline trec; cu
 - **88 de teste unitare** și **9 instrumentate** verzi pe fiecare dispozitiv; `assembleDebug`, `lintDebug`, scriptul offline și verificarea schemei trec.
 - **M7:** poze locale prin `FileProvider`, backup ZIP zilnic cu rotație 7, export/import SAF cu „Înlocuiește tot” / „Adaugă ce lipsește”, memento-uri la 19:00 cu deduplicare. Scenariul export → ștergerea datelor → import verificat cu modul avion activ.
 - **M8:** dată de început și interval la creare, statusul `PROGRAMAT` pentru lucrările din viitor, calendarul lunar de lucru și memento-urile de început (19:00 pentru „peste 3 zile” și „mâine”, 07:30 pentru „azi”). Fără migrare de schemă.
-- **Runda de finisaj:** inseturile de sistem nu se mai aplică de două ori; memento-urile pleacă odată cu lucrarea ștearsă.
+- **Runda de finisaj:** inseturile de sistem nu se mai aplică de două ori; memento-urile pleacă odată cu lucrarea ștearsă; toate cele 10 formulare folosesc `BrandFormSheet`, iar ecranele nu mai conțin carduri generice sau dimensiuni `dp` scrise direct.
 - **Versiunea curentă:** `1.0.0`, versionCode 11, instalată pentru livrare pe telefon.
 - **Tema din design system-ul aprobat este aplicată:** paletă M3, scara de text, colțurile, tokenii de spațiere și chip-urile de status cu pictogramă.
-- **Livrare:** intervalul este afișat în detaliul lucrării; telefonul nu mai conține date de test sau demo; butonul de ștergere demo și versiunea sunt în „Mai mult”; iconița a fost verificată în sertarul Samsung. Au rămas doar refactorizarea vizuală și M9, ambele opționale.
+- **Livrare:** intervalul este afișat în detaliul lucrării; telefonul nu mai conține date de test sau demo; butonul de ștergere demo și versiunea sunt în „Mai mult”; iconița a fost verificată în sertarul Samsung; refactorizarea vizuală este finalizată. A rămas doar M9, opțional.
 - **M9 — opțional, nu blochează livrarea:** statistici simple, widget „Am lucrat azi la…”, „spațiu folosit”, stările „camera nu e disponibilă” și „backup eșuat”, zile lucrate per etapă (cere migrare de schemă) și câmpul `work` în rândul măsurătorii din descriere.
