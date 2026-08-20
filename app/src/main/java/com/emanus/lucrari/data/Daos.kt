@@ -66,6 +66,9 @@ interface ClientDao {
 	@Query("SELECT * FROM clients WHERE name = :name COLLATE NOCASE LIMIT 1")
 	suspend fun byName(name: String): Client?
 
+	@Query("SELECT * FROM clients ORDER BY createdAt")
+	suspend fun allOnce(): List<Client>
+
 	@Query("SELECT COUNT(*) FROM clients")
 	suspend fun count(): Int
 }
@@ -89,6 +92,9 @@ interface JobDao {
 
 	@Query("SELECT * FROM jobs WHERE clientId = :clientId ORDER BY createdAt DESC")
 	fun observeByClient(clientId: String): Flow<List<Job>>
+
+	@Query("SELECT * FROM jobs WHERE clientId = :clientId ORDER BY createdAt DESC")
+	suspend fun byClientOnce(clientId: String): List<Job>
 
 	@Query(
 		"""

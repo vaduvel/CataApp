@@ -2,6 +2,7 @@ package com.emanus.lucrari.ui.screen
 
 import android.Manifest
 import android.content.ClipData
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -61,6 +62,7 @@ import com.emanus.lucrari.R
 import com.emanus.lucrari.data.Reminder
 import com.emanus.lucrari.data.repo.ImportMode
 import com.emanus.lucrari.data.repo.ImportResult
+import com.emanus.lucrari.domain.Seed
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -70,6 +72,7 @@ import kotlinx.coroutines.launch
 
 class MoreViewModel(app: App) : ViewModel() {
 	private val backup = app.backupRepo
+	private val db = app.db
 	private val remindersRepo = app.reminderRepo
 	val reminders: StateFlow<List<Reminder>> = remindersRepo.open()
 		.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -107,6 +110,14 @@ class MoreViewModel(app: App) : ViewModel() {
 		viewModelScope.launch { remindersRepo.toggle(reminder) }
 	}
 
+	fun deleteDemo(onDone: (Boolean) -> Unit) {
+		viewModelScope.launch {
+			busy.value = true
+			onDone(Seed.delete(db))
+			busy.value = false
+		}
+	}
+
 	companion object {
 		val factory: ViewModelProvider.Factory = viewModelFactory {
 			initializer {
@@ -140,6 +151,9 @@ fun MoreScreen(
 	val exportDone = stringResource(R.string.backup_export_done)
 	val importDone = stringResource(R.string.backup_import_done)
 	val backupFailed = stringResource(R.string.backup_failed)
+	val demoDeleted = stringResource(R.string.demo_deleted)
+	val demoAlreadyDeleted = stringResource(R.string.demo_already_deleted)
+	val appVersion = remember(context) { installedVersionName(context) }
 
 	val exportLauncher = rememberLauncherForActivityResult(
 		ActivityResultContracts.CreateDocument("application/zip"),
@@ -193,6 +207,30 @@ fun MoreScreen(
 					onClick = onOpenPhotos,
 					icon = { Icon(Icons.Outlined.PhotoCamera, contentDescription = null) },
 				)
+			}
+			item {
+				Card(modifier = Modifier.fillMaxWidth()) {
+					Column(
+						modifier = Modifier.padding(16.dp),
+						verticalArrangement = Arrangement.spacedBy(10.dp),
+					) {
+						Text(stringResource(R.string.demo_title), style = MaterialTheme.typography.titleMedium)
+						Text(stringResource(R.string.demo_hint))
+						OutlinedButton(
+							onClick = {
+								vm.deleteDemo { deleted ->
+									scope.launch {
+										snackbar.showSnackbar(
+											if (deleted) demoDeleted else demoAlreadyDeleted,
+										)
+									}
+								}
+							},
+							enabled = !busy,
+							modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+						) { Text(stringResource(R.string.demo_delete)) }
+					}
+				}
 			}
 			item {
 				Card(modifier = Modifier.fillMaxWidth()) {
@@ -278,6 +316,12 @@ fun MoreScreen(
 					}
 				}
 			}
+			item {
+				Text(
+					text = stringResource(R.string.app_version, appVersion),
+					style = MaterialTheme.typography.bodySmall,
+				)
+			}
 		}
 	}
 
@@ -316,6 +360,19 @@ fun MoreScreen(
 			},
 		)
 	}
+}
+
+@Suppress("DEPRECATION")
+private fun installedVersionName(context: Context): String {
+	val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+		context.packageManager.getPackageInfo(
+			context.packageName,
+			PackageManager.PackageInfoFlags.of(0),
+		)
+	} else {
+		context.packageManager.getPackageInfo(context.packageName, 0)
+	}
+	return info.versionName.orEmpty()
 }
 
 @Composable

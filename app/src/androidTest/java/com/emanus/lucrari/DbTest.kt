@@ -8,6 +8,7 @@ import com.emanus.lucrari.data.AppDb
 import com.emanus.lucrari.data.Client
 import com.emanus.lucrari.data.Job
 import com.emanus.lucrari.data.JobStatus
+import com.emanus.lucrari.data.Reminder
 import com.emanus.lucrari.domain.Seed
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
@@ -66,6 +67,43 @@ class DbTest {
 
 		assertEquals(1, db.clients().count())
 		assertEquals(1, db.jobs().observeAll().first().size)
+	}
+
+	@Test
+	fun stergerea_demo_ului_nu_atinge_datele_utilizatorului() = runBlocking {
+		Seed.ensure(db)
+		val userClient = Client(name = "Luigi")
+		db.clients().upsert(userClient)
+		db.jobs().upsert(Job(clientId = userClient.id, title = "Bucatarie"))
+		db.reminders().upsert(
+			Reminder(jobId = Seed.DEMO_JOB_ID, text = "Demo", dueAt = 1L),
+		)
+
+		assertTrue(Seed.delete(db))
+		assertFalse(Seed.delete(db))
+
+		// Upgrade peste versiunile în care seed-ul folosea UUID-uri aleatoare.
+		val legacyClient = Client(
+			name = "Mario",
+			phone = "+39 333 000 0000",
+			note = "Cheia la vecin, scara B",
+		)
+		db.clients().upsert(legacyClient)
+		db.jobs().upsert(
+			Job(
+				clientId = legacyClient.id,
+				title = "Rifacimento bagno",
+				street = "Via 23",
+				city = "Milano",
+				type = "Baie completă",
+				agreedPriceCents = 240_000L,
+			),
+		)
+		assertTrue(Seed.delete(db))
+
+		assertEquals(listOf("Luigi"), db.clients().allOnce().map { it.name })
+		assertEquals(listOf("Bucatarie"), db.jobs().observeAll().first().map { it.title })
+		assertTrue(db.reminders().observeByJob(Seed.DEMO_JOB_ID).first().isEmpty())
 	}
 
 	@Test

@@ -16,6 +16,12 @@
 	<string name="screen_money_title">Bani</string>
 	<string name="screen_more_title">Mai mult</string>
 	<string name="screen_more_subtitle">Șabloane de etape, backup, export și import: se implementează în M7.</string>
+	<string name="demo_title">Date demo</string>
+	<string name="demo_hint">Șterge exemplul Mario și lucrarea Rifacimento bagno. Datele tale rămân.</string>
+	<string name="demo_delete">Șterge datele demo</string>
+	<string name="demo_deleted">Datele demo au fost șterse.</string>
+	<string name="demo_already_deleted">Datele demo nu mai sunt în aplicație.</string>
+	<string name="app_version">Versiunea %1$s</string>
 
 	<!-- Statusuri -->
 	<string name="status_ofertat">Ofertat</string>

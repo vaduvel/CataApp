@@ -1,5 +1,6 @@
 package com.emanus.lucrari.domain
 
+import androidx.room.withTransaction
 import com.emanus.lucrari.data.AppDb
 import com.emanus.lucrari.data.Billing
 import com.emanus.lucrari.data.Client
@@ -25,6 +26,8 @@ import java.time.LocalDate
  * 2.400 € la corp, extra 180 €, acont facturat și încasat 800 €, două zile lucrate.
  */
 object Seed {
+	const val DEMO_CLIENT_ID = "seed-client-mario-v1"
+	const val DEMO_JOB_ID = "seed-job-rifacimento-bagno-v1"
 
 	/**
 	 * Datele demo intră o singură dată, la prima pornire după instalare. Regula stă
@@ -40,12 +43,14 @@ object Seed {
 		if (!shouldSeed(alreadySeeded, db.clients().count())) return false
 
 		val client = Client(
+			id = DEMO_CLIENT_ID,
 			name = "Mario",
 			phone = "+39 333 000 0000",
 			note = "Cheia la vecin, scara B",
 		)
 
 		val job = Job(
+			id = DEMO_JOB_ID,
 			clientId = client.id,
 			title = "Rifacimento bagno",
 			street = "Via 23",
@@ -137,4 +142,52 @@ object Seed {
 
 		return true
 	}
+
+	/**
+	 * Șterge numai exemplul livrat cu aplicația. Identificatorii stabili acoperă
+	 * instalările noi; amprenta strictă acoperă actualizarea peste versiunile în care
+	 * seed-ul primea UUID-uri aleatoare. Orice altă lucrare a clientului rămâne intactă.
+	 */
+	suspend fun delete(db: AppDb): Boolean = db.withTransaction {
+		val demo = findDemo(db) ?: return@withTransaction false
+		val (client, job) = demo
+
+		if (job != null) {
+			db.reminders().deleteByJob(job.id)
+			db.jobs().delete(job)
+		}
+		if (db.jobs().byClientOnce(client.id).isEmpty()) {
+			db.clients().delete(client)
+		}
+		true
+	}
+
+	private suspend fun findDemo(db: AppDb): Pair<Client, Job?>? {
+		val stableClient = db.clients().byId(DEMO_CLIENT_ID)
+		if (stableClient != null) {
+			val stableJob = db.jobs().byId(DEMO_JOB_ID)
+			if (stableJob != null || db.jobs().byClientOnce(stableClient.id).isEmpty()) {
+				return stableClient to stableJob
+			}
+		}
+
+		for (client in db.clients().allOnce().filter(::isLegacyDemoClient)) {
+			val jobs = db.jobs().byClientOnce(client.id)
+			val demoJob = jobs.singleOrNull(::isLegacyDemoJob)
+			if (demoJob != null || jobs.isEmpty()) return client to demoJob
+		}
+		return null
+	}
+
+	private fun isLegacyDemoClient(client: Client): Boolean =
+		client.name == "Mario" &&
+			client.phone == "+39 333 000 0000" &&
+			client.note == "Cheia la vecin, scara B"
+
+	private fun isLegacyDemoJob(job: Job): Boolean =
+		job.title == "Rifacimento bagno" &&
+			job.street == "Via 23" &&
+			job.city == "Milano" &&
+			job.type == "Baie completă" &&
+			job.agreedPriceCents == 240_000L
 }
