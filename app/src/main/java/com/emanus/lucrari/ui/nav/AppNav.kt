@@ -108,6 +108,7 @@ fun AppRoot() {
 			}
 			composable(Tab.MORE.route) {
 				MoreScreen(
+					onOpenCalendar = { navController.navigate(ROUTE_CALENDAR) },
 					onOpenClients = { navController.navigate(ROUTE_CLIENTS) },
 					onOpenPhotos = { navController.navigate(ROUTE_PHOTOS) },
 				)

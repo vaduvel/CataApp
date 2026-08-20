@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
@@ -117,7 +118,11 @@ class MoreViewModel(app: App) : ViewModel() {
 }
 
 @Composable
-fun MoreScreen(onOpenClients: () -> Unit, onOpenPhotos: () -> Unit) {
+fun MoreScreen(
+	onOpenCalendar: () -> Unit,
+	onOpenClients: () -> Unit,
+	onOpenPhotos: () -> Unit,
+) {
 	val vm: MoreViewModel = viewModel(factory = MoreViewModel.factory)
 	val reminders by vm.reminders.collectAsState()
 	val busy by vm.busy.collectAsState()
@@ -161,6 +166,16 @@ fun MoreScreen(onOpenClients: () -> Unit, onOpenPhotos: () -> Unit) {
 				Text(
 					text = stringResource(R.string.screen_more_title),
 					style = MaterialTheme.typography.headlineSmall,
+				)
+			}
+			// Calendarul are si o iconita pe ecranul Lucrari, dar acolo e usor de ratat.
+			// Randul de aici e singurul loc in care se vede scris ce face.
+			item {
+				MoreLinkCard(
+					title = stringResource(R.string.calendar_title),
+					hint = stringResource(R.string.more_calendar_hint),
+					onClick = onOpenCalendar,
+					icon = { Icon(Icons.Outlined.CalendarMonth, contentDescription = null) },
 				)
 			}
 			item {

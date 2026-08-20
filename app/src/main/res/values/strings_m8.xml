@@ -21,6 +21,7 @@
 	<string name="calendar_hint">Atinge o zi ca să vezi ce e programat.</string>
 	<string name="calendar_day_empty">Nimic programat în ziua asta.</string>
 	<string name="calendar_month_count">Programate luna asta: %1$d</string>
+	<string name="more_calendar_hint">Ce lucrare e programată și în ce zi.</string>
 	<string-array name="weekday_initials">
 		<item>L</item>
 		<item>Ma</item>
